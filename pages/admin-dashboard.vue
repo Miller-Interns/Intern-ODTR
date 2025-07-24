@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import type { TimeLog } from "~/types/time-logs.ts";
 
 const pendingLogs = ref<TimeLog[]>([
@@ -75,7 +74,7 @@ function approveAll() {
           v-else
           class="text-center py-10 px-4 bg-white rounded-lg border border-gray-200"
         >
-          <p class="text-gray-500">No pending approvals. Great job!</p>
+          <p class="text-gray-500">No pending approvals.</p>
         </div>
       </main>
     </div>

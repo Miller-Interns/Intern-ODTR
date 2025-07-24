@@ -1,4 +1,4 @@
-import type { Intern } from "~/types/intern";
+import type { Intern } from "~/types/intern.ts";
 
 export type TimeLog = {
   id: string;
