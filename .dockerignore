@@ -1,0 +1,17 @@
+# Ignore folders that are generated or not needed in the container
+.nuxt
+node_modules
+dist
+.output
+
+# Ignore local config and environment files
+.env
+.DS_Store
+
+# Ignore Docker files
+Dockerfile
+.dockerignore
+
+# Ignore Git files
+.git
+.gitignore

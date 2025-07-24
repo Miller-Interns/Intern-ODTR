@@ -1,13 +1,21 @@
-version: '3.1'
+version: '3.8'
 services:
+  # The PostgreSQL Database Service
   db:
     image: postgres:latest
+    restart: always
     ports:
-      - '5432:5432'
+      # --- THIS IS THE CORRECTED PORT MAPPING ---
+      # Maps port 5440 on your PC to port 5432 in the container.
+      - '5440:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # The database admin tool
   admin:
     image: adminer
     restart: always
@@ -15,3 +23,20 @@ services:
       - db
     ports:
       - 8080:8080
+
+  # Your Nuxt Application Service
+  app:
+    build: .
+    restart: always
+    ports:
+      # The app port remains at 3000
+      - "3000:3000"
+    environment:
+      - POSTGRES_CONNECTION_URL=postgresql://postgres:password@db:5432/db
+      - JWT_SECRET=bQeThWmZq4t7w!z$$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s6v9y$$B&E(
+    depends_on:
+      - db
+
+# Defines the volume to persist database data
+volumes:
+  db_data:
