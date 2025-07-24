@@ -2,6 +2,7 @@ import { PrismaClient } from '../app/generated/prisma/index.js'
 
 const prisma = new PrismaClient();
 
+// TODO: update password to the hashed version
 async function main() {
     await prisma.user.createMany({
         data: [
