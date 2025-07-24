@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+generator kysely {
+  provider           = "prisma-kysely"
+  previewFeatures    = ["multiSchema"]
+  output             = "../app/server/db"
+  fileName           = "types.d.ts"
+  bigIntTypeOverride = "bigint"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_CONNECTION_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String?  @db.VarChar(255)
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  Intern  Intern[]
+  TimeLog TimeLog[]
+
+  @@map("users")
+}
+
+model Batch {
+  id           String    @id @default(uuid())
+  batch_number String
+  start_date   DateTime  @default(now())
+  end_date     DateTime?
+  status       Boolean   @default(true)
+
+  Intern Intern[]
+
+  @@map("batches")
+}
+
+model Intern {
+  id                       String  @id @default(uuid())
+  user                     User    @relation(fields: [user_id], references: [id])
+  user_id                  String  @unique
+  batch                    Batch   @relation(fields: [batch_id], references: [id])
+  batch_id                 String
+  school                   String
+  course                   String
+  year                     String
+  contact_number           String
+  emergency_contact_person String
+  emergency_contact_number String
+  required_hours           Int
+  status                   Boolean
+
+  TimeLog TimeLog[]
+
+  @@map("interns")
+}
+
+model TimeLog {
+  id          String   @id @default(uuid())
+  intern      Intern   @relation(fields: [intern_id], references: [id])
+  intern_id   String
+  time_in     DateTime
+  time_out    DateTime
+  overtime    Int?
+  total_hours Int
+  remarks     String?
+  status      Boolean  @default(false)
+  user        User     @relation(fields: [admin_id], references: [id])
+  admin_id    String
+
+  @@map("time_logs")
+}
