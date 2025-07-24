@@ -10,28 +10,32 @@ async function main() {
 				id: '015084bc-bec3-4373-aec3-729fba0a825a',
                 email: 'alyssa.palencia@mllrdev.com',
                 name: 'Alyssa Palencia',
-				isAdmin: false,
+                password: 'mllrdev321',
+				isAdmin: true,
             },
             {
 				//Karl Zablan
 				id: '0908da60-40f8-4b20-948c-dca792a64860',
 				email: 'karl.zablan@mllrdev.com',
-				name: 'Karl Zablan',
-				isAdmin: false,
+                name: 'Karl Zablan',
+                password: 'mllrdev321',
+				isAdmin: true,
             },
             {
 				//Seth Cornelio
 				id: 'cef438de-359c-4802-97ca-66d74dd50cf1',
 				email: 'seth.cornelio@mllrdev.com',
-				name: 'Seth Cornelio',
+                name: 'Seth Cornelio',
+                password: 'mllrdev321',
 				isAdmin: true,
             },
             {
 				//Sheen Balatero
 				id: 'ada24d94-f49e-4af1-91f0-64056ad149eb',
 				email: 'sheen.balatero@mllrdev.com',
-				name: 'Sheen Balatero',
-				isAdmin: false,
+                name: 'Sheen Balatero',
+                password: 'mllrdev321',
+				isAdmin: true,
 			},
         ]
     })
