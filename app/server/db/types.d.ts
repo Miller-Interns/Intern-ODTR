@@ -7,9 +7,9 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 export type Batch = {
     id: string;
     batch_number: string;
-    start_date: Timestamp;
-    end_date: Timestamp;
-    status: boolean;
+    start_date: Generated<Timestamp>;
+    end_date: Timestamp | null;
+    status: Generated<boolean>;
 };
 export type Intern = {
     id: string;
@@ -32,7 +32,7 @@ export type TimeLog = {
     overtime: number | null;
     total_hours: number;
     remarks: string | null;
-    status: boolean;
+    status: Generated<boolean>;
     admin_id: string;
 };
 export type User = {
@@ -40,8 +40,9 @@ export type User = {
     email: string;
     name: string | null;
     password: string | null;
+    isAdmin: Generated<boolean>;
     createdAt: Generated<Timestamp>;
-    updatedAt: Timestamp;
+    updatedAt: Generated<Timestamp>;
 };
 export type DB = {
     batches: Batch;

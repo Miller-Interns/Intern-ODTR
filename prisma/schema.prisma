@@ -24,24 +24,25 @@ model User {
   email     String   @unique
   name      String?
   password  String?  @db.VarChar(255)
+  isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 
-  Intern Intern[]
+  Intern  Intern[]
   TimeLog TimeLog[]
 
   @@map("users")
 }
 
 model Batch {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   batch_number String
-  start_date   DateTime
-  end_date     DateTime
-  status       Boolean
+  start_date   DateTime  @default(now())
+  end_date     DateTime?
+  status       Boolean   @default(true)
 
   Intern Intern[]
-  
+
   @@map("batches")
 }
 
@@ -74,7 +75,7 @@ model TimeLog {
   overtime    Int?
   total_hours Int
   remarks     String?
-  status      Boolean
+  status      Boolean  @default(false)
   user        User     @relation(fields: [admin_id], references: [id])
   admin_id    String
 
