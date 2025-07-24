@@ -6,23 +6,77 @@ generator client {
   output   = "../app/generated/prisma"
 }
 
+generator kysely {
+  provider           = "prisma-kysely"
+  previewFeatures    = ["multiSchema"]
+  output             = "../app/server/db"
+  fileName           = "types.d.ts"
+  bigIntTypeOverride = "bigint"
+}
+
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_CONNECTION_URL")
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Intern Intern[]
+  TimeLog TimeLog[]
+
+  @@map("users")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model Batch {
+  id           String   @id @default(uuid())
+  batch_number String
+  start_date   DateTime
+  end_date     DateTime
+  status       Boolean
+
+  Intern Intern[]
+  
+  @@map("batches")
+}
+
+model Intern {
+  id                       String  @id @default(uuid())
+  user                     User    @relation(fields: [user_id], references: [id])
+  user_id                  String  @unique
+  batch                    Batch   @relation(fields: [batch_id], references: [id])
+  batch_id                 String
+  school                   String
+  course                   String
+  year                     String
+  contact_number           String
+  emergency_contact_person String
+  emergency_contact_number String
+  required_hours           Int
+  status                   Boolean
+
+  TimeLog TimeLog[]
+
+  @@map("interns")
+}
+
+model TimeLog {
+  id          String   @id @default(uuid())
+  intern      Intern   @relation(fields: [intern_id], references: [id])
+  intern_id   String
+  time_in     DateTime
+  time_out    DateTime
+  overtime    Int?
+  total_hours Int
+  remarks     String?
+  status      Boolean
+  user        User     @relation(fields: [admin_id], references: [id])
+  admin_id    String
+
+  @@map("time_logs")
 }
