@@ -18,13 +18,13 @@ export default defineEventHandler(async (event) => {
     if (!user || !user.password) { // Assuming your field is named 'hashed_password'
         // Note: We use the same generic error message to prevent "user enumeration,"
         // which is telling an attacker whether an email exists in the system.
-        throw createError({ statusCode: 401, message: 'Incorrect email or password' });
+        throw createError({ statusCode: 401, message: 'Incorrect email or password', statusMessage: 'Incorrect email or password' });
     }
 
     // 3. Verify the password (this code now only runs if user.hashed_password is a string)
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-        throw createError({ statusCode: 401, message: 'Incorrect email or password' });
+        throw createError({ statusCode: 401, message: 'Incorrect email or password', statusMessage: 'Incorrect email or password' });
     }
 
     // 4. Create JWT payload
@@ -34,14 +34,14 @@ export default defineEventHandler(async (event) => {
     };
 
     // 5. Sign the token
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1d' });
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '12h' });
 
     // 6. Set the cookie
     setCookie(event, 'auth_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 1,
+        maxAge: 60 * 60 * 12, // 12 hours
         path: '/',
     });
 

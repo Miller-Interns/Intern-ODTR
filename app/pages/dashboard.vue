@@ -12,11 +12,11 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const { user } = useAuth();
+const { user, clearUser } = useAuth();
 
 const handleLogout = async () => {
   await $fetch('/api/logout', { method: 'POST' });
-  user.value = null; // Clear the client-side state
+  clearUser(); // Use the function to clear the state
   await navigateTo('/login');
 };
 </script>
