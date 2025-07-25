@@ -14,10 +14,7 @@ export default defineEventHandler(async (event) => {
 
     // 1. Find the user by their email
     const user = await prisma.user.findUnique({ where: { email } });
-
-    // 2. **THE FIX IS HERE**
-    //    Check if the user exists AND if they have a password hash stored.
-    //    If either is false, the login attempt is invalid for this method.
+    // 2. Check if the user exists and has a password
     if (!user || !user.password) { // Assuming your field is named 'hashed_password'
         // Note: We use the same generic error message to prevent "user enumeration,"
         // which is telling an attacker whether an email exists in the system.
@@ -40,7 +37,7 @@ export default defineEventHandler(async (event) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '1d' });
 
     // 6. Set the cookie
-    setCookie(event, 'auth-token', token, {
+    setCookie(event, 'auth_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

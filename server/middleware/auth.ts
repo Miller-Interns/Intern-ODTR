@@ -1,22 +1,29 @@
+// server/middleware/auth.ts
 import jwt from 'jsonwebtoken';
 
 export default defineEventHandler((event) => {
-    const token = getCookie(event, 'auth-token');
-    const jwtSecret = process.env.JWT_SECRET;
+  // We are logging the path to see which requests this middleware runs for.
+  console.log(`[Server Middleware] Running for: ${event.path}`);
 
-    if (token && jwtSecret) {
-        try {
-            // Verify the token and decode the payload
-            const decoded = jwt.verify(token, jwtSecret);
-            // Attach the user payload to the event context
-            event.context.user = decoded;
-        } catch (error) {
-            // If token is invalid, clear it and proceed as an unauthenticated user
-            event.context.user = null;
-            // Optional: you could clear the invalid cookie here
-            // setCookie(event, 'auth-token', '', { maxAge: 0, path: '/' });
-        }
-    } else {
-        event.context.user = null;
+  const token = getCookie(event, 'auth_token'); // Make sure name is 'auth_token'
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (token && jwtSecret) {
+    console.log('[Server Middleware] Found auth_token cookie.');
+    try {
+      // Try to verify the token
+      const decoded = jwt.verify(token, jwtSecret);
+      // If successful, attach the user payload to the event.
+      event.context.user = decoded;
+      console.log('[Server Middleware] Token verified successfully. User context set:', event.context.user);
+    } catch (error: any) {
+      // If token is invalid (expired, wrong signature, etc.)
+      console.error('[Server Middleware] Token verification FAILED:', error.message);
+      event.context.user = null;
     }
+  } else {
+    // No token was found in the request.
+    console.log('[Server Middleware] No auth_token cookie found.');
+    event.context.user = null;
+  }
 });
