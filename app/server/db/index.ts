@@ -1,13 +1,15 @@
-import { Kysely, PostgresDialect } from 'kysely'
-import pg from 'pg'
-import type { DB } from './types'
+import { PrismaClient } from '../../generated/prisma'
 
-const config = useRuntimeConfig()
+const prismaClientSingleton = () => {
+  return new PrismaClient()
+}
 
-export const db = new Kysely<DB>({
-	dialect: new PostgresDialect({
-		pool: new pg.Pool({
-			connectionString: config.DATABASE_URL,
-		}),
-	}),
-})
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
+
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+
+export default prisma
+
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma

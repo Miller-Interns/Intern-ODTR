@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { TimeLog } from "~/types/time-logs.ts";
-import RemarksModal from "~/components/modal-remarks.vue";
+import type { TimeLogForUI } from "../pages/admin-dashboard.vue";
+import RemarksModal from "./modal-remarks.vue";
+import { ref } from 'vue'
 
 const isModalVisible = ref(false);
 const existingRemark = ref("Completed the initial setup of the project.");
@@ -10,7 +11,7 @@ function handleRemarksUpdate(newRemark: string) {
   existingRemark.value = newRemark; // Update the original data
 }
 
-const { log } = defineProps<{ log: TimeLog }>();
+const { log } = defineProps<{ log: TimeLogForUI }>();
 const emit = defineEmits(["approve"]);
 
 function formatTime(dateString: string): string {
@@ -53,16 +54,16 @@ function handleApprove() {
       <div class="flex justify-between mb-4">
         <div class="flex flex-col">
           <span class="text-sm text-gray-600 mb-1">Time In</span>
-          <span class="font-semibold text-gray-900">{{ log.timeIn }}</span>
+          <span class="font-semibold text-gray-900">{{ log.time_in }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-sm text-gray-600 mb-1">Time Out</span>
-          <span class="font-semibold text-gray-900">{{ log.timeOut }}</span>
+          <span class="font-semibold text-gray-900">{{ log.time_out }}</span>
         </div>
         <div class="flex flex-col">
           <span class="text-sm text-gray-600 mb-1">Total Hours</span>
           <span class="font-semibold text-gray-900">{{
-            calculateTotalHours(log.timeIn, log.timeOut).toFixed(2)
+            calculateTotalHours(log.time_in, log.time_out).toFixed(2)
           }}</span>
         </div>
       </div>
@@ -70,7 +71,7 @@ function handleApprove() {
       <span class="font-semibold text-gray-900">
         {{
           calculateOvertimeHours(
-            calculateTotalHours(log.timeIn, log.timeOut)
+            calculateTotalHours(log.time_in, log.time_out)
           ).toFixed(2)
         }}
       </span>
