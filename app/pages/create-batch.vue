@@ -9,7 +9,6 @@
           id="batchNumber"
           v-model.trim="batchNumber"
           type="text"
-          placeholder="e.g., FSD-2024-01"
           required
         />
       </div>
@@ -44,7 +43,7 @@
 
 <script setup lang="ts">
 
-import type { BatchApiResponse } from '../interfaces/batch-response';
+import type { Batch} from '~/server/db/types'
 
 definePageMeta({
   path: "/createBatch",
@@ -80,7 +79,7 @@ async function submitBatch() {
 
   try {
 
-    await $fetch<BatchApiResponse>('/api/batches', {
+    await $fetch<Batch>('/api/batches/Post-batch', {
       method: 'POST',
       body: {
         batch_number: batchNumber.value,

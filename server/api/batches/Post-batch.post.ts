@@ -1,5 +1,4 @@
 
-import { defineEventHandler, createError, setResponseStatus } from 'h3';
 import { prisma } from '~/server/db/db';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
