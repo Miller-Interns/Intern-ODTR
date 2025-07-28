@@ -24,15 +24,12 @@ export default defineEventHandler(async (event) => {
     return { id: user.id, email: user.email };
 
   } catch (error: any) {
-    // ----> ADD THIS LINE! <----
-    console.error("REGISTER API ERROR:", error); 
-    // This will show us the REAL problem in the terminal.
+    console.error("REGISTER API ERROR:", error);
 
     if (error.code === 'P2002') {
       throw createError({ statusCode: 409, message: 'Email already in use' });
     }
-    
-    // This is the generic error that the browser sees.
+
     throw createError({ statusCode: 500, message: 'An error occurred' });
   }
 });

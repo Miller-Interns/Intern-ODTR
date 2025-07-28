@@ -16,7 +16,7 @@ const { user, clearUser } = useAuth();
 
 const handleLogout = async () => {
   await $fetch('/api/logout', { method: 'POST' });
-  clearUser(); // Use the function to clear the state
+  clearUser();
   await navigateTo('/login');
 };
 </script>
@@ -27,6 +27,7 @@ const handleLogout = async () => {
   font-family: sans-serif;
   text-align: center;
 }
+
 .submit-button {
   display: inline-block;
   width: auto;
@@ -34,13 +35,14 @@ const handleLogout = async () => {
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  background-color: #EF4444; /* Red for logout */
+  background-color: #EF4444;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 24px;
 }
+
 .submit-button:hover {
   background-color: #DC2626;
 }

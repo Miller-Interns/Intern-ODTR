@@ -3,37 +3,43 @@
     <div class="login-card">
       <div class="logo-placeholder"></div>
       <div class="card-header">
-        <!-- Changed Text -->
         <h1>Create an Account</h1>
         <p>Join the MllrDev Intern DTR</p>
       </div>
 
-      <!-- Success and Error Messages -->
       <p v-if="successMsg" class="success-message">{{ successMsg }}</p>
       <p v-if="errorMsg" class="error-message">{{ errorMsg }}</p>
 
       <form class="login-form" @submit.prevent="handleRegister">
-        <!-- ... The email and password inputs are exactly the same ... -->
         <div class="input-group">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
           <label for="email">Email:</label>
-          <input id="email" v-model="email" name="email" type="email" autocomplete="email" required class="form-input" placeholder="Enter Email">
+          <input id="email" v-model="email" name="email" type="email" autocomplete="email" required class="form-input"
+            placeholder="Enter Email">
         </div>
         <div class="input-group">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
           <label for="password">Password:</label>
-          <input id="password" v-model="password" name="password" type="password" autocomplete="new-password" required class="form-input" placeholder="Enter Password">
+          <input id="password" v-model="password" name="password" type="password" autocomplete="new-password" required
+            class="form-input" placeholder="Enter Password">
         </div>
 
         <div class="form-group">
-          <!-- Changed Button Text -->
           <button type="submit" class="submit-button" :disabled="isLoading">
             {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
           </button>
         </div>
       </form>
       <button class="submit-button" :disabled="isLoading" @click="navigateTo('/login');">
-        Go back
+        Already have an account? Log In
       </button>
     </div>
   </div>
@@ -54,20 +60,18 @@ const handleRegister = async () => {
   successMsg.value = null;
 
   try {
-    // Call the register API endpoint
     await $fetch('/api/register', {
       method: 'POST',
       body: { email: email.value, password: password.value },
     });
-    
-    // On success, show a message and redirect to the login page
     successMsg.value = 'Account created successfully! Redirecting to login...';
     setTimeout(() => {
       navigateTo('/login');
-    }, 2000); // Wait 2 seconds before redirecting
+    }, 2000);
 
   } catch (error: any) {
     errorMsg.value = error.data?.message || 'An error occurred during registration.';
+
   } finally {
     isLoading.value = false;
   }
@@ -199,9 +203,8 @@ const handleRegister = async () => {
   width: 100%;
 }
 
-/* You can add a style for the success message */
 .success-message {
-  color: #16A34A; /* Green */
+  color: #16A34A;
   background-color: #D1FAE5;
   padding: 12px;
   border-radius: 8px;
@@ -212,7 +215,7 @@ const handleRegister = async () => {
 }
 
 .error-message {
-  color: #EF4444; /* Red */
+  color: #EF4444;
   background-color: #FEE2E2;
   padding: 12px;
   border-radius: 8px;

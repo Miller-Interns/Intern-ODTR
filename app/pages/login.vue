@@ -8,7 +8,6 @@
       </div>
       <p v-if="errorMsg" class="error-message">{{ errorMsg }}</p>
       <form class="login-form" @submit.prevent="handleLogin">
-        <!-- Your form inputs are perfect, no changes needed here -->
         <div class="input-group">
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -26,8 +25,8 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
           <label for="password">Password:</label>
-          <input id="password" v-model="password" name="password" type="password"
-            autocomplete="current-password" required class="form-input" placeholder="Enter Password">
+          <input id="password" v-model="password" name="password" type="password" autocomplete="current-password"
+            required class="form-input" placeholder="Enter Password">
         </div>
         <div class="form-group">
           <button type="submit" class="submit-button" :disabled="isLoading">
@@ -59,21 +58,14 @@ const handleLogin = async () => {
   isLoading.value = true;
   errorMsg.value = null;
   try {
-    // 1. Call API to set cookie.
     await $fetch('/api/login', {
       method: 'POST',
       body: { email: email.value, password: password.value },
     });
-    // 2. Update client-side state.
     await fetchUser();
-    // 3. Navigate to protected page.
     await navigateTo('/dashboard');
   } catch (error: any) {
-    // --- THIS IS THE UPDATE ---
-    // Log the detailed error object from the server to the browser console.
     console.error('Login failed. Server response:', error.data);
-
-    // Display the specific message from our new API error.
     errorMsg.value = error.data?.statusMessage || 'An unknown error occurred.';
   } finally {
     isLoading.value = false;
