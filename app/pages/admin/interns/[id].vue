@@ -1,50 +1,44 @@
 <script setup lang="ts">
 definePageMeta({
-  layouts: 'admin',
+  layout: 'default',
 });
+
+interface LogEntry {
+  id: string;
+  time_in: string; // These are ISO strings
+  time_out: string | null;
+  total_hours: number | null;
+  overtime: number | null;
+  remarks: string | null;
+  status: 'approved' | 'pending'; // The string status we created in the API
+  date: string;
+}
+
+// This describes the `intern` object from your API
+interface InternProfile {
+  id: string;
+  name: string | null;
+  school: string;
+  course: string;
+  year: string;
+  statusString: 'Ongoing' | 'Completed';
+  required_hours: number;
+  hoursCompleted: number;
+  avatar: string | null;
+  role: string;
+}
+
+// This is the main interface for the entire API response object
+interface InternDetailResponse {
+  intern: InternProfile;
+  timeLogs: LogEntry[];
+}
 
 const route = useRoute();
-const internId = route.params.id; // Get the intern's ID from the URL
+const internId = route.params.id as string; // Get the intern's ID from the URL
+const { data, pending, error } = await useFetch<InternDetailResponse>(`/api/approval/${internId}`);
 
 const activeTab = ref('time-logs'); // Default active tab
-
-// --- DUMMY DATA ---
-// In a real app, you would fetch this data from your API
-// using `useFetch` based on the `internId`.
-const intern = ref({
-  name: 'Harold Jan P. Besario',
-  status: 'Ongoing',
-  role: 'UI/UX Designer',
-  course: 'BS CpE - 4th Year',
-  school: 'NORSU',
-  hoursCompleted: 150,
-  hoursRequired: 300,
-  avatar: '/avatar-placeholder.png', // A placeholder image in your public/ dir
-});
-
-const timeLogs = ref([
-  {
-    id: 'log1',
-    date: '2025-07-21T12:00:00Z',
-    time_in: '2025-07-21T09:00:00Z',
-    time_out: '2025-07-21T19:00:00Z',
-    total_hours: 10,
-    overtime: 2,
-    remarks: 'Finished the onboarding module.',
-    status: 'pending', // A log waiting for approval
-  },
-  {
-    id: 'log2',
-    date: '2025-07-20T12:00:00Z',
-    time_in: '2025-07-20T09:00:00Z',
-    time_out: '2025-07-20T18:00:00Z',
-    total_hours: 9,
-    overtime: 1,
-    remarks: null,
-    status: 'approved', // An already approved log
-  },
-]);
-// --- END DUMMY DATA ---
 </script>
 
 <template>
@@ -54,8 +48,11 @@ const timeLogs = ref([
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
     </button>
 
-    <!-- Intern Info Card -->
-    <InternInfo :intern="intern" />
+    <div v-if="pending">Loading intern...</div>
+    <div v-else-if="error">Could not load intern data.</div>
+    
+    <div v-else-if="data">
+    <InternInfo :intern="data.intern" />
 
      <!-- Tabs: Personal Info / Time Logs -->
     <div class="mt-6 bg-gray-200 p-1 rounded-full flex items-center">
@@ -78,7 +75,7 @@ const timeLogs = ref([
     <div class="mt-6">
       <div v-if="activeTab === 'time-logs'" class="space-y-4">
         <InternLogs
-          v-for="log in timeLogs"
+          v-for="log in data.timeLogs"
           :key="log.id"
           :log="log"
         />
@@ -89,5 +86,6 @@ const timeLogs = ref([
         <p class="text-gray-600">Personal information will be displayed here.</p>
       </div>
     </div>
+  </div>
   </div>
 </template>

@@ -1,66 +1,61 @@
 <script setup lang="ts">
+import type { TimeLogForUI } from "../../../app/types/time-log.ts";
 
 definePageMeta({
-  layouts: 'admin',
+  layout: 'default',
 });
 
-export type TimeLogForUI = {
-  id: string;
-  intern: { // This property is required
-    id: string;
-    name: string;
-  };
-  intern_id: string;
-  time_in: string;    // In the UI, it's just a string or Date
-  time_out: string | null;
-  overtime?: number | null; // Optional because it can be missing
-  remarks: string | null;
-  status: boolean;
-  admin_id: string;
-  total_hours: number; // Optional because it can be missing
-};
+const STANDARD_WORK_HOURS = 8;
+const BREAK_HOURS = 1;
 
-const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/api/approval/log');
-const editingLog = ref<TimeLogForUI | null>(null);
-const remarkText = ref<string>('');
+const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/api/approval/log', {
+  transform: (logs) => {
+    return logs.map(log => {
+      if (!log.time_in || !log.time_out) {
+        return { ...log, total_hours: 0, overtime: 0 };
+      }
+      const timeIn = new Date(log.time_in);
+      const timeOut = new Date(log.time_out);
+      if (isNaN(timeIn.getTime()) || isNaN(timeOut.getTime())) {
+        return { ...log, total_hours: 0, overtime: 0 };
+      }
 
-async function onLogApproved(logId: string) {
-  try {
-  await $fetch('/api/approval/approval', {
-      method: 'PATCH',
-      body: {
-        logId: logId,
-        status: true, 
-      },
+      const grossDurationHours = (timeOut.getTime() - timeIn.getTime()) / (1000 * 60 * 60);
+      const calculatedTotalHours = Math.max(0, grossDurationHours - BREAK_HOURS);
+      const calculatedOvertime = Math.max(0, calculatedTotalHours - STANDARD_WORK_HOURS);
+
+      return {
+        ...log,
+        total_hours: parseFloat(calculatedTotalHours.toFixed(2)),
+        overtime: parseFloat(calculatedOvertime.toFixed(2)),
+      };
     });
- alert(`Log with ID ${logId} has been approved.`);
- await refresh();
- } catch (e) {
-    console.error('Failed to approve log:', e);
-    alert('Failed to approve the log. Please try again.');
   }
-}
+});
 
-async function submitRemark() {
-  if (!editingLog.value) return;
+
+async function handleApproval(payload: { id: string; remarks: string }) {
+  const logToApprove = pendingLogs.value?.find(log => log.id === payload.id);
+  if (!logToApprove) return;
 
   try {
     await $fetch('/api/approval/approval', {
       method: 'PATCH',
       body: {
-        logId: editingLog.value.id,
-        remarks: remarkText.value, // Send the updated remarks
+        logId: payload.id,
+        remarks: payload.remarks,
+        status: true,
+        total_hours: logToApprove.total_hours, // Pass calculated hours
+        overtime: logToApprove.overtime,       // Pass calculated overtime
       },
     });
 
-    alert('Remarks have been updated.');
-    editingLog.value = null;
-    remarkText.value = '';
+    alert(`Log with ID ${payload.id} has been approved.`);
     await refresh();
 
   } catch (e) {
-    console.error('Failed to update remarks:', e);
-    alert('Failed to update remarks. Please try again.');
+    console.error('Failed to approve log:', e);
+    alert('Failed to approve the log. Please try again.');
   }
 }
 
@@ -69,10 +64,17 @@ async function approveAll() {
     alert('No logs to approve.');
     return;
   }
-  
+
+  const approvalPayload = pendingLogs.value.map(log => ({
+    id: log.id,
+    total_hours: log.total_hours,
+    overtime: log.overtime,
+  }));
+
   try {
     await $fetch('/api/approval/all', {
       method: 'POST',
+      body: { logs: approvalPayload },
     });
 
     alert(`Approving all ${pendingLogs.value?.length || 0} logs.`);
@@ -83,7 +85,7 @@ async function approveAll() {
     alert('Failed to approve all logs. Please try again.');
   }
 }
-  
+
 const today = new Intl.DateTimeFormat('en-US', {
   weekday: 'long',
   year: 'numeric',
@@ -91,40 +93,12 @@ const today = new Intl.DateTimeFormat('en-US', {
   day: 'numeric'
 }).format(new Date());
 
-function openRemarkModal(log: TimeLogForUI) {
-  editingLog.value = log;
-}
-
-async function handleRemarkSubmit(newRemarkText: string) {
-  if (!editingLog.value) return;
-
-  const logId = editingLog.value.id;
-  editingLog.value = null;
-
-  try {
-    await $fetch('/api/approval/approval', {
-      method: 'PATCH',
-      body: {
-        logId: logId,
-        remarks: newRemarkText, // Send the new text from the modal
-      },
-    });
-
-    alert('Remarks have been updated.');
-    await refresh(); 
-
-  } catch (e) {
-    console.error('Failed to update remarks:', e);
-    alert('Failed to update remarks. Please try again.');
-  }
-}
 </script>
 
 <template>
   <div>
-    <!-- Header Section -->
       <header class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Pending Approvals for Today</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Pending Logs</h1>
       <div class="flex justify-between items-center mt-2">
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-500">{{ today }}</span>
@@ -142,7 +116,6 @@ async function handleRemarkSubmit(newRemarkText: string) {
       </div>
     </header>
 
-    <!-- Main Content: List of Logs -->
     <main>
       <div v-if="pending" class="text-center py-10 text-gray-500">Loading...</div>
       <div v-else-if="error" class="text-center p-4 bg-red-100 text-red-700 rounded-lg">
@@ -153,21 +126,12 @@ async function handleRemarkSubmit(newRemarkText: string) {
           v-for="log in pendingLogs"
           :key="log.id"
           :log="log"
-          @approve="onLogApproved"
-          @edit-remarks="openRemarkModal"
+           @approve-with-remarks="handleApproval"
         />
       </div>
       <div v-else class="text-center py-10 mt-8 bg-white rounded-lg shadow-sm">
         <p class="text-gray-500">No pending approvals.</p>
       </div>
     </main>
-
-    <!-- Modal for Remarks (no visual changes needed) -->
-    <ModalRemarks
-      v-if="editingLog"
-      :initial-value="editingLog.remarks || ''"
-      @close="editingLog = null"
-      @submit="handleRemarkSubmit"
-    />
   </div>
 </template>

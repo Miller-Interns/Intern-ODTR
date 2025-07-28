@@ -1,22 +1,5 @@
 import { defineEventHandler, setResponseStatus } from 'h3';
-import { db } from '../../utils/db' 
-
-function calculateTotalHours(startTime: Date, endTime: Date | null): number | null {
-  if (!endTime) return null; // Can't calculate if there's no end time
-  const start = startTime.getTime();
-  const end = endTime.getTime();
-  const diffMilliseconds = Math.abs(end - start);
-  return diffMilliseconds / (1000 * 60 * 60); // returns hours
-}
-
-function calculateOvertimeHours(
-  totalHours: number | null,
-  standardWorkdayHours: number = 8
-): number | null {
-  if (totalHours === null) return null; // Can't calculate overtime without total hours
-  const overtime = totalHours > standardWorkdayHours ? totalHours - standardWorkdayHours : 0;
-  return overtime;
-}
+import { db } from '../../utils/db';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -25,37 +8,49 @@ export default defineEventHandler(async (event) => {
       .innerJoin('interns', 'interns.id', 'time_logs.intern_id')
       .innerJoin('users', 'users.id', 'interns.user_id')
       .where('time_logs.status', '=', false)
-      .selectAll('time_logs')
-      .select(['users.name as intern_name'])
+      .select([
+        'time_logs.id',
+        'time_logs.time_in',
+        'time_logs.time_out',
+        'time_logs.remarks',
+        'time_logs.status',
+        'time_logs.intern_id',
+        'time_logs.admin_id',
+        'time_logs.total_hours', // Send the raw value (likely null or 0)
+        'time_logs.overtime',    // Send the raw value (likely null or 0)
+        'users.name as intern_name',
+      ])
       .orderBy('time_logs.time_in', 'asc')
       .execute();
 
     const formattedLogs = pendingLogsFromDb.map((log) => {
-const total_hours = calculateTotalHours(log.time_in, log.time_out);
-      const overtime = calculateOvertimeHours(total_hours);
-      return {
-        ...log, 
-        intern: {
-          id: log.intern_id,
-          name: log.intern_name ?? 'Unnamed Intern',
-        },
-         total_hours,
-        overtime,
-        // Ensure date fields are strings, as the UI expects
+     return {
+       id: log.id,
+        intern_id: log.intern_id,
+        admin_id: log.admin_id,
+        status: log.status,
+        remarks: log.remarks,
+
+        total_hours: log.total_hours,
+        overtime: log.overtime,
+
         time_in: log.time_in.toISOString(),
- time_out: log.time_out ? log.time_out.toISOString() : null,      };
+        time_out: log.time_out ? log.time_out.toISOString() : null,
+
+        intern: {
+        id: log.intern_id,
+        name: log.intern_name ?? 'Unnamed Intern', // Provide a fallback for safety
+        },
+      };
     });
 
     return formattedLogs;
 
   } catch (error: any) {
     console.error('API Error fetching pending logs:', error);
-
     setResponseStatus(event, 500);
     return {
       message: 'Failed to fetch pending logs.',
     };
   }
-
-  
 });

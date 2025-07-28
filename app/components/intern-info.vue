@@ -16,7 +16,6 @@ defineProps({
         
         <div class="flex items-center text-sm gap-2 text-gray-600 mt-1">
           <span>{{ intern.status }}</span> -
-          <!-- This would be a real toggle component -->
           <span class="flex items-center gap-1 text-xs">
             <span class="bg-gray-200 p-1 rounded-full w-8 h-4 inline-block"></span>
             Mark as Completed
