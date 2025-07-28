@@ -29,6 +29,8 @@
     "@nuxt/eslint": "^1.7.1",
     "@nuxt/eslint-config": "^1.7.1",
     "@nuxtjs/eslint-module": "^4.1.0",
+    "@types/pg": "^8.15.4",
+    "dotenv": "^17.2.1",
     "eslint": "^9.31.0",
     "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-vue": "^10.3.0",
