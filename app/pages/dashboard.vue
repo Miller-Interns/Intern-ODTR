@@ -1,8 +1,8 @@
 <template>
   <div v-if="user" class="dashboard-container">
     <h1>Dashboard</h1>
-    <p>Welcome, <strong>{{ user.email }}</strong>!</p>
-    <p>This page is protected. If you can see this after reloading, it worked!</p>
+    <p>Welcome!</p>
+    <p>This page is protected.</p>
     <button @click="handleLogout" class="submit-button">Log Out</button>
   </div>
 </template>
