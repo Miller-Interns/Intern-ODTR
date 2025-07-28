@@ -1,6 +1,20 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { db   } from '../../../server/utils/db' // Adjust path if needed
+import { db, type DB   } from '../../../server/utils/db' // Adjust path if needed
 
+function calculateTotalHours(startTime: Date, endTime: Date | null): number | null {
+  if (!endTime) return null; // Return null if there's no end time
+  const diffMilliseconds = Math.abs(endTime.getTime() - startTime.getTime());
+  return diffMilliseconds / (1000 * 60 * 60); // returns hours
+}
+
+function calculateOvertimeHours(
+  totalHours: number | null,
+  standardWorkdayHours: number = 8
+): number | null {
+  if (totalHours === null) return null; // Can't calculate without total hours
+  const overtime = totalHours > standardWorkdayHours ? totalHours - standardWorkdayHours : 0;
+  return overtime;
+}
 
 export default defineEventHandler(async (event) => {
   // Read the data sent from the onLogApproved or submitRemark functions
@@ -14,22 +28,42 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // --- Dynamic Query Building ---
-  // Create an object to hold only the data we want to update.
-  const dataToUpdate: { status?: boolean; remarks?: string } = {}
+   const logToUpdate = await db
+    .selectFrom('time_logs')
+    .where('id', '=', body.logId)
+    .select(['time_in', 'time_out'])
+    .executeTakeFirst();
 
-  // Check if a 'status' was sent in the body (from onLogApproved)
-  if (typeof body.status === 'boolean') {
-    dataToUpdate.status = body.status
+    if (!logToUpdate) {
+    throw createError({
+      statusCode: 404, // Not Found
+      statusMessage: `Log with ID ${body.logId} was not found.`,
+    })
   }
+  
+ const dataToUpdate: Partial<DB['time_logs']> = {}
 
-  // Check if 'remarks' were sent in the body (from submitRemark)
+  // If 'remarks' were sent, add them to the update object.
+  // This can happen with or without an approval.
   if (typeof body.remarks === 'string') {
-    // We allow setting remarks to an empty string, so we don't check for !body.remarks
     dataToUpdate.remarks = body.remarks
   }
 
-  // If after checking, there's nothing to update, it's an error.
+  // This block only runs when the frontend sends `status: true`.
+  if (body.status === true) {
+    // 1. Set the status to true for the update
+    dataToUpdate.status = true;
+
+    // 2. Calculate hours and overtime using the data we fetched
+    const totalHours = calculateTotalHours(logToUpdate.time_in, logToUpdate.time_out);
+    const overtime = calculateOvertimeHours(totalHours);
+
+    // 3. Add the calculated values to our update object
+    dataToUpdate.total_hours = totalHours;
+    dataToUpdate.overtime = overtime;
+  }
+
+   // If after checking, there's nothing to update, it's an error.
   if (Object.keys(dataToUpdate).length === 0) {
     throw createError({
       statusCode: 400,
@@ -47,7 +81,7 @@ export default defineEventHandler(async (event) => {
       .updateTable('time_logs')
       .set(dataToUpdate)
       .where('id', '=', body.logId)
-      .executeTakeFirstOrThrow() // Throws an error if the logId is not found
+      .execute();
 
     return { success: true, message: 'Log updated successfully.' }
   } catch (e: any) {

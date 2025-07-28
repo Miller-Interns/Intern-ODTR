@@ -1,5 +1,9 @@
 <script setup lang="ts">
 
+definePageMeta({
+  layouts: 'admin',
+});
+
 export type TimeLogForUI = {
   id: string;
   intern: { // This property is required
@@ -26,7 +30,7 @@ async function onLogApproved(logId: string) {
       method: 'PATCH',
       body: {
         logId: logId,
-        status: true, // The action is to approve (set status to true)
+        status: true, 
       },
     });
  alert(`Log with ID ${logId} has been approved.`);
@@ -36,11 +40,6 @@ async function onLogApproved(logId: string) {
     alert('Failed to approve the log. Please try again.');
   }
 }
-
-// function openRemarkModal(log: TimeLogForUI) {
-//   editingLog.value = log;
-//   remarkText.value = log.remarks || ''; // Pre-fill with existing remarks
-// }
 
 async function submitRemark() {
   if (!editingLog.value) return;
@@ -55,10 +54,8 @@ async function submitRemark() {
     });
 
     alert('Remarks have been updated.');
-    // Close the modal and reset state.
     editingLog.value = null;
     remarkText.value = '';
-    // Refresh the data to show the new remarks in the list.
     await refresh();
 
   } catch (e) {
@@ -74,13 +71,11 @@ async function approveAll() {
   }
   
   try {
-    // Call a new endpoint designed for bulk updates.
     await $fetch('/api/approval/all', {
       method: 'POST',
     });
 
     alert(`Approving all ${pendingLogs.value?.length || 0} logs.`);
-    // Refresh the list, which should now be empty.
     await refresh();
 
   } catch (e) {
@@ -90,7 +85,7 @@ async function approveAll() {
 }
   
 const today = new Intl.DateTimeFormat('en-US', {
-  weekday: 'short',
+  weekday: 'long',
   year: 'numeric',
   month: 'short',
   day: 'numeric'
@@ -104,12 +99,9 @@ async function handleRemarkSubmit(newRemarkText: string) {
   if (!editingLog.value) return;
 
   const logId = editingLog.value.id;
-
-  // Close the modal immediately for a better user experience
   editingLog.value = null;
 
   try {
-    // Call the same PATCH endpoint, but only send the remarks
     await $fetch('/api/approval/approval', {
       method: 'PATCH',
       body: {
@@ -119,7 +111,7 @@ async function handleRemarkSubmit(newRemarkText: string) {
     });
 
     alert('Remarks have been updated.');
-    await refresh(); // Refresh the main list to show the new remarks
+    await refresh(); 
 
   } catch (e) {
     console.error('Failed to update remarks:', e);
@@ -129,69 +121,53 @@ async function handleRemarkSubmit(newRemarkText: string) {
 </script>
 
 <template>
-  
-  <div class="bg-gray-50 min-h-screen p-4 sm:p-6">
-
-    <div>
-      <header class="mb-8">
-        <h1 class="font-serif text-2xl font-light text-gray-700 mb-1">
-          Welcome Back, Admin 
-        </h1>
-        <h2 class="font-serif text-3xl font-light text-gray-900 mb-6">
-          Today's Pending Time Log Approvals
-        </h2>
-
-        <div class="flex items-center">
-          <span class="text-lg text-gray-600">{{ today }}</span>
-          <span
-            class="bg-gray-300 text-gray-700 rounded-full w-7 h-7 flex items-center justify-center font-bold text-sm ml-3"
-          >
-          <span v-if="pending">...</span>
-           <span v-else>{{ pendingLogs?.length || 0 }}</span>
+  <div>
+    <!-- Header Section -->
+      <header class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Pending Approvals for Today</h1>
+      <div class="flex justify-between items-center mt-2">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-500">{{ today }}</span>
+          <span v-if="!pending" class="bg-teal-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            {{ pendingLogs?.length || 0 }}
           </span>
-          <button
-            @click="approveAll"
-            :disabled="!pendingLogs || pendingLogs.length === 0"
-            class="ml-auto py-2 px-5 bg-white border border-gray-300 rounded-md text-gray-600 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Approve All
-          </button>
         </div>
-      </header>
-
-      <main>
-  <div v-if="pending" class="text-center py-10">
-    <p class="text-gray-500">Loading Pending Logs...</p>
-  </div>
-
-  <div v-else-if="error" class="text-center py-10 px-4 bg-red-50 rounded-lg border border-red-200">
-    <p class="font-semibold text-red-700">Failed to load data</p>
-    <p class="text-sm text-red-600 mt-1">{{ error.message }}</p>
-  </div>
-
-       <template v-else-if="pendingLogs && pendingLogs.length > 0">
-          <TimeLogsContainer
-    v-for="log in pendingLogs"
-    :key="log.id"
-    :log="log" 
-    @approve="onLogApproved"
-    @edit-remarks="openRemarkModal" 
-  />
-        </template>
-
-        <RemarksModal
-  v-if="editingLog"
-  :initial-value="editingLog.remarks || ''"
-  @close="editingLog = null"
-  @submit="handleRemarkSubmit"
-/>
-        <div
-          v-else
-          class="text-center py-10 px-4 bg-white rounded-lg border border-gray-200"
+        <button
+          @click="approveAll"
+          :disabled="!pendingLogs || pendingLogs.length === 0"
+          class="bg-teal-500 text-white font-semibold text-sm py-2 px-5 rounded-full shadow-sm hover:bg-teal-600 transition-colors disabled:opacity-50"
         >
-          <p class="text-gray-500">No pending approvals.</p>
-        </div>
-      </main>
-    </div>
+          Approve All
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content: List of Logs -->
+    <main>
+      <div v-if="pending" class="text-center py-10 text-gray-500">Loading...</div>
+      <div v-else-if="error" class="text-center p-4 bg-red-100 text-red-700 rounded-lg">
+        Failed to load data.
+      </div>
+      <div v-else-if="pendingLogs && pendingLogs.length > 0" class="space-y-4">
+        <TimeLogsContainer
+          v-for="log in pendingLogs"
+          :key="log.id"
+          :log="log"
+          @approve="onLogApproved"
+          @edit-remarks="openRemarkModal"
+        />
+      </div>
+      <div v-else class="text-center py-10 mt-8 bg-white rounded-lg shadow-sm">
+        <p class="text-gray-500">No pending approvals.</p>
+      </div>
+    </main>
+
+    <!-- Modal for Remarks (no visual changes needed) -->
+    <ModalRemarks
+      v-if="editingLog"
+      :initial-value="editingLog.remarks || ''"
+      @close="editingLog = null"
+      @submit="handleRemarkSubmit"
+    />
   </div>
 </template>

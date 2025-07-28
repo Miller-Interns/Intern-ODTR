@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { TimeLogForUI } from "../pages/admin-dashboard.vue";
+import type { TimeLogForUI } from "../pages/admin/dashboard.vue";
 
 const { log } = defineProps<{ log: TimeLogForUI }>();
 const emit = defineEmits(["approve", "edit-remarks"]);
 
-function formatTime(dateString: string | null): string {
+function formatTimeOnly(dateString: string | null): string {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
   return date.toLocaleTimeString("en-US", {
@@ -14,22 +14,15 @@ function formatTime(dateString: string | null): string {
   });
 }
 
-// function calculateTotalHours(startTime: string, endTime: string): number {
-//   const start = new Date(startTime).getTime();
-//   const end = new Date(endTime).getTime();
-//   const diffMilliseconds = Math.abs(end - start);
-//   const totalHours = diffMilliseconds / (1000 * 60 * 60);
-//   return totalHours;
-// }
+function formatDuration(hours: number | null | undefined): string {
+  if (hours === null || hours === undefined) return "0 Hours";
+  // Use Intl.NumberFormat to handle decimals nicely and avoid unnecessary trailing zeros.
+  const formattedHours = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2, // Allow up to two decimal places
+  }).format(hours);
+  return `${formattedHours} Hours`;
+}
 
-// function calculateOvertimeHours(
-//   totalHours: number,
-//   standardWorkdayHours: number = 8
-// ): number {
-//   const overtimeHours =
-//     totalHours > standardWorkdayHours ? totalHours - standardWorkdayHours : 0;
-//   return overtimeHours;
-// }
 
 function handleApprove() {
   emit("approve", log.id);
@@ -42,63 +35,58 @@ function handleEditRemarks() {
 </script>
 
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
-    <div class="bg-gray-100 p-4 rounded-md">
-      <p class="font-medium text-gray-800 mb-4">{{ log.intern.name }}</p>
+  <!-- Main Card Container -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden p-5">
+    <!-- Intern Name -->
+    <p class="font-bold text-gray-800 text-lg mb-4">{{ log.intern.name }}</p>
 
-      <div class="flex justify-between mb-4">
-        <div class="flex flex-col">
-          <span class="text-sm text-gray-600 mb-1">Time In</span>
-          <span class="font-semibold text-gray-900">{{ log.time_in }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-sm text-gray-600 mb-1">Time Out</span>
-          <span class="font-semibold text-gray-900">{{ log.time_out }}</span>
-        </div>
+    <!-- Info Grid -->
+    <div class="grid grid-cols-3 text-center mb-4">
+      <div>
+        <span class="text-xs text-gray-500">Time in</span>
+        <p class="font-bold text-gray-900">{{ formatTimeOnly(log.time_in) }}</p>
       </div>
-
-      <div v-if="log.time_out" class="flex justify-between">
-        <div class="flex flex-col">
-          <span class="text-sm text-gray-600 mb-1">Total Hours</span>
-          <span class="font-semibold text-gray-900">{{
-            log.total_hours?.toFixed(2) ?? '0.00'
-          }}</span>
-        </div>
-
-       <div class="flex flex-col">
-      <span class="text-sm text-gray-500">Overtime (If there is any):</span>
-      <span class="font-semibold text-gray-900">
-        {{
-          log.overtime?.toFixed(2) ?? '0.00' 
-        }}
-      </span>
+      <div>
+        <span class="text-xs text-gray-500">Time out</span>
+        <p class="font-bold text-gray-900">{{ formatTimeOnly(log.time_out) }}</p>
+      </div>
+      <div>
+        <span class="text-xs text-gray-500">Total Hours</span>
+        <p class="font-bold text-gray-900">{{  formatDuration(log.total_hours)  }}</p>
+      </div>
+    </div>   
+        
+     <div class="text-sm px-2">
+      <span class="text-gray-500">Overtime (if there is any):</span>
+      <!-- Value is now adjacent with a left margin -->
+      <span class="font-bold text-gray-900 ml-2">{{ formatDuration(log.overtime)  }}</span>
     </div>
-  </div>
-  </div>
 
-    <div v-if="log.remarks" class="mt-4 pt-4 border-t border-gray-200">
-      <p class="text-sm text-gray-600 font-semibold">Remarks:</p>
-      <p class="text-sm text-gray-800 italic">"{{ log.remarks }}"</p>
+    <!-- Remarks Display (optional) -->
+    <div v-if="log.remarks" class="mt-4 pt-3 border-t border-gray-100">
+      <p class="text-xs text-gray-500 font-semibold">Remarks:</p>
+      <p class="text-sm text-gray-700 italic">"{{ log.remarks }}"</p>
     </div>
-  </div>
 
-  <div class="flex flex-col mt-4 gap-2">
-    <button
-      class="w-full py-3 px-4 rounded-md border border-gray-300 bg-transparent text-gray-700 flex items-center justify-center hover:bg-gray-50 transition-colors"
-      @click="handleEditRemarks"
-    >
-      <span class="font-bold text-lg mr-2">+</span>
-      Add/Edit Remarks
-    </button>
+    <!-- Action Buttons -->
+    <div class="mt-6 flex flex-col gap-3">
+       <button
+        @click="handleEditRemarks"
+        class="w-full py-3 px-4 rounded-full border border-gray-300 bg-transparent text-gray-700 flex items-center justify-center hover:bg-gray-50 transition-colors font-semibold text-sm"
+      >
+        <!-- Plus Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Add/Edit Remarks
+      </button>
 
-    <!-- <p>Current Remarks: "{{ existingRemark }}"</p> -->
-
-    
-    <button
-      @click="handleApprove"
-      class="w-full py-3 px-4 rounded-md bg-gray-200 text-gray-600 font-medium hover:bg-gray-300 transition-colors"
-    >
-      Approve
-    </button>
+      <button
+        @click="handleApprove"
+        class="w-full py-3 px-4 rounded-full bg-teal-500 text-white font-bold hover:bg-teal-600 transition-colors shadow-sm"
+      >
+        Approve
+      </button>
+    </div>
   </div>
 </template>
