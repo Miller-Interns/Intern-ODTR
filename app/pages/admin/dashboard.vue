@@ -7,7 +7,7 @@ definePageMeta({
 const STANDARD_WORK_HOURS = 8;
 const BREAK_HOURS = 1;
 
-const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/server/api/admin/approval/log', {
+const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/api/admin/approval/log', {
   transform: (logs) => {
     return logs.map(log => {
       if (!log.time_in || !log.time_out) {

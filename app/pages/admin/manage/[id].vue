@@ -1,17 +1,56 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import type { InternDetailsResponse } from '~/types/composites';
+import type { InternDetailsResponse, TimeLogForUI } from '~/types/composites';
 
 const route = useRoute();
 const internId = route.params.id;
-const { data, pending, error } = await useFetch<InternDetailsResponse>(`/api/admin/approval/${internId}`);
-const internFullName = computed(() => data.value?.intern.user.name || 'Loading...');
 
+const { data, pending, error } = await useFetch<InternDetailsResponse>(`/api/admin/approval/${internId}`);
+
+const isModalVisible = ref(false);
+const selectedLog = ref<TimeLogForUI | null>(null);
+
+const internFullName = computed(() => data.value?.intern.user.name || 'Loading...');
+// const pendingLogs = computed(() => data.value?.timeLogs.filter(log => !log.status) || []);
+const isApproving = ref(false);
+
+function openApprovalModal(log: TimeLogForUI) {
+  selectedLog.value = log;
+  isModalVisible.value = true;
+}
+
+async function approveLog(logId: string) {
+  if (isApproving.value) return;
+  isApproving.value = true;
+  
+  try {
+    await $fetch('/api/admin/approval', {
+      method: 'POST',
+      body: { logIds: [logId] },
+    });
+
+    // Instant UI feedback
+    if (data.value) {
+      const logToUpdate = data.value.timeLogs.find(l => l.id === logId);
+      if (logToUpdate) {
+        logToUpdate.status = true;
+      }
+    }
+    
+    // Close the modal on success
+    isModalVisible.value = false;
+
+  } catch (err) {
+    console.error("Failed to approve log:", err);
+  } finally {
+    isApproving.value = false;
+  }
+}
 </script>
 
 <template>
-  <div class="bg-gray-100 min-h-screen font-sans">
-    <div class="max-w-md mx-auto bg-white min-h-screen">
+  <div>
+    <div>
       <header class="p-4 flex items-center">
         <NuxtLink to="/admin/active-interns" class="text-gray-600">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -57,29 +96,12 @@ const internFullName = computed(() => data.value?.intern.user.name || 'Loading..
 
           <!-- Time Logs List -->
           <div class="space-y-4">
-            <div v-for="log in data.timeLogs" :key="log.id" class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-              <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center">
-                  <svg class="w-5 h-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-                  <span class="font-medium text-gray-700">{{ new Date(log.time_in).toLocaleDateString() }}</span>
-                </div>
-              </div>
-              <div class="grid grid-cols-3 gap-4 text-sm mb-3">
-                <div>
-                  <p class="text-gray-500">Time in:</p>
-                  <p class="font-semibold text-gray-800">{{ new Date(log.time_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Time out:</p>
-                  <p class="font-semibold text-gray-800">{{ log.time_out ? new Date(log.time_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A' }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Total Hours:</p>
-                  <p class="font-semibold text-gray-800">{{ log.total_hours }} Hours</p>
-                </div>
-              </div>
-              <button class="w-full py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg">Pending Approval</button>
-            </div>
+          <InternLogs
+              v-for="log in data.timeLogs"
+              :key="log.id"
+              :log="log"                      
+              @open-modal="openApprovalModal"
+            />
             
             <!-- Export Button -->
             <button class="w-full mt-4 py-2 px-4 border-2 border-teal-400 text-teal-500 font-semibold rounded-lg flex items-center justify-center">
@@ -88,7 +110,16 @@ const internFullName = computed(() => data.value?.intern.user.name || 'Loading..
             </button>
           </div>
         </div>
+      
       </main>
+
+      <ModalApproveLog
+        v-model="isModalVisible"
+        :log="selectedLog"
+        :intern-name="internFullName"
+        @approve="approveLog"
+      />
+
     </div>
   </div>
 </template>

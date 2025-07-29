@@ -1,13 +1,18 @@
 <script setup>
 const props = defineProps({
   log: { type: Object, required: true },
+  // isApproving: { type: Boolean, default: false } 
 });
 
+const emit = defineEmits(['open-modal']);
+
+// CORRECTED: Use `log.time_in` which is the correct property from your API.
 const formattedDate = new Intl.DateTimeFormat('en-US', {
-  month: '2-digit',
-  day: '2-digit',
-  year: 'numeric'
-}).format(new Date(props.log.date));
+  weekday: 'short',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(new Date(props.log.time_in));
 
 function formatTimeOnly(dateString) {
   if (!dateString) return "N/A";
@@ -22,15 +27,40 @@ function formatDuration(hours) {
   if (hours === null || hours === undefined) return "0 Hours";
   return `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(hours)} Hours`;
 }
+
+function handleCardClick() {
+  if (props.log.status || props.isApproving) {
+    return;
+  }
+   emit('open-modal', props.log.id);
+}
+
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-md overflow-hidden p-5">
+  <div 
+    @click="handleCardClick"
+    :class="[
+      'bg-white rounded-xl shadow-md overflow-hidden p-5 transition-all', 
+      !log.status ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1' : '', 
+      isApproving && !log.status ? 'opacity-50 pointer-events-none' : ''
+    ]"
+  >
     <!-- Card Header with Date -->
     <div class="flex items-center text-gray-600 font-semibold mb-4">
+       <div class="flex items-center text-gray-600">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
       <span>{{ formattedDate }}</span>
     </div>
+
+    <span
+        v-if="!log.status"
+        class="text-xs font-semibold px-3 py-1 rounded-full bg-teal-100 text-teal-800"
+      >
+        Pending Approval
+      </span>
+      </div>
+    
 
     <!-- Info Grid -->
     <div class="grid grid-cols-3 text-center mb-4">
@@ -61,24 +91,17 @@ function formatDuration(hours) {
       </div>
     </div>
 
-    <!-- Action Button -->
+    <!-- Action Button
     <div class="mt-6">
-      <!-- Pending Button -->
+    
       <button
-        v-if="log.status === 'pending'"
-        class="w-full py-3 px-4 rounded-full bg-yellow-400 text-yellow-900 font-bold text-sm"
+        v-if="!log.status"
+        @click="handleApproveClick"
+        :disabled="isApproving"
+        class="w-full py-3 px-4 rounded-full bg-yellow-400 text-yellow-900 font-bold text-sm hover:bg-yellow-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
-        Pending Approval
+        {{ isApproving ? 'Approving...' : 'Pending Approval' }}
       </button>
-
-      <!-- Export DTR Button -->
-      <button
-        v-if="log.status === 'approved'"
-        class="w-full py-3 px-4 rounded-full bg-teal-500 text-white font-bold flex items-center justify-center gap-2 hover:bg-teal-600 transition-colors shadow-sm text-sm"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-        Export DTR
-      </button>
-    </div>
+    </div> -->
   </div>
 </template>

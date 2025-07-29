@@ -17,8 +17,8 @@ const batchStatus = computed(() => {
 </script>
 
 <template>
-  <div class="bg-gray-100 min-h-screen font-sans">
-    <div class="max-w-md mx-auto bg-white min-h-screen">
+  <div>
+    <div >
       <!-- Header -->
       <header class="p-4 flex items-center">
         <button class="text-gray-600">
