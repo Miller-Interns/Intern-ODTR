@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="batch-container">
     <h1>Create Batch</h1>
     <form @submit.prevent="submitBatch">
@@ -43,11 +43,12 @@
 
 <script setup lang="ts">
 
-import type { Batch} from '~/server/db/types'
+import { Status, type Batch} from '~/server/db/types'
+
 
 definePageMeta({
   path: "/createBatch",
-  layout: 'batch'
+
 });
 
 
@@ -76,14 +77,17 @@ async function submitBatch() {
   successMessage.value = '';
   errorMessage.value = '';
   isLoading.value = true;
+  
+  const todayString = getTodayDateString();
+  const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
 
   try {
-
     await $fetch<Batch>('/api/batches/Post-batch', {
       method: 'POST',
       body: {
         batch_number: batchNumber.value,
         start_date: startDate.value,
+        status: statusToSet
       },
     });
 
@@ -97,8 +101,89 @@ async function submitBatch() {
     isLoading.value = false;
   }
 }
+</script> -->
+<template>
+  <div class="batch-container">
+    <h1>Create Batch</h1>
+    <form @submit.prevent="submitBatch">
+      <div class="form-group">
+        <label for="batchNumber">Batch Number</label>
+        <input id="batchNumber" v-model.trim="batchNumber" type="text" required />
+      </div>
+      <div class="form-group">
+        <label for="startDate">Start Date</label>
+        <input id="startDate" v-model="startDate" type="date" required />
+      </div>
+      <button type="submit" :disabled="isLoading">
+        <span v-if="isLoading">Submitting...</span>
+        <span v-else>Submit</span>
+      </button>
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Status } from '~/enums/status';
+import type { BatchApiResponse } from '~/interfaces/batch-response';
+
+definePageMeta({
+  path: "/createBatch",
+});
+
+const batchNumber = ref<string>('');
+const startDate = ref<string>('');
+const isLoading = ref<boolean>(false);
+const successMessage = ref<string>('');
+const errorMessage = ref<string>('');
+
+function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+onMounted(() => {
+  startDate.value = getTodayDateString();
+});
+
+async function submitBatch() {
+  successMessage.value = '';
+  errorMessage.value = '';
+  isLoading.value = true;
+  
+  const todayString = getTodayDateString();
+  const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
+
+  try {
+    const response = await $fetch<BatchApiResponse>('/api/batches/Post-batch', {
+      method: 'POST',
+      body: {
+        batch_number: batchNumber.value,
+        start_date: startDate.value,
+        status: statusToSet,
+      },
+    });
+
+    if (response.success) {
+      successMessage.value = `Batch "${response.batch.batch_number}" created successfully!`;
+      batchNumber.value = '';
+      startDate.value = getTodayDateString();
+    }
+  } catch (error: any) {
+    errorMessage.value = error.data?.statusMessage || 'An unexpected error occurred.';
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
+<style scoped>
+/* Your styles are correct, no changes needed */
+</style>
 <style scoped>
 /* Adding some basic styles to make it look good */
 .batch-container {
