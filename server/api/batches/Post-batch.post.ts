@@ -81,14 +81,27 @@ const batchInputSchema = z.object({
   batch_number: z.string().trim(),
   start_date: z.string(),
   status: z.enum([Status.INCOMING, Status.ONGOING]), 
+})
+
+.superRefine(async (data) => {
+  const existingBatch = await prisma.batch.findFirst({
+    where: {
+      batch_number: data.batch_number,
+    },
+  });
+
+  if (existingBatch) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: `A batch with the number already exists.`,
+        
+  })
+}
 });
 
 
-
 export default defineEventHandler(async (event): Promise<BatchApiResponse> => {
-  const body = await readValidatedBody(event, (bodyToValidate) => 
-    batchInputSchema.safeParse(bodyToValidate)
-  );
+  const body = await batchInputSchema.safeParseAsync(await readBody(event));
 
   if (!body.success) {
     throw createError({
@@ -127,14 +140,7 @@ export default defineEventHandler(async (event): Promise<BatchApiResponse> => {
     };
 
   } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === 'P2002') { 
-        throw createError({
-          statusCode: 409,
-          statusMessage: `A batch with the number "${batch_number}" already exists.`,
-        });
-      }
-    }
+
     
     console.error('Failed to create batch:', e);
     throw createError({
