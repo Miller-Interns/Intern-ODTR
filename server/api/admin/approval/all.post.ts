@@ -1,6 +1,3 @@
-import { defineEventHandler, readBody, createError } from 'h3'
-import { db } from '../../../server/utils/db' 
-
 type LogPayload = {
   id: string;
   total_hours: number;

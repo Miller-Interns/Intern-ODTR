@@ -1,6 +1,3 @@
-import { defineEventHandler, setResponseStatus } from 'h3';
-import { db } from '../../utils/db';
-
 export default defineEventHandler(async (event) => {
   try {
     const pendingLogsFromDb = await db

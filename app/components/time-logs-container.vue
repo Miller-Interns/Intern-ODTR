@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { TimeLogForUI } from "../../app/types/time-log.ts";
+import type { TimeLogForUI } from "../types/composites.js";
 
 const { log } = defineProps<{ log: TimeLogForUI }>();
 const emit = defineEmits(["approve-with-remarks"]);
@@ -60,7 +60,7 @@ function handleApprove() {
 
     <div v-if="isEditingRemarks" class="mt-4">
       <label for="remarks" class="block text-sm font-semibold text-gray-800 mb-2">
-        Note/Remarks: <span class="text-red-500">*</span>
+        Note/Remarks: 
       </label>
       <textarea
         id="remarks"

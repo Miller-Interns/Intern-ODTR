@@ -1,6 +1,4 @@
-import { defineEventHandler, readBody, createError } from 'h3';
-import { db } from '../../../server/utils/db'; 
-import type { DB } from '../../../app/server/db/types'; 
+import type { DB } from '../../../../app/server/db/types'; 
 import type { Updateable } from 'kysely';
 
 export default defineEventHandler(async (event) => {

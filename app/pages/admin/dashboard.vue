@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { TimeLogForUI } from "../../../app/types/time-log.ts";
-
+import type { TimeLogForUI } from "../../types/composites.ts";
 definePageMeta({
   layout: 'default',
 });
@@ -8,7 +7,7 @@ definePageMeta({
 const STANDARD_WORK_HOURS = 8;
 const BREAK_HOURS = 1;
 
-const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/api/approval/log', {
+const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogForUI[]>('/server/api/admin/approval/log', {
   transform: (logs) => {
     return logs.map(log => {
       if (!log.time_in || !log.time_out) {
@@ -39,7 +38,7 @@ async function handleApproval(payload: { id: string; remarks: string }) {
   if (!logToApprove) return;
 
   try {
-    await $fetch('/api/approval/approval', {
+    await $fetch('/api/admin/approval/approval', {
       method: 'PATCH',
       body: {
         logId: payload.id,
@@ -72,7 +71,7 @@ async function approveAll() {
   }));
 
   try {
-    await $fetch('/api/approval/all', {
+    await $fetch('/api/admin/approval/all', {
       method: 'POST',
       body: { logs: approvalPayload },
     });
