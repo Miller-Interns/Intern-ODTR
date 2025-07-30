@@ -80,6 +80,7 @@ const batchInputSchema = z.object({
   batch_number: z.string().trim(),
   start_date: z.string(),
   status: z.enum([Status.INCOMING, Status.ONGOING]), 
+  supervisorId: z.string()
 })
 
 .superRefine(async (data) => {
@@ -110,13 +111,14 @@ export default defineEventHandler(async (event): Promise<BatchApiResponse> => {
   }
 
 
-  const { batch_number, start_date, status } = body.data;
+  const { batch_number, start_date, status, supervisorId } = body.data;
 
 
   const prismaData = {
     batch_number,
     start_date: new Date(start_date), 
     status, 
+    supervisorId
   };
 
 
@@ -127,15 +129,27 @@ export default defineEventHandler(async (event): Promise<BatchApiResponse> => {
         id: true,
         batch_number: true,
         start_date: true,
-        status: true 
+        status: true,
+        intern_supervisor:{
+          select:{
+            id: true,
+            name: true
+          }
+        }
       }
     });
-    
-    setResponseStatus(event, 201); 
+
+    const responseBatch = {
+      id: newBatch.id,
+      batch_number: newBatch.batch_number,
+      start_date: newBatch.start_date,
+      status: newBatch.status,
+      supervisorId: newBatch.intern_supervisor
+    };
 
     return {
       success: true,
-      batch: newBatch,
+      batch: responseBatch,
     };
 
   } catch (e) {

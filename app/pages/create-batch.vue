@@ -114,6 +114,19 @@ async function submitBatch() {
         <label for="startDate">Start Date</label>
         <input id="startDate" v-model="startDate" type="date" required />
       </div>
+        <div class="form-group">
+        <label for="supervisor">Intern Supervisor</label>
+        <select id="supervisor" v-model="selectedSupervisorId" required>
+          <option :value="null" disabled>-- Please select a supervisor --</option>
+          <option
+            v-for="supervisor in supervisorList"
+            :key="supervisor.id"
+            :value="supervisor.id"
+          >
+            {{ supervisor.name }}
+          </option>
+        </select>
+      </div>
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading">Submitting...</span>
         <span v-else>Submit</span>
@@ -125,8 +138,8 @@ async function submitBatch() {
 </template>
 
 <script setup lang="ts">
-import { Status } from '~/enums/status';
-import type { BatchApiResponse } from '~/interfaces/batch-response';
+import { Status } from "~/enums/status";
+import { type BatchApiResponse, type  Supervisor, supervisors } from '~/interfaces/batch-response';
 import { getTodayDateString } from '~/composables/today-date';
 
 definePageMeta({
@@ -135,6 +148,11 @@ definePageMeta({
 
 const batchNumber = ref<string>('');
 const startDate = ref<string>('');
+
+
+const supervisorList = ref<Supervisor[]>(supervisors);
+const selectedSupervisorId = ref<string>('');
+
 const isLoading = ref<boolean>(false);
 const successMessage = ref<string>('');
 const errorMessage = ref<string>('');
@@ -143,26 +161,38 @@ const errorMessage = ref<string>('');
 
 onMounted(() => {
   startDate.value = getTodayDateString();
+   selectedSupervisorId.value = '';
 });
 
 async function submitBatch() {
+    console.log("Submit function started.");
+
+     if (!selectedSupervisorId.value) {
+      errorMessage.value = 'Please select a supervisor.';
+      return; // Exit early if validation fails
+    }
+
   successMessage.value = '';
   errorMessage.value = '';
   isLoading.value = true;
   
   const todayString = getTodayDateString();
   const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
-
+  console.log("into to $fetch..."); 
   try {
+    console.log("Attempting to $fetch..."); 
+    
     const response = await $fetch<BatchApiResponse>('/api/batches/Post-batch', {
       method: 'POST',
       body: {
         batch_number: batchNumber.value,
         start_date: startDate.value,
         status: statusToSet,
+       supervisorId: selectedSupervisorId.value,
+
       },
     });
-
+  console.log("API response received:", response); 
     if (response.success) {
       successMessage.value = `Batch "${response.batch.batch_number}" created successfully!`;
       batchNumber.value = '';

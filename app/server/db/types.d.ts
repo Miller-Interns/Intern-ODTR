@@ -16,6 +16,7 @@ export type Batch = {
     start_date: Generated<Timestamp>;
     end_date: Timestamp | null;
     status: Generated<Status>;
+    supervisorId: string;
 };
 export type Intern = {
     id: string;

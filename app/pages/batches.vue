@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import ViewButton from '~/composables/view-buttom.vue';
-import { type Batch } from '@prisma/client';
+import {type Batch } from '~/interfaces/batch-response';
 import { formatDate } from '~/server/db/utils/format'
 import { NuxtLink } from '#components';
-
 
 
 definePageMeta({
@@ -14,6 +13,9 @@ definePageMeta({
 const { data: allBatches, pending, error } = await useFetch<Batch[]>('/api/batches/batch');
 const currentBatches = computed(() => {
     if (!allBatches.value) return [];
+      const today = new Date();
+today.setHours(0, 0, 0, 0);
+    console.log(today)
     return allBatches.value.filter(batch => batch.end_date === null);
 });
 
@@ -21,8 +23,7 @@ const previousBatches = computed(() => {
     if (!allBatches.value) return [];
     return allBatches.value.filter(batch => batch.end_date !== null);
 });
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+
 
 const triggerServerStatusUpdate = async () => {
    try {
@@ -36,20 +37,28 @@ const triggerServerStatusUpdate = async () => {
   }
 };
 
-watch(allBatches, (newBatches) => {
-  if (!newBatches || newBatches.length === 0) return;
+watchEffect((onInvalidate) => {
+  const batches = allBatches.value;
 
-  const needsUpdate = newBatches.some(batch => 
-    batch.status === 'INCOMING' && batch.start_date <= today
+  if (!batches || batches.length === 0) {
+    return;
+  }
+  
+  console.log("watchEffect is running with loaded batches.");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const needsUpdate = batches.some(batch => 
+     batch.status === 'INCOMING' && new Date(batch.start_date) <= today
   );
 
   if (needsUpdate) {
     triggerServerStatusUpdate();
   }
-}, { 
-  once: true
-}); 
+  
 
+});
 </script>
 
 <template>
@@ -73,13 +82,14 @@ watch(allBatches, (newBatches) => {
                             <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
                             <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
                             <ViewButton :batch-id="batch.id" />
-                            <NuxtLink to="/editBatch/${batch.id}"><button>
+                            <!-- <NuxtLink to="/editBatch/${batch.id}"><button>
                                     edit Batch
                                 </button>
-                            </NuxtLink>
+                            </NuxtLink> -->
                         </div>
                         <div class="card-details">
                           <p>Status: <span class="status" :class="`status-${batch.status?.toLowerCase()}`">{{ batch.status }}</span></p>
+                         
             </div>
                     </div>
                 </div>
