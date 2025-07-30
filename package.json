@@ -10,8 +10,11 @@
 		"postinstall": "nuxt prepare"
 	},
 	"dependencies": {
+		"@nuxt/ui": "^3.3.0",
 		"@prisma/client": "^6.12.0",
 		"@prisma/nuxt": "^0.3.0",
+		"bcrypt": "^6.0.0",
+		"bcryptjs": "^3.0.2",
 		"kysely": "^0.28.3",
 		"nuxt": "^4.0.0",
 		"pg": "^8.16.3",
@@ -23,6 +26,8 @@
 	"devDependencies": {
 		"@nuxt/eslint": "^1.7.0",
 		"@nuxt/eslint-config": "^1.7.0",
+		"@types/bcrypt": "^6.0.0",
+		"@types/bcryptjs": "^2.4.6",
 		"@types/pg": "^8.15.4",
 		"eslint": "^9.31.0",
 		"eslint-config-prettier": "^10.1.8",

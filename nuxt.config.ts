@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import type { NuxtConfig } from 'nuxt/config'
+	
 
 const runtimeConfig: NuxtConfig['runtimeConfig'] = {
 	DATABASE_URL: process.env.POSTGRES_CONNECTION_URL,
@@ -12,5 +13,5 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: ['@prisma/nuxt', '@nuxt/eslint'],
+	modules: ['@prisma/nuxt', '@nuxt/eslint','@nuxt/ui'],
 })

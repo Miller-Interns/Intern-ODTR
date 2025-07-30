@@ -1,6 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+enum Status {
+  INCOMING
+  ONGOING
+  COMPLETED
+}
+
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -52,14 +58,21 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
+
   school                   String
-  course                   String
-  year                     String
-  contact_number           String
-  emergency_contact_person String
-  emergency_contact_number String
   required_hours           Int
-  status                   Boolean
+  status                   Status @default(INCOMING)
+
+  course                   String @default("BSCOE")
+  year                     String @default("3rd Year")
+  contact_number           String @default("N/A")
+  emergency_contact_person String @default("N/A")
+  emergency_contact_number String @default("N/A")
+  role                     String @default("Web Developer")
+  intern_picture           String?
+  hours_completed          Int?
+  note                     String?
+
 
   TimeLog TimeLog[]
 

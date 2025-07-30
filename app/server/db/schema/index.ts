@@ -20,6 +20,10 @@ export const InternSchema = z.object({
   emergency_contact_number: z.string(),
   required_hours: z.number(),
   status: z.boolean(),
+  role: z.string(),
+  intern_picture: z.string(),
+  hours_completed: z.number(),
+  note: z.string(),
 })
 
 export const TimeLogSchema = z.object({
