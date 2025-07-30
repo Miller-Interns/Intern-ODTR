@@ -4,7 +4,7 @@ import type { DB } from "../../app/server/db/types";
 
 const dialect = new PostgresDialect({
   pool: new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.POSTGRES_CONNECTION_URL,
   }),
 });
 

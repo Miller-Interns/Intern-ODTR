@@ -1,12 +1,12 @@
-import { sql} from 'kysely';
+import { sql } from 'kysely';
 import type { ActiveInternsApiResponse, InternWithDetails } from '../../../../app/types/composites.ts';
 import type { Batch } from '../../../../app/server/db/types';
 import type { Selectable } from 'kysely';
 
-export default defineEventHandler(async (_event): 
-Promise<ActiveInternsApiResponse> => {
+export default defineEventHandler(async (_event):
+  Promise<ActiveInternsApiResponse> => {
   try {
-     const activeBatch: Selectable<Batch> | undefined = await db
+    const activeBatch: Selectable<Batch> | undefined = await db
       .selectFrom('batches')
       .selectAll()
       .where('status', '=', true)
@@ -16,14 +16,14 @@ Promise<ActiveInternsApiResponse> => {
       throw createError({
         statusCode: 404,
         statusMessage: 'No active batch found.',
-      }); 
+      });
     }
 
     const internsData = await db
       .selectFrom('interns as i')
       .innerJoin('users as u', 'u.id', 'i.user_id')
       .where('i.batch_id', '=', activeBatch.id)
-      .selectAll('i') // Select all columns from the 'interns' table
+      .selectAll('i')
       .select(['u.name', 'u.email'])
 
       .select(
@@ -36,16 +36,16 @@ Promise<ActiveInternsApiResponse> => {
       .orderBy('u.name', 'asc')
       .execute();
 
-       const interns: InternWithDetails[] = internsData.map(row => {
- const { name, email, completed_hours, ...internBase } = row;
-        return {
-          ...internBase,
-          user: {
-            name,
-            email,
-            // avatar: null, // Placeholder for future avatar column
-          },
-          completed_hours:  Number(completed_hours) || 0, 
+    const interns: InternWithDetails[] = internsData.map(row => {
+      const { name, email, completed_hours, ...internBase } = row;
+      return {
+        ...internBase,
+        user: {
+          name,
+          email,
+          // avatar: null, // Placeholder for future avatar column
+        },
+        completed_hours: Number(completed_hours) || 0,
       };
     });
 
@@ -54,11 +54,9 @@ Promise<ActiveInternsApiResponse> => {
       interns: interns,
     };
 
-   } catch (error: any) {
-    // 5. Handle potential errors
+  } catch (error: any) {
     console.error('API Error fetching active interns:', error);
 
-    // Re-throw a generic server error
     throw createError({
       statusCode: 500,
       statusMessage: 'An internal server error occurred while fetching data.',

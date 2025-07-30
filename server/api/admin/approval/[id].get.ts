@@ -1,6 +1,5 @@
 import { sql } from 'kysely';
 
-// You will likely want to define these response types in your 'composites.ts' file
 import type { InternWithDetails, TimeLogForUI } from '../../../../app/types/composites.ts';
 
 type InternDetailsResponse = {
@@ -16,12 +15,10 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
   }
 
   try {
-    // ---- 1. Fetch the Intern's Details ----
-    // This query is almost identical to the one from your previous API
     const internResult = await db
       .selectFrom('interns as i')
       .innerJoin('users as u', 'u.id', 'i.user_id')
-      .where('i.id', '=', internId) // The only change is we search by intern ID now
+      .where('i.id', '=', internId)
       .selectAll('i')
       .select(['u.name', 'u.email' /*, 'u.avatar' */])
       .select(
@@ -31,9 +28,8 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
           WHERE intern_id = i.id AND status = true
         )`.as('completed_hours')
       )
-      .executeTakeFirstOrThrow(); // Use executeTakeFirstOrThrow for a single required record
+      .executeTakeFirstOrThrow();
 
-    // Reshape the flat result to the nested InternWithDetails type
     const { name, email, completed_hours, ...internBase } = internResult;
     const intern: InternWithDetails = {
       ...internBase,
@@ -41,7 +37,6 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
       completed_hours: Number(completed_hours) || 0,
     };
 
-    // ---- 2. Fetch the Intern's Time Logs ----
     const timeLogsResult = await db
       .selectFrom('time_logs as tl')
       .innerJoin('interns as i', 'i.id', 'tl.intern_id')
@@ -51,16 +46,15 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
       .select([
         'tl.id', 'tl.intern_id', 'tl.time_in', 'tl.time_out', 'tl.overtime',
         'tl.total_hours', 'tl.remarks', 'tl.status', 'tl.admin_id',
-        // And select the intern's name from the users table
         'u.name'
       ])
       .execute();
-      
- const timeLogs: TimeLogForUI[] = timeLogsResult.map(log => {
+
+    const timeLogs: TimeLogForUI[] = timeLogsResult.map(log => {
       const { name, ...restOfLog } = log;
       return {
-         ...restOfLog,
-         intern: {
+        ...restOfLog,
+        intern: {
           id: log.intern_id,
           name: name,
         },
@@ -69,9 +63,9 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
       };
     });
 
-     return {
+    return {
       intern,
-      timeLogs: timeLogs, // Use the new, correctly shaped array
+      timeLogs: timeLogs,
     };
 
   } catch (error: any) {
