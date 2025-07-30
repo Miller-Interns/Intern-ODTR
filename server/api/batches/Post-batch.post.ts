@@ -71,7 +71,6 @@
 // });
 
 import { prisma } from '~/server/db/db';
-import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import type { BatchApiResponse } from '~/interfaces/batch-response';
 import { Status } from "@prisma/client";

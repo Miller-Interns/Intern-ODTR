@@ -127,6 +127,7 @@ async function submitBatch() {
 <script setup lang="ts">
 import { Status } from '~/enums/status';
 import type { BatchApiResponse } from '~/interfaces/batch-response';
+import { getTodayDateString } from '~/composables/today-date';
 
 definePageMeta({
   path: "/createBatch",
@@ -138,13 +139,7 @@ const isLoading = ref<boolean>(false);
 const successMessage = ref<string>('');
 const errorMessage = ref<string>('');
 
-function getTodayDateString(): string {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+
 
 onMounted(() => {
   startDate.value = getTodayDateString();

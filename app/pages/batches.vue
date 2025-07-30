@@ -3,7 +3,6 @@ import ViewButton from '~/composables/view-buttom.vue';
 import { type Batch } from '@prisma/client';
 import { formatDate } from '~/server/db/utils/format'
 import { NuxtLink } from '#components';
-import ShowBatch from '~/components/show-batch.vue';
 
 
 
@@ -13,7 +12,6 @@ definePageMeta({
 })
 
 const { data: allBatches, pending, error } = await useFetch<Batch[]>('/api/batches/batch');
-
 const currentBatches = computed(() => {
     if (!allBatches.value) return [];
     return allBatches.value.filter(batch => batch.end_date === null);
@@ -23,6 +21,35 @@ const previousBatches = computed(() => {
     if (!allBatches.value) return [];
     return allBatches.value.filter(batch => batch.end_date !== null);
 });
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const triggerServerStatusUpdate = async () => {
+   try {
+    const updatedBatchList = await $fetch<Batch[]>('/api/batches/status', {
+      method: 'PATCH'
+    });
+    allBatches.value = updatedBatchList;
+
+  } catch (e) {
+    console.error('Client: Failed to trigger the server-side status update:', e);
+  }
+};
+
+watch(allBatches, (newBatches) => {
+  if (!newBatches || newBatches.length === 0) return;
+
+  const needsUpdate = newBatches.some(batch => 
+    batch.status === 'INCOMING' && batch.start_date <= today
+  );
+
+  if (needsUpdate) {
+    triggerServerStatusUpdate();
+  }
+}, { 
+  once: true
+}); 
+
 </script>
 
 <template>
@@ -52,8 +79,8 @@ const previousBatches = computed(() => {
                             </NuxtLink>
                         </div>
                         <div class="card-details">
-                            <p>Status: <span class="status">{{ batch.status }}</span></p>
-                        </div>
+                          <p>Status: <span class="status" :class="`status-${batch.status?.toLowerCase()}`">{{ batch.status }}</span></p>
+            </div>
                     </div>
                 </div>
                 <p v-else class="empty-state">No active batches.</p>
@@ -89,7 +116,6 @@ const previousBatches = computed(() => {
     </div>
 </template>
 
-<!-- You might want to add some basic styling for the new date elements -->
 <style scoped>
 .date,
 .date-range {
