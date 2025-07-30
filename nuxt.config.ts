@@ -1,5 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
 import type { NuxtConfig } from 'nuxt/config'
 
 const runtimeConfig: NuxtConfig['runtimeConfig'] = {
@@ -12,7 +10,11 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: ['@prisma/nuxt', '@nuxt/eslint'],
+	modules: [
+		'@prisma/nuxt', 
+		'@nuxt/eslint',
+		'@nuxt/ui'
+	],
 
 	vite: {
 		build: {
