@@ -14,6 +14,7 @@ export interface BatchApiResponse {
 
 export interface BatchWithInternCount extends Batch {
   intern_count: number;
+  supervisor_name: string | null; 
 }
 
 

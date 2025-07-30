@@ -82,6 +82,7 @@ watchEffect((onInvalidate) => {
                             <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
                             <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
                             <p class="interns">No. of Interns{{ batch.intern_count }}</p>
+                            {{batch.supervisor_name }}
                             <ViewButton :batch-id="batch.id" />
                             <!-- <NuxtLink to="/editBatch/${batch.id}"><button>
                                     edit Batch

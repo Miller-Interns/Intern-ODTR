@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
       .selectFrom('batches')
       .selectAll('batches') // Select all columns from the 'batches' table
       // Here we create and join our subquery
+       .leftJoin('users', 'users.id', 'batches.supervisorId')
       .leftJoin(
         (eb) =>
           eb
@@ -47,7 +48,8 @@ export default defineEventHandler(async (event) => {
         (join) => join.onRef('intern_counts.batch_id', '=', 'batches.id') // Join condition
       )
       // Make sure to select the count from our subquery
-      .select('intern_counts.intern_count')
+      .select(['intern_counts.intern_count' ,
+        'users.name as supervisor_name'])
       .orderBy('batches.batch_number', 'desc')
       .execute();
 
