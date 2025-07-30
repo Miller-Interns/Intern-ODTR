@@ -12,9 +12,10 @@ export interface BatchApiResponse {
   };
 }
 
-export interface BatchWithSupervisor extends Batch {
-  supervisor_name: string | null; // It's 'string | null' because a LEFT JOIN can result in null if there's no match
+export interface BatchWithInternCount extends Batch {
+  intern_count: number;
 }
+
 
 export interface User {
     id: string;

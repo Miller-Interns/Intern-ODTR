@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ViewButton from '~/composables/view-buttom.vue';
-import {type Batch } from '~/interfaces/batch-response';
+import {type Batch, type BatchWithInternCount } from '~/interfaces/batch-response';
 import { formatDate } from '~/server/db/utils/format'
 import { NuxtLink } from '#components';
 
@@ -10,7 +10,7 @@ definePageMeta({
     layout: 'batch'
 })
 
-const { data: allBatches, pending, error } = await useFetch<Batch[]>('/api/batches/batch');
+const { data: allBatches, pending, error } = await useFetch<BatchWithInternCount[]>('/api/batches/batch');
 const currentBatches = computed(() => {
     if (!allBatches.value) return [];
       const today = new Date();
@@ -27,7 +27,7 @@ const previousBatches = computed(() => {
 
 const triggerServerStatusUpdate = async () => {
    try {
-    const updatedBatchList = await $fetch<Batch[]>('/api/batches/status', {
+    const updatedBatchList = await $fetch<BatchWithInternCount[]>('/api/batches/status', {
       method: 'PATCH'
     });
     allBatches.value = updatedBatchList;
@@ -81,6 +81,7 @@ watchEffect((onInvalidate) => {
                         <div class="card-header">
                             <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
                             <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
+                            <p class="interns">No. of Interns{{ batch.intern_count }}</p>
                             <ViewButton :batch-id="batch.id" />
                             <!-- <NuxtLink to="/editBatch/${batch.id}"><button>
                                     edit Batch
