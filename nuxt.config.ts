@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     databaseUrl: process.env.POSTGRES_CONNECTION_URL,
   },
 
-  modules: ['@nuxt/eslint', '@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/eslint', '@nuxt/ui'],
 
   alias: {
     '@/generated/prisma': fileURLToPath(new URL('./app/generated/prisma', import.meta.url)),
