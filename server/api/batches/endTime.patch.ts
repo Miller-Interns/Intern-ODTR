@@ -1,28 +1,39 @@
-
-
-
 import { db } from '~/server/db/index';
-import {sql } from 'kysely'
+import { sql } from 'kysely';
+import { z } from 'zod';
 
+const BodySchema = z.object({
+    id:z.string(),
+  end_date: z.string()
+});
 
 export default defineEventHandler(async (event) => {
+  
+  const body = await readBody(event);
+  const validation = BodySchema.safeParse(body);
+
+  if (!validation.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid request body',
+      data: validation.error.issues,
+    });
+  }
+
+  const { id, end_date } = validation.data;
+
   try {
-   
- const updatedBatches = await db
+
+    await db
       .updateTable('batches')
-      .set({ status: 'ONGOING' })
-      .where((eb) =>
-        eb.and([
-          eb('status', '=', 'INCOMING'),
-          eb('start_date', '<=', new Date()),
-        ])
-      )
-      .returningAll() 
+      .set({ 
+        end_date: end_date,
+        status: 'COMPLETED'
+       })
+      .where('batches.id', '=', id)
       .execute();
 
-    console.log(`Server: Atomically updated ${updatedBatches.length} batch(es).`);
-
-  const allBatches = await db
+    const allBatches = await db
         .selectFrom('batches')
         .selectAll('batches') 
         .leftJoin('users', 'users.id', 'batches.supervisorId')
@@ -54,10 +65,10 @@ export default defineEventHandler(async (event) => {
       return batchesWithCount;
   
     } catch (e: any) {
-      console.error('API Error:', e);
+      console.error('API Error in endTime.patch.ts:', e);
       throw createError({
         statusCode: 500,
-        statusMessage: 'Failed to fetch batches from the database.',
+        statusMessage: 'Failed to update batches in the database.',
       });
     }
-  });
+});

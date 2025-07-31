@@ -1,3 +1,5 @@
+import type { BatchWithInternCount } from '~/interfaces/batch-response';
+
 export function getTodayDateString(): string {
   const today = new Date();
   const year = today.getFullYear();
@@ -5,3 +7,4 @@ export function getTodayDateString(): string {
   const day = String(today.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+

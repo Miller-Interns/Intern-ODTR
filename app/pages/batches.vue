@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import ViewButton from '~/composables/view-buttom.vue';
-import {type Batch, type BatchWithInternCount } from '~/interfaces/batch-response';
+import {  type BatchWithInternCount } from '~/interfaces/batch-response';
 import { formatDate } from '~/server/db/utils/format'
-import { NuxtLink } from '#components';
+import { getTodayDateString} from '~/composables/today-date';
 
 
 definePageMeta({
@@ -10,11 +10,71 @@ definePageMeta({
     layout: 'batch'
 })
 
+
 const { data: allBatches, pending, error } = await useFetch<BatchWithInternCount[]>('/api/batches/batch');
-const currentBatches = computed(() => {
+
+
+
+const triggerServerStatusUpdate = async () => {
+    try {
+        const updatedBatchList = await $fetch<BatchWithInternCount[]>('/api/batches/status', {
+            method: 'PATCH'
+        });
+        allBatches.value = updatedBatchList;
+
+    } catch (e) {
+        console.error('Client: Failed to trigger the server-side status update:', e);
+    }
+  
+};
+
+watchEffect((onInvalidate) => {
+    const batches = allBatches.value;
+
+    if (!batches || batches.length === 0) {
+        return;
+    }
+
+    console.log("watchEffect is running with loaded batches.");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const needsUpdate = batches.some(batch =>
+        batch.status === 'INCOMING' && new Date(batch.start_date) <= today
+    );
+
+    if (needsUpdate) {
+        triggerServerStatusUpdate();
+    }
+
+
+});
+
+  const endTime = async (batchId: string)=>{
+   
+    try{
+    const today=getTodayDateString()
+        const batchComplete=await $fetch <BatchWithInternCount[]>('api/batches/endTime',{
+            method: 'PATCH',
+            body:{
+                id: batchId,
+                end_date:today,
+            }
+        });
+        allBatches.value=batchComplete;
+    } 
+    catch (error: any) {
+    console.error('Failed to update batch end time:', error);
+ 
+}
+  }
+ 
+
+  const currentBatches = computed(() => {
     if (!allBatches.value) return [];
-      const today = new Date();
-today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     console.log(today)
     return allBatches.value.filter(batch => batch.end_date === null);
 });
@@ -23,42 +83,9 @@ const previousBatches = computed(() => {
     if (!allBatches.value) return [];
     return allBatches.value.filter(batch => batch.end_date !== null);
 });
+        
 
 
-const triggerServerStatusUpdate = async () => {
-   try {
-    const updatedBatchList = await $fetch<BatchWithInternCount[]>('/api/batches/status', {
-      method: 'PATCH'
-    });
-    allBatches.value = updatedBatchList;
-
-  } catch (e) {
-    console.error('Client: Failed to trigger the server-side status update:', e);
-  }
-};
-
-watchEffect((onInvalidate) => {
-  const batches = allBatches.value;
-
-  if (!batches || batches.length === 0) {
-    return;
-  }
-  
-  console.log("watchEffect is running with loaded batches.");
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const needsUpdate = batches.some(batch => 
-     batch.status === 'INCOMING' && new Date(batch.start_date) <= today
-  );
-
-  if (needsUpdate) {
-    triggerServerStatusUpdate();
-  }
-  
-
-});
 </script>
 
 <template>
@@ -82,23 +109,26 @@ watchEffect((onInvalidate) => {
                             <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
                             <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
                             <p class="interns">No. of Interns{{ batch.intern_count }}</p>
-                            {{batch.supervisor_name }}
+                            {{ batch.supervisor_name }}
                             <ViewButton :batch-id="batch.id" />
-                            <!-- <NuxtLink to="/editBatch/${batch.id}"><button>
-                                    edit Batch
-                                </button>
-                            </NuxtLink> -->
+                       <NuxtLink :to="`/editBatch?id=${batch.id}`">
+                            <button>Edit Batch</button>
+                        </NuxtLink>
                         </div>
                         <div class="card-details">
-                          <p>Status: <span class="status" :class="`status-${batch.status?.toLowerCase()}`">{{ batch.status }}</span></p>
-                         
-            </div>
+                            <p>Status: <span class="status" :class="`status-${batch.status?.toLowerCase()}`">{{
+                                batch.status }}</span></p>
+
+                        </div>
+                        <button class="batchComplete" @click="endTime(batch.id)">
+                            Mark Batch as Complete</button>
+                       
                     </div>
                 </div>
                 <p v-else class="empty-state">No active batches.</p>
             </section>
 
-            <NuxtLink to="/createBatch"><button>
+            <NuxtLink to="/createBatch/${batch.id}"><button>
                     Create Batch
                 </button></NuxtLink>
 
@@ -116,6 +146,8 @@ watchEffect((onInvalidate) => {
                         </div>
                         <div class="card-details">
                             <p>Status: <span class="status">{{ batch.status }}</span></p>
+                            <p class="interns">No. of Interns{{ batch.intern_count }}</p>
+                            {{ batch.supervisor_name }}
                         </div>
                     </div>
                 </div>

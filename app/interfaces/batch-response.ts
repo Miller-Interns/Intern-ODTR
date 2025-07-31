@@ -27,7 +27,7 @@ export interface Batch{
     id: string; 
     batch_number: string;
     start_date: Date;
-    end_date: Date;
+    end_date: Date | null;
     status: Status;
     supervisorId: Supervisor
 }
