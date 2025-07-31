@@ -10,17 +10,6 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: [
-		'@prisma/nuxt', 
-		'@nuxt/eslint',
-		'@nuxt/ui'
-	],
-
-	vite: {
-		build: {
-			rollupOptions: {
-				external: ['@prisma/client']
-			}
-		}
-	}
+	modules: ['@nuxt/eslint', '@nuxt/ui'],
+	css: ['@/assets/css/main.css'],
 })
