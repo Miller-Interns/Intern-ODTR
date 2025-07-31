@@ -1,5 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
 import type { NuxtConfig } from 'nuxt/config'
 
 const runtimeConfig: NuxtConfig['runtimeConfig'] = {
