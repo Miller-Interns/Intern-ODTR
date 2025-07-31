@@ -12,5 +12,6 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: ['@nuxt/eslint'],
+	modules: ['@nuxt/eslint', '@nuxt/ui'],
+	css: ['@/assets/css/main.css'],
 })
