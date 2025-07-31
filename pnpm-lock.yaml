@@ -17,12 +17,15 @@ importers:
       '@prisma/nuxt':
         specifier: ^0.3.0
         version: 0.3.0(magicast@0.3.5)(prisma@6.12.0(typescript@5.8.3))(typescript@5.8.3)(vite@7.0.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.0))
+<<<<<<< HEAD
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
+=======
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
       kysely:
         specifier: ^0.28.3
         version: 0.28.3
@@ -647,17 +650,30 @@ packages:
   '@fastify/busboy@3.1.1':
     resolution: {integrity: sha512-5DGmA8FTdB2XbDeEwc/5ZXBl6UbBAyBOOLlPuBnZ/N1SwdH9Ii+cOX3tBROlDgcTXxjOYnLMVoKk9+FXAw0CJw==}
 
+<<<<<<< HEAD
   '@floating-ui/core@1.7.2':
     resolution: {integrity: sha512-wNB5ooIKHQc+Kui96jE/n69rHFWAVoxn5CAzL1Xdd8FG03cgY3MLO+GF9U3W737fYDSgPWA6MReKhBQBop6Pcw==}
 
   '@floating-ui/dom@1.7.2':
     resolution: {integrity: sha512-7cfaOQuCS27HD7DX+6ib2OrnW+b4ZBwDNnCcT0uTyidcmyWb03FnQqJybDBoCnpdxwBSfA94UAYlRCt7mV+TbA==}
+=======
+  '@floating-ui/core@1.7.3':
+    resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
+
+  '@floating-ui/dom@1.7.3':
+    resolution: {integrity: sha512-uZA413QEpNuhtb3/iIKoYMSK07keHPYeXF02Zhd6e213j+d1NamLix/mCLxBUDW/Gx52sPH2m+chlUsyaBs/Ag==}
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
+<<<<<<< HEAD
   '@floating-ui/vue@1.1.7':
     resolution: {integrity: sha512-idmAtbAIigGXN2SI5gItiXYBYtNfDTP9yIiObxgu13dgtG7ARCHlNfnR29GxP4LI4o13oiwsJ8wVgghj1lNqcw==}
+=======
+  '@floating-ui/vue@1.1.8':
+    resolution: {integrity: sha512-SNJAa1jbT8Gh1LvWw2uIIViLL0saV2bCY59ISCvJzhbut5DSb2H3LKUK49Xkd7SixTNHKX4LFu59nbwIXt9jjQ==}
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -679,8 +695,13 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
+<<<<<<< HEAD
   '@iconify/collections@1.0.573':
     resolution: {integrity: sha512-eEyZWQ223YX76w7URx+7O7xu5uTSJ9SJ1z7JB9YumWXoZOXVmNasyuOIU3JdQfCmvc1/qpT1dMhY3d65wgHs5Q==}
+=======
+  '@iconify/collections@1.0.574':
+    resolution: {integrity: sha512-ECuh4GjXtSsj6NHEQ/gpzZNf9etMfxXjNNoa6ZXZhUJGbLl+uHLP96AJwrmoBuJSU6msIMctvAORDz7W16UjSg==}
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -6397,6 +6418,7 @@ snapshots:
 
   '@fastify/busboy@3.1.1': {}
 
+<<<<<<< HEAD
   '@floating-ui/core@1.7.2':
     dependencies:
       '@floating-ui/utils': 0.2.10
@@ -6404,13 +6426,28 @@ snapshots:
   '@floating-ui/dom@1.7.2':
     dependencies:
       '@floating-ui/core': 1.7.2
+=======
+  '@floating-ui/core@1.7.3':
+    dependencies:
+      '@floating-ui/utils': 0.2.10
+
+  '@floating-ui/dom@1.7.3':
+    dependencies:
+      '@floating-ui/core': 1.7.3
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
       '@floating-ui/utils': 0.2.10
 
   '@floating-ui/utils@0.2.10': {}
 
+<<<<<<< HEAD
   '@floating-ui/vue@1.1.7(vue@3.5.17(typescript@5.8.3))':
     dependencies:
       '@floating-ui/dom': 1.7.2
+=======
+  '@floating-ui/vue@1.1.8(vue@3.5.17(typescript@5.8.3))':
+    dependencies:
+      '@floating-ui/dom': 1.7.3
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
       '@floating-ui/utils': 0.2.10
       vue-demi: 0.14.10(vue@3.5.17(typescript@5.8.3))
     transitivePeerDependencies:
@@ -6430,7 +6467,11 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
+<<<<<<< HEAD
   '@iconify/collections@1.0.573':
+=======
+  '@iconify/collections@1.0.574':
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -6866,7 +6907,11 @@ snapshots:
 
   '@nuxt/icon@1.15.0(magicast@0.3.5)(vite@7.0.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))':
     dependencies:
+<<<<<<< HEAD
       '@iconify/collections': 1.0.573
+=======
+      '@iconify/collections': 1.0.574
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
       '@iconify/types': 2.0.0
       '@iconify/utils': 2.3.0
       '@iconify/vue': 5.0.0(vue@3.5.17(typescript@5.8.3))
@@ -11309,8 +11354,13 @@ snapshots:
 
   reka-ui@2.3.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3)):
     dependencies:
+<<<<<<< HEAD
       '@floating-ui/dom': 1.7.2
       '@floating-ui/vue': 1.1.7(vue@3.5.17(typescript@5.8.3))
+=======
+      '@floating-ui/dom': 1.7.3
+      '@floating-ui/vue': 1.1.8(vue@3.5.17(typescript@5.8.3))
+>>>>>>> dabfe53e9a3c05db441c3db2dd0f14f94e487e7c
       '@internationalized/date': 3.8.2
       '@internationalized/number': 3.6.4
       '@tanstack/vue-virtual': 3.13.12(vue@3.5.17(typescript@5.8.3))
