@@ -12,5 +12,5 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: ['@prisma/nuxt', '@nuxt/eslint'],
+	modules: ['@nuxt/eslint'],
 })
