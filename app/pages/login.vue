@@ -1,127 +1,97 @@
 <template>
-  <!-- Main container using Flexbox for centering -->
-  <div class="flex items-start justify-center min-h-screen bg-gray-500 dark:bg-gray-900 p-4 pt-[10vh]">
+  <div class="flex items-start justify-center min-h-screen bg-[#E9E9E9] dark:bg-gray-900 p-4 pt-[10vh]">
     <UCard class="w-full max-w-sm">
       <template #header>
-        <div class="text-center">
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <div class="text-center space-y-4">
+          <div class="flex justify-center">
+            <img :src="Logo" alt="App Logo" class="w-16 h-16" />
+          </div>
+          <h1 class="text-lg font-bold text-gray-900 dark:text-white">
             Welcome to MllrDev Intern DTR
           </h1>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Log in with your account to continue
+          <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
+            Log in with your Miller Development account to continue
           </p>
         </div>
       </template>
-
-      <!-- UForm handles validation, state, and submission -->
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="handleLogin">
-        <UFormGroup label="Email" name="email">
-          <UInput
-            v-model="state.email"
-            icon="i-heroicons-at-symbol"
-            placeholder="username@gmail.com"
-            autocomplete="email"
-            size="lg"
-          />
-        </UFormGroup>
-
-        <UFormGroup label="Password" name="password">
-          <UInput
-            v-model="state.password"
-            :type="isPasswordVisible ? 'text' : 'password'"
-            placeholder="Password"
-            autocomplete="current-password"
-            size="lg"
-          >
-            <!-- Slot for the show/hide password toggle -->
+        <UFormField name="email" label="Email:*">
+          <UInput v-model="state.email" placeholder="username@gmail.com"
+            class="w-full rounded-md border text-sm italic placeholder-gray-400"
+            :class="emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'" />
+        </UFormField>
+        <p v-if="emailError" class="text-sm text-red-500 mt-1">
+          Please Enter a Valid Email Address
+        </p>
+        <UFormField name="password" label="Password:*">
+          <UInput v-model="state.password" :type="isPasswordVisible ? 'text' : 'password'" placeholder="Password"
+            class="w-full rounded-md border text-sm italic placeholder-gray-400"
+            :class="passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'">
             <template #trailing>
-              <UButton
-                :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                variant="link"
-                color="primary"
-                :padded="false"
-                @click="isPasswordVisible = !isPasswordVisible"
-              />
+              <UButton :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'" variant="link"
+                color="neutral" :padded="false" @click="isPasswordVisible = !isPasswordVisible" />
             </template>
           </UInput>
-        </UFormGroup>
-
-        <UButton
-          type="submit"
-          label="Sign In"
-          color="primary"
-          size="lg"
-          :loading="isLoading"
-          block
-        />
+        </UFormField>
+        <p v-if="passwordError" class="text-sm text-red-500 mt-1">
+          {{ passwordError }}
+        </p>
+        <UButton type="submit" label="Sign in" :loading="isLoading" block
+          class="bg-[#5da7af] hover:bg-[#5aa897] text-white text-base py-2 rounded-md" />
       </UForm>
     </UCard>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { z } from 'zod';
-import type { FormSubmitEvent } from '#ui/types';
+import { ref, reactive } from 'vue'
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+import { UForm, UFormField, UInput, UCard, UButton } from '#components'
+import Logo from '../assets/images/logo-cadet-blue.svg'
 
-definePageMeta({
-  middleware: 'guest',
-});
+definePageMeta({ middleware: 'guest' })
 
-const { fetchUser } = useAuth();
-const isLoading = ref(false);
-const isPasswordVisible = ref(false);
+const { fetchUser } = useAuth()
 
-// 1. Define the validation schema with Zod
+const isLoading = ref(false)
+const isPasswordVisible = ref(false)
+const emailError = ref(false)
+const passwordError = ref<string | undefined>(undefined)
+
 const schema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.string().email(),
   password: z.string().min(1, 'Password is required'),
-});
+})
 
-// Type definition for the form state, inferred from the schema
 type Schema = z.output<typeof schema>
 
-// 2. Create a reactive state object for the form
 const state = reactive({
   email: '',
   password: '',
-});
+})
 
-// 3. The handleLogin function now receives a typed event from UForm
 const handleLogin = async (event: FormSubmitEvent<Schema>) => {
-  isLoading.value = true;
-  // The 'event.data' is the validated form state
-  const { email, password } = event.data;
+  isLoading.value = true
+  emailError.value = false
+  passwordError.value = undefined
 
   try {
     await $fetch('/api/login', {
       method: 'POST',
-      body: { email, password },
-    });
-    
-    await fetchUser();
-    await navigateTo('/dashboard');
-
-  } catch (error: any) {
-    console.error('Login failed. Server response:', error.data);
-    const message = error.data?.statusMessage || 'An unknown error occurred.';
-    
-    // UForm can programmatically set errors. We need access to the form instance.
-    // However, a simpler approach for a login form is to display a general toast notification.
-    // For this example, we'll stick to a simple alert or console log for the error.
-    // A more advanced pattern would involve using `useToast()` from Nuxt UI.
-    const toast = useToast()
-    toast.add({
-      title: 'Login Failed',
-      description: message.includes('password') || message.includes('credentials')
-        ? 'Incorrect email or password.'
-        : 'An unexpected error occurred. Please try again.',
-      color: 'secondary',
-      icon: 'i-heroicons-exclamation-circle',
+      body: {
+        email: event.data.email,
+        password: event.data.password,
+      },
     })
 
+    await fetchUser()
+    await navigateTo('/dashboard')
+  } catch (error: any) {
+    emailError.value = true
+    passwordError.value = error.data?.statusMessage || 'Incorrect Password'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 </script>
