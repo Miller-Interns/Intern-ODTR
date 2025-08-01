@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-start justify-center min-h-screen bg-white dark:bg-gray-900 p-4 pt-[10vh]">
+  <div class="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900 p-4">
     <UCard class="w-full max-w-sm !border-none !shadow-none !ring-0 !divide-y-0">
       <template #header>
         <div class="text-center space-y-4">
