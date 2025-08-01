@@ -1,53 +1,78 @@
-
 <template>
-  <div class="batch-container">
-    <h1>Create Batch</h1>
-    <form @submit.prevent="submitBatch">
-      <div class="form-group">
-        <label for="batchNumber">Batch Number</label>
-        <input id="batchNumber" v-model.trim="batchNumber" type="text" required />
+
+  <div class="max-w-md mx-auto p-6 w-full">
+
+    <div class="flex items-center space-x-4">
+      <UButton icon="i-lucide-corner-up-left" color=secondary variant="ghost" aria-label="Go back" @click="goBack" />
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
+        Create Batch
+      </h1>
+    </div>
+
+
+    <UForm state="formState" @submit="submitBatch" class="space-y-6 ">
+
+      <div class="flex space-x-4 ">
+        <UFormGroup name="batchNumber" class="grow " required>
+          <div>
+            Batch Number : <span class="text-red-500">*</span>
+          </div>
+          <UInput class="w-full" v-model.trim="batchNumber" placeholder="Batch" size="xl" />
+        </UFormGroup>
       </div>
-      <div class="form-group">
-        <label for="startDate">Start Date</label>
-        <input id="startDate" v-model="startDate" type="date" required />
-      </div>
-        <div class="form-group">
-        <label for="supervisor">Intern Supervisor</label>
-        <select id="supervisor" v-model="selectedSupervisorId" required>
-          <option :value="null" disabled>-- Please select a supervisor --</option>
-          <option
-            v-for="supervisor in supervisorList"
-            :key="supervisor.id"
-            :value="supervisor.id"
-          >
-            {{ supervisor.name }}
-          </option>
-        </select>
-      </div>
-      <button type="submit" :disabled="isLoading">
-        <span v-if="isLoading">Submitting...</span>
-        <span v-else>Submit</span>
-      </button>
-      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-    </form>
+
+
+      <section class="items-center space-x-10 w-full max-w-md">
+        <UFormGroup name="startDate" class="grow" required>
+
+          <div>
+            Start Date : <span class="text-red-500">*</span>
+          </div>
+          <UInput class="w-full" v-model="startDate" type="date" size="xl" />
+        </UFormGroup>
+      </section>
+
+      <section class="items-center space-x-10 w-full max-w-md">
+        <UFormGroup name="slectedSupervisorId" class="grow" required>
+
+          <div>
+            Intern Supervisor : <span class="text-red-500">*</span>
+          </div>
+          <USelect v-model="selectedSupervisorId" :items="supervisorList" placeholder="Select Intern Supervisor" value-key="value"
+            class="w-48 items-center space-x-10 w-full max-w-md" />
+        </UFormGroup>
+      </section>
+      <UButton type="submit" text=regular label="Save Batch" :loading="isLoading" color=primary block size="lg"
+        class="mt-8" />
+
+
+      <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
+        :title="successMessage" @close="successMessage = ''" />
+      <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
+        @close="errorMessage = ''" />
+    </UForm>
   </div>
+
 </template>
 
 <script setup lang="ts">
 import { Status } from "~/enums/status";
-import { type BatchApiResponse, type  Supervisor, supervisors } from '~/interfaces/batch-response';
+import { type BatchApiResponse } from '~/interfaces/batch-response';
 import { getTodayDateString } from '~/composables/today-date';
+
+
 
 definePageMeta({
   path: "/createBatch",
 });
 
+const router = useRouter()
+
 const batchNumber = ref<string>('');
 const startDate = ref<string>('');
 
 
-const supervisorList = ref<Supervisor[]>(supervisors);
+
 const selectedSupervisorId = ref<string>('');
 
 const isLoading = ref<boolean>(false);
@@ -56,40 +81,49 @@ const errorMessage = ref<string>('');
 
 
 
+
 onMounted(() => {
   startDate.value = getTodayDateString();
-   selectedSupervisorId.value = '';
+  selectedSupervisorId.value = '';
+
 });
 
-async function submitBatch() {
-    console.log("Submit function started.");
+function goBack() {
+  router.push('/'), 1500;
+}
 
-     if (!selectedSupervisorId.value) {
-      errorMessage.value = 'Please select a supervisor.';
-      return; // Exit early if validation fails
-    }
+
+  const todayString = getTodayDateString();
+
+
+async function submitBatch() {
+  console.log("Submit function started.");
+
+  if (!selectedSupervisorId.value) {
+    errorMessage.value = 'Please select a supervisor.';
+    return;
+  }
 
   successMessage.value = '';
   errorMessage.value = '';
   isLoading.value = true;
-  
-  const todayString = getTodayDateString();
+
   const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
-  console.log("into to $fetch..."); 
+  console.log("into to $fetch...");
   try {
-    console.log("Attempting to $fetch..."); 
-    
+    console.log("Attempting to $fetch...");
+
     const response = await $fetch<BatchApiResponse>('/api/batches/Post-batch', {
       method: 'POST',
       body: {
         batch_number: batchNumber.value,
         start_date: startDate.value,
         status: statusToSet,
-       supervisorId: selectedSupervisorId.value,
+        supervisorId: selectedSupervisorId.value,
 
       },
     });
-  console.log("API response received:", response); 
+    console.log("API response received:", response);
     if (response.success) {
       successMessage.value = `Batch "${response.batch.batch_number}" created successfully!`;
       batchNumber.value = '';
@@ -101,75 +135,16 @@ async function submitBatch() {
     isLoading.value = false;
   }
 }
+
+const { data: supervisorList } = await useFetch('/api/batches/admin', {
+  key: 'typicode-users',
+  transform: (data: { id: string, name: string }[]) => {
+    return data?.map(user => ({
+      label: user.name,
+      value: String(user.id),
+    }))
+  },
+  lazy: true
+})
+
 </script>
-
-<style scoped>
-/* Your styles are correct, no changes needed */
-</style>
-<style scoped>
-/* Adding some basic styles to make it look good */
-.batch-container {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-input[type="text"],
-input[type="date"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #a0c3e6;
-  cursor: not-allowed;
-}
-
-.success-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  color: #155724;
-  background-color: #d4edda;
-  border-radius: 4px;
-}
-
-.error-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  color: #721c24;
-  background-color: #f8d7da;
-  border-radius: 4px;
-}
-</style>

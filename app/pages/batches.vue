@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import ViewButton from '~/composables/view-buttom.vue';
-import {  type BatchWithInternCount } from '~/interfaces/batch-response';
+import {capitalize} from '~/server/db/utils/format'
+import { type BatchWithInternCount } from '~/interfaces/batch-response';
 import { formatDate } from '~/server/db/utils/format'
-import { getTodayDateString} from '~/composables/today-date';
+import { getTodayDateString } from '~/composables/today-date';
+
 
 
 definePageMeta({
@@ -25,7 +26,7 @@ const triggerServerStatusUpdate = async () => {
     } catch (e) {
         console.error('Client: Failed to trigger the server-side status update:', e);
     }
-  
+
 };
 
 watchEffect((onInvalidate) => {
@@ -51,27 +52,27 @@ watchEffect((onInvalidate) => {
 
 });
 
-  const endTime = async (batchId: string)=>{
-   
-    try{
-    const today=getTodayDateString()
-        const batchComplete=await $fetch <BatchWithInternCount[]>('api/batches/endTime',{
+const endTime = async (batchId: string) => {
+
+    try {
+        const today = getTodayDateString()
+        const batchComplete = await $fetch<BatchWithInternCount[]>('api/batches/endTime', {
             method: 'PATCH',
-            body:{
+            body: {
                 id: batchId,
-                end_date:today,
+                end_date: today,
             }
         });
-        allBatches.value=batchComplete;
-    } 
+        allBatches.value = batchComplete;
+    }
     catch (error: any) {
-    console.error('Failed to update batch end time:', error);
- 
-}
-  }
- 
+        console.error('Failed to update batch end time:', error);
 
-  const currentBatches = computed(() => {
+    }
+}
+
+
+const currentBatches = computed(() => {
     if (!allBatches.value) return [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -83,101 +84,139 @@ const previousBatches = computed(() => {
     if (!allBatches.value) return [];
     return allBatches.value.filter(batch => batch.end_date !== null);
 });
-        
+
 
 
 </script>
-
 <template>
-    <div>
-        <div v-if="pending" class="loading-state">
-            Loading batch information...
-        </div>
 
-        <div v-else-if="error" class="error-state">
-            <h2>Error</h2>
-            <p>Could not load batches. Please try again later.</p>
-            <pre>{{ error.message }}</pre>
-        </div>
+  <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto font-sans">
 
-        <div v-else>
-            <section class="batch-section">
-                <h2>Current Batches</h2>
-                <div v-if="currentBatches.length > 0" class="batch-list">
-                    <div v-for="batch in currentBatches" :key="batch.id" class="batchCard current">
-                        <div class="card-header">
-                            <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
-                            <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
-                            <p class="interns">No. of Interns{{ batch.intern_count }}</p>
-                            {{ batch.supervisor_name }}
-                            <ViewButton :batch-id="batch.id" />
-                       <NuxtLink :to="`/editBatch?id=${batch.id}`">
-                            <button>Edit Batch</button>
-                        </NuxtLink>
-                        </div>
-                        <div class="card-details">
-                            <p>Status: <span class="status" :class="`status-${batch.status?.toLowerCase()}`">{{
-                                batch.status }}</span></p>
-
-                        </div>
-                        <button class="batchComplete" @click="endTime(batch.id)">
-                            Mark Batch as Complete</button>
-                       
-                    </div>
-                </div>
-                <p v-else class="empty-state">No active batches.</p>
-            </section>
-
-            <NuxtLink to="/createBatch/${batch.id}"><button>
-                    Create Batch
-                </button></NuxtLink>
-
-            <section class="batch-section">
-                <h2>Previous Batches</h2>
-                <div v-if="previousBatches.length > 0" class="batch-list">
-                    <div v-for="batch in previousBatches" :key="batch.id" class="batchCard previous">
-                        <div class="card-header">
-                            <h3 class="batchNo">Batch {{ batch.batch_number }}</h3>
-                            <div class="date-range">
-                                <p class="date">Started: {{ formatDate(batch.start_date) }}</p>
-                                <p class="date">Ended: {{ formatDate(batch.end_date) }}</p>
-                            </div>
-                            <ViewButton :batch-id="batch.id" />
-                        </div>
-                        <div class="card-details">
-                            <p>Status: <span class="status">{{ batch.status }}</span></p>
-                            <p class="interns">No. of Interns{{ batch.intern_count }}</p>
-                            {{ batch.supervisor_name }}
-                        </div>
-                    </div>
-                </div>
-                <p v-else class="empty-state">No previous batches found.</p>
-            </section>
-        </div>
-
-        <!-- Slot allows this component to be used as a layout wrapper if needed. -->
-        <slot />
+    
+    <div v-if="pending">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Manage Batch</h2>
+      <USkeleton class="h-56 w-full mb-4" />
+      <USkeleton class="h-12 w-full mb-8" />
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Previous Batches</h2>
+      <USkeleton class="h-48 w-full" />
     </div>
+
+    <div v-else-if="error">
+      <UCard >
+        <template #header>
+          <h2 class="text-xl font-bold text-red-600">Error</h2>
+        </template>
+        <p>Could not load batches. Please try again later.</p>
+        <pre class="mt-4 p-2 bg-red-50 rounded-md text-red-700 text-xs">{{ error.message }}</pre>
+      </UCard>
+    </div>
+
+ 
+    <div v-else class="flex flex-col gap-y-10">
+      <section>
+        <h2 class="text-regular font-bold text-gray-800 dark:text-gray-100 mb-4 md:text-3xl">Manage Batch</h2>
+        
+        <div v-if="currentBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 ">
+          <div v-for="batch in currentBatches" :key="batch.id">
+           
+            <UCard :ui="{ footer:  'py-3 px-4 sm:px-6'  }"
+        
+            class="flex flex-col space-y-1 shadow-[0_5px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)]
+        dark:shadow-[0_5px_15px_rgba(0,0,0,0.3),_0_3px_6px_rgba(0,0,0,0.25)] ">
+              <template #header>
+                <div class="flex justify-between items-center">
+                  <div class="flex left gap-3">
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">Batch {{ batch.batch_number }}</h3>
+                    <UBadge class="rounded-full"  color=primary variant=solid size="md">{{ capitalize(batch.status) }}</UBadge>
+                    </div>
+                          <div class="flex right items-center">
+                    <NuxtLink :to="`/editBatch?id=${batch.id}`">
+                      <UButton icon="i-lucide-pencil-line" color=secondary variant="ghost" size="sm" aria-label="Edit Batch" />
+                    </NuxtLink>
+                          </div>
+                </div>
+              </template>
+             
+              
+              <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300 flex-grow">
+                <div>
+                  <p class="font-medium text-gray-800 dark:text-gray-100">{{ batch.intern_count ?? 0}}/5 Interns</p>
+                  <p class="text-gray-500 dark:text-gray-400">({{ 5 - (batch.intern_count ?? 0) }} Slots Available)</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400">Started in</p>
+                  <p class="font-medium">{{ formatDate(batch.start_date) }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400">Intern Supervisor</p>
+                  <p class="font-medium">{{ batch.supervisor_name || 'N/A' }}</p>
+                </div>
+              </div>
+              
+
+               <template #footer>
+        
+                 <UButton class="py-2.5" :to="`/viewBatch?id=${batch.id}`" label="View Batch Details" color=primary variant="outline" block />
+              
+                </template>
+
+            </UCard>
+
+       
+            <div class="mt-3 flex flex-col py-5">
+             
+              <UButton class="py-2.5" @click="endTime(batch.id)" label="Mark Batch As Completed" color=primary variant=solid block />
+            </div>
+          </div>
+        </div>
+        <p v-else class="text-gray-500 dark:text-gray-400 mt-4">No active batches.</p>
+      </section>
+
+      
+      <section class="mt-3 flex flex-col  mb-4">
+        <NuxtLink to="/createBatch">
+          <UButton class="py-2.5" icon="i-lucide-plus"  label="Create Batch" variant=solid color=primary  block size=xl />
+        </NuxtLink>
+      </section>
+
+    
+      <section>
+        <h2 class="text-regular font-bold text-gray-800 dark:text-gray-100 mb-4 md:text-3xl">Previous Batches</h2>
+        
+        <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <UCard v-for="batch in previousBatches" :key="batch.id">
+            <template #header>
+              <div class="flex left items-center gap-3">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Batch {{ batch.batch_number }}</h3>
+                <UBadge class="rounded-full" color=primary variant=solid size="md">{{ capitalize(batch.status) }}</UBadge>
+              </div>
+            </template>
+            <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <div>
+                <p class="font-medium text-gray-800 dark:text-gray-100">{{ batch.intern_count ?? 0 }}/5 Interns</p>
+                <p class="text-gray-500 dark:text-gray-400">(All Slots have been filled)</p>
+              </div>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">Started on</p>
+                <p class="font-medium">{{ formatDate(batch.start_date) }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">Ended On</p>
+                <p class="font-medium">{{ formatDate(batch.end_date) }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">Intern Supervisor</p>
+                <p class="font-medium">{{ batch.supervisor_name || 'N/A' }}</p>
+              </div>
+            </div>
+          </UCard>
+        </div>
+        <p v-else class="text-gray-500 dark:text-gray-400 mt-4">No previous batches found.</p>
+      </section>
+      
+    </div>
+    
+  
+  </div>
 </template>
 
-<style scoped>
-.date,
-.date-range {
-    font-size: 0.9em;
-    color: #555;
-    margin: 0;
-}
-
-.date-range {
-    text-align: right;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-}
-
-/* Add other styles as needed */
-</style>

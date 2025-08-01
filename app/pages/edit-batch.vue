@@ -1,45 +1,72 @@
 <template>
-  <div class="batch-container">
-    <div v-if="pending" class="loading">Loading batch data...</div>
-    <div v-else-if="fetchError" class="error-message">
-      Could not load batch data. {{ fetchError.message }}
+
+  <div class="max-w-md mx-auto p-6 w-full h-full">
+
+    <div class="flex items-center space-x-4">
+      <UButton icon="i-lucide-corner-up-left" color=secondary variant="ghost" aria-label="Go back" @click="goBack" />
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
+        Edit Batch
+      </h1>
     </div>
-    <div v-else>
-      <h1>Edit Batch {{ batchNumber }}</h1>
-      <form @submit.prevent="submitBatch">
-        <div class="form-group">
-          <label for="batchNumber">Batch Number</label>
-          <input id="batchNumber" v-model="batchNumber" type="text" required />
-        </div>
-        <div class="form-group">
-          <label for="startDate">Start Date</label>
-          <input id="startDate" v-model="startDate" type="date" required />
-        </div>
-        <div class="form-group">
-          <label for="supervisor">Intern Supervisor</label>
-          <select id="supervisor" v-model="selectedSupervisorId" required>
-            <option :value="null" disabled>-- Please select a supervisor --</option>
-            <option v-for="supervisor in supervisorList" :key="supervisor.id" :value="supervisor.id">
-              {{ supervisor.name }}
-            </option>
-          </select>
-        </div>
-        <button type="submit" :disabled="isSubmitting">
-          <span v-if="isSubmitting">Saving...</span>
-          <span v-else>Save Changes</span>
-        </button>
-        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      </form>
-    </div>
+
+
+    <UForm :state="{}" @submit="submitBatch" class="space-y-6 ">
+
+      <div class="flex space-x-4 ">
+        <UFormGroup name="batchNumber" class="grow " required>
+          <div>
+            Batch Number : <span class="text-red-500">*</span>
+          </div>
+          <UInput class="w-full" v-model.trim="batchNumber" placeholder="Batch" size="xl" />
+        </UFormGroup>
+      </div>
+
+
+    
+      <section class="items-center space-x-10 w-full max-w-md">
+        <UFormGroup name="startDate" class="grow" required>
+
+          <div>
+            Start Date : <span class="text-red-500">*</span>
+          </div>
+          <UInput class="w-full" v-model="startDate" type="date" size="xl" />
+        </UFormGroup>
+      </section>
+
+      <section class="items-center space-x-10 w-full max-w-md">
+        <UFormGroup name="slectedSupervisorId" class="grow" required>
+
+          <div>
+            Intern Supervisor : <span class="text-red-500">*</span>
+          </div>
+          <USelect v-model="selectedSupervisorId" :items="supervisorList" placeholder="Select Intern Supervisor" value-key="value"
+            class="w-48 items-center space-x-10 w-full max-w-md" />
+        </UFormGroup>
+      </section>
+
+  
+
+
+
+
+      <UButton type="submit" text=regular label="Save Batch" :loading="isSubmitting" color=primary block size="lg"
+        class="mt-8" />
+
+
+      <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
+        :title="successMessage" @close="successMessage = ''" />
+      <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
+        @close="errorMessage = ''" />
+    </UForm>
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { Status } from "~/enums/status";
-import { type BatchWithInternCount, type Supervisor, supervisors } from '~/interfaces/batch-response';
+import { type BatchWithInternCount} from '~/interfaces/batch-response';
+import { getTodayDateString } from '~/composables/today-date';
+import {format} from 'date-fns'
 
 definePageMeta({
   path: '/editBatch'
@@ -57,16 +84,22 @@ const fetchError = ref<Error | null>(null);
 
 
 const batchNumber = ref('');
-const startDate = ref('');
-const selectedSupervisorId = ref<string | null>(null);
-const supervisorList = ref<Supervisor[]>(supervisors);
+const startDate =ref<string>('');
+const selectedSupervisorId = ref<string>('');
 
-  const todayString = getTodayDateString();
-  const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
+const todayString =  getTodayDateString();
 
+console.log("start")
+console.log(startDate)
+console.log("today")
+console.log(todayString)
 const isSubmitting = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
+
+function goBack() {
+  router.push('/'), 1500;
+}
 
 onMounted(async () => {
   if (!batchId) {
@@ -76,10 +109,10 @@ onMounted(async () => {
   }
   try {
     batchData.value = await $fetch<BatchWithInternCount>('/api/batches/single', {
-        method: 'GET',
-        query: {
-            id: batchId
-        }
+      method: 'GET',
+      query: {
+        id: batchId
+      }
     });
   } catch (err: any) {
     fetchError.value = err;
@@ -91,22 +124,21 @@ onMounted(async () => {
 watchEffect(() => {
   if (batchData.value) {
     batchNumber.value = batchData.value.batch_number.toString();
-    startDate.value = batchData.value.start_date.split('T')[0];
-    
+    startDate.value=format(new Date(batchData.value.start_date), 'yyyy-MM-dd');
   }
 });
 
 
 async function submitBatch() {
+  
+const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
   if (!selectedSupervisorId.value) {
     errorMessage.value = "Please select a supervisor.";
     return;
   }
 
- 
-  
   try {
-    await $fetch<BatchWithInternCount>(`/api/batches/edit`, { 
+    await $fetch<BatchWithInternCount>(`/api/batches/edit`, {
       method: 'PATCH',
       body: {
         id: batchId,
@@ -116,8 +148,8 @@ async function submitBatch() {
         supervisorId: selectedSupervisorId.value,
       },
     });
- isSubmitting.value = true;
-  errorMessage.value = '';
+    isSubmitting.value = true;
+    errorMessage.value = '';
     successMessage.value = 'Batch updated successfully! Redirecting...';
     setTimeout(() => router.push('/'), 1500);
 
@@ -127,9 +159,16 @@ async function submitBatch() {
     isSubmitting.value = false;
   }
 }
-</script>
 
-<style scoped>
-.batch-container { max-width: 500px; margin: 2rem auto; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-/* ...and your other styles... */
-</style>
+
+const { data: supervisorList, pending: status } = await useFetch('/api/batches/admin', {
+  key: 'typicode-users',
+  transform: (data: { id: string, name: string }[]) => {
+    return data?.map(user => ({
+      label: user.name,
+      value: String(user.id),
+    }))
+  },
+  lazy: true
+})
+</script>
