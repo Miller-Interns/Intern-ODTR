@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-start justify-center min-h-screen bg-[#E9E9E9] dark:bg-gray-900 p-4 pt-[10vh]">
-    <UCard class="w-full max-w-sm">
+  <div class="flex items-start justify-center min-h-screen bg-white dark:bg-gray-900 p-4 pt-[10vh]">
+    <UCard class="w-full max-w-sm !border-none !shadow-none !ring-0 !divide-y-0">
       <template #header>
         <div class="text-center space-y-4">
           <div class="flex justify-center">
@@ -24,8 +24,8 @@
           Please Enter a Valid Email Address
         </p>
         <UFormField name="password" label="Password:*">
-          <UInput v-model="state.password" :type="isPasswordVisible ? 'text' : 'password'" placeholder="Password"
-            class="w-full rounded-md border text-sm italic placeholder-gray-400"
+          <UInput v-model="state.password" :type="isPasswordVisible ? 'text' : 'password'" revealable="false"
+            placeholder="Password" class="w-full rounded-md border text-sm italic placeholder-gray-400"
             :class="passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'">
             <template #trailing>
               <UButton :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'" variant="link"
@@ -37,7 +37,7 @@
           {{ passwordError }}
         </p>
         <UButton type="submit" label="Sign in" :loading="isLoading" block
-          class="bg-[#5da7af] hover:bg-[#5aa897] text-white text-base py-2 rounded-md" />
+          class="bg-primary-500 text-white text-base py-2 rounded-md" />
       </UForm>
     </UCard>
   </div>
