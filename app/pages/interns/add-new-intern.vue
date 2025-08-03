@@ -95,7 +95,7 @@ async function addIntern() {
         alert('Intern added successfully!')
         console.log('Server response:', response)
 
-        router.push('/interns/view_interns')
+        router.push('/interns/list-of-interns')
     } catch (error: any) {
         console.error('Error adding intern:', error)
         alert(`Failed to add intern: ${error.data?.statusMessage || 'Please check your input.'}`)

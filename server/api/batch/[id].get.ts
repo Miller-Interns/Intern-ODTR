@@ -53,8 +53,8 @@ export default defineEventHandler(async (event) => {
       },
       interns: batchDataFromDb.Intern.map((intern) => ({
         id: intern.id,
-        name: intern.user.name,
-        pictureUrl: intern.intern_picture,
+        fullName: intern.user.name,
+        internPicture: intern.intern_picture,
         hoursCompleted: intern.hours_completed,
         requiredHours: intern.required_hours,
       })),

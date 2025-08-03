@@ -1,165 +1,25 @@
-<template>
-  <div v-if="pending" class="status-message">
-    Loading intern details...
-  </div>
-  <div v-else-if="error || !form" class="status-message error">
-    Error: Could not find intern data. Please check the server logs and ensure the API is running.
-  </div>
-  <div v-else class="page-background">
-    <div class="details-container">
-      <form @submit.prevent="saveChanges">
-        <div class="header">
-          <NuxtLink to="/interns/view_interns" class="back-button">
-            ←
-          </NuxtLink>
-        </div>
-        <div class="intern-header">
-          <div class="profile-picture-container" :class="{ 'is-editable': isEditing }" @click="handleProfileClick">
-            <input ref="fileInput" type="file" @change="handleFileUpload" accept="image/png, image/jpeg, image/gif"
-              style="display: none" />
-            <img v-if="form.internPicture" :src="form.internPicture" alt="Profile Picture"
-              class="profile-picture-image" />
-            <div v-else class="profile-picture-placeholder">
-              <span class="plus-icon">+</span>
-            </div>
-          </div>
-          <div class="header-details">
-            <p class="intern-name">{{ form.fullName }}</p>
-            <p class="intern-status">{{ form.status }}</p>
-            <p class="intern-role">{{ form.role }}</p>
-            <p class="sub-details">{{ form.course }} - {{ form.year }} | {{ form.school }}</p>
-            <p class="sub-details">Hours Completed: {{ form.hoursCompleted ?? 0 }}/{{ form.requiredHours }}</p>
-          </div>
-        </div>
-        <div class="tabs">
-          <button type="button" class="tab-button active">
-            Personal Info
-          </button>
-          <button type="button" class="tab-button" @click="console.log('Time Logs page not implemented.')">
-            Time Logs
-          </button>
-        </div>
-        <div class="info-body">
-          <h2 class="info-section-title">Intern details:</h2>
-          <div class="info-group">
-            <label for="first-name" class="info-label">
-              First Name:
-            </label>
-            <input id="first-name" type="text" class="info-input" v-model="form.firstName" :disabled="!isEditing"
-              required />
-          </div>
-          <div class="info-group">
-            <label for="middle-name" class="info-label">
-              Middle Name(Optional):
-            </label>
-            <input id="middle-name" type="text" class="info-input" v-model="form.middleName" :disabled="!isEditing" />
-          </div>
-          <div class="info-group">
-            <label for="last-name" class="info-label">
-              Last Name:
-            </label>
-            <input id="last-name" type="text" class="info-input" v-model="form.lastName" :disabled="!isEditing"
-              required />
-          </div>
-          <div class="info-group">
-            <label for="contact-number" class="info-label">
-              Contact Number:
-            </label>
-            <input id="contact-number" type="tel" class="info-input" v-model="form.contactNumber"
-              :disabled="!isEditing" />
-          </div>
-          <div class="info-group">
-            <label for="email" class="info-label">
-              Email:
-            </label>
-            <input id="email" type="email" class="info-input" v-model="form.email" :disabled="!isEditing" required />
-          </div>
-
-          <h2 class="info-section-title">Internship information:</h2>
-          <div class="info-group">
-            <label for="school" class="info-label">
-              School:
-            </label>
-            <input id="school" type="text" class="info-input" v-model="form.school" :disabled="!isEditing" required />
-          </div>
-          <div class="info-group">
-            <label for="courseYear" class="info-label">
-              Course and Year Level:
-            </label>
-            <input id="courseYear" type="text" class="info-input" v-model="form.courseYear" :disabled="!isEditing"
-              required />
-          </div>
-          <div class="info-group">
-            <label for="required-hours" class="info-label">
-              Required Hours:
-            </label>
-            <input id="required-hours" type="number" class="info-input" v-model.number="form.requiredHours"
-              :disabled="!isEditing" required />
-          </div>
-          <div class="info-group">
-            <label for="role-position" class="info-label">
-              Role/Position:
-            </label>
-            <input id="role-position" type="text" class="info-input" v-model="form.role" :disabled="!isEditing"
-              required />
-          </div>
-          <div class="info-group">
-            <label for="emergency-person" class="info-label">
-              Emergency Contact Person:
-            </label>
-            <input id="emergency-person" type="text" class="info-input" v-model="form.contactPerson"
-              :disabled="!isEditing" />
-          </div>
-          <div class="info-group">
-            <label for="emergency-contact" class="info-label">
-              Emergency Contact Number:
-            </label>
-            <input id="emergency-contact" type="text" class="info-input" v-model="form.contactPersonNumber"
-              :disabled="!isEditing" />
-          </div>
-        </div>
-        <button v-if="!isEditing" type="button" @click="startEditing" class="action-button edit-button">
-          Edit Details
-        </button>
-        <button v-else type="submit" class="action-button save-button">
-          ✓ Save Changes
-        </button>
-      </form>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
+import { defineAsyncComponent, ref, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+import type { FormSubmitEvent } from '#ui/types'
+import type { TabsItem } from '#ui/types'
 import type { Status } from '~/generated/prisma'
+import InternProfileHeader from '~/components/intern-profile-header.vue'
+import type { InternDetails } from '~/interfaces/interfaces'
 
+const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
+const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue'))
 const route = useRoute()
+const toast = useToast()
 const internId = route.params.id as string
 const isEditing = ref(false)
+const newAvatarFile = ref<File | null>(null)  
+const avatarPreviewUrl = ref<string | null>(null)  
 
-interface InternDetails {
-  id: string
-  userId: string
-  fullName: string
-  lastName: string
-  firstName: string
-  middleName: string | null
-  email: string
-  contactNumber: string | null
-  contactPerson: string | null
-  contactPersonNumber: string | null
-  school: string
-  course: string
-  year: string
-  courseYear: string
-  requiredHours: number
-  hoursCompleted: number | null
-  note: string | null
-  role: string
-  status: Status
-  password?: string | null
-  internPicture: string | null
-}
+const items: TabsItem[] = [
+  { slot: 'personalinfo', label: 'Personal Info' },
+  { slot: 'timelog', label: 'Time Log' },
+]
 
 const { data: form, pending, error, refresh } = await useFetch<InternDetails>(`/api/interns_details/${internId}`)
 
@@ -167,293 +27,128 @@ function startEditing() {
   isEditing.value = true
 }
 
-async function saveChanges() {
+async function cancelEditing() {
+  newAvatarFile.value = null
+  avatarPreviewUrl.value = null
+
+  await refresh()
+  isEditing.value = false
+  toast.add({ title: 'Edit cancelled', color: 'info' })
+}
+
+async function saveChanges(event: FormSubmitEvent<InternDetails>) {
   if (!form.value) return
-
-  if (!form.value.userId) {
-    window.alert('CRITICAL ERROR: Cannot save because User ID is missing. Please refresh.')
-    return
-  }
-
+  const savingToast = toast.add({ title: 'Saving changes...', color: 'secondary' })
   try {
+    if (newAvatarFile.value) {
+      const formData = new FormData()
+      formData.append('avatar', newAvatarFile.value)
+      await $fetch(`/api/interns/${internId}/upload-picture`, {
+        method: 'POST',
+        body: formData,
+      })
+    }
+
     await $fetch(`/api/interns_details/${internId}`, {
       method: 'PUT',
-      body: form.value,
+      body: event.data,
     })
 
+    toast.update(savingToast.id, { title: 'Intern details updated successfully!', color: 'success' })
     isEditing.value = false
-    window.alert('Intern details updated successfully!')
+    
+    newAvatarFile.value = null
+    avatarPreviewUrl.value = null
     await refresh()
+
   } catch (err: any) {
-    console.error('Failed to save changes:', err)
-    window.alert(`Error: ${err.data?.statusMessage || 'Could not save changes. Check server logs.'}`)
+    toast.update(savingToast.id, { title: 'Error Saving', description: err.data?.statusMessage || 'Could not save changes.', color: 'error' })
   }
 }
 
-const fileInput = ref<HTMLInputElement | null>(null)
+async function markAsCompleted() {
+  if (!form.value) return
+  if (!confirm('Are you sure you want to mark this intern as completed?')) return
 
-function triggerFileInput() {
-  fileInput.value?.click()
-}
-
-function handleProfileClick() {
-  if (isEditing.value) {
-    triggerFileInput()
-  }
-}
-
-async function handleFileUpload(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  const formData = new FormData()
-  formData.append('avatar', file)
-
+  const statusToast = toast.add({ title: 'Updating status...', color: 'secondary' })
   try {
-    await $fetch(`/api/interns/${internId}/upload-picture`, {
-      method: 'POST',
-      body: formData,
+    const payload = { ...form.value, status: 'COMPLETED' }
+    await $fetch(`/api/interns_details/${internId}`, {
+      method: 'PUT',
+      body: payload,
     })
-
-    window.alert('Profile picture updated!')
+    toast.update(statusToast.id, { title: 'Intern marked as Completed!', color: 'success' })
     await refresh()
-  } catch (err: any) {
-    console.error('Failed to upload picture:', err)
-    window.alert(`Error: ${err.data?.statusMessage || 'Could not upload the picture.'}`)
+  } catch (err: any)
+  {
+    toast.update(statusToast.id, { title: 'Error Updating Status', description: err.data?.statusMessage || 'Could not update status.', color: 'error' })
   }
 }
+
+function handleStatusUpdate(newStatus: Status) {
+  if (!form.value) return
+  form.value.status = newStatus
+}
+
+function handlePictureUpload(file: File) {
+  if (!form.value) return
+  newAvatarFile.value = file
+
+  if (avatarPreviewUrl.value) {
+    URL.revokeObjectURL(avatarPreviewUrl.value)
+  }
+  avatarPreviewUrl.value = URL.createObjectURL(file)
+}
+
+onUnmounted(() => {
+  if (avatarPreviewUrl.value) {
+    URL.revokeObjectURL(avatarPreviewUrl.value)
+  }
+})
 </script>
 
-<style scoped>
-.page-background {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #ffffff;
-  min-height: 100vh;
-  padding-bottom: 90px;
-}
-
-.details-container {
-  width: 100%;
-  max-width: 550px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.status-message {
-  text-align: center;
-  margin-top: 50px;
-  font-size: 1.2rem;
-  color: #666;
-}
-
-.status-message.error {
-  color: #d8000c;
-  font-weight: bold;
-}
-
-.header {
-  margin-bottom: 20px;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #333;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.header h1 {
-  font-size: 28px;
-  color: #333;
-  margin: 0;
-  font-weight: normal;
-}
-
-.intern-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding-bottom: 20px;
-}
-
-.header-details p {
-  margin: 0;
-  line-height: 1.4;
-}
-
-.intern-name {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #050505;
-}
-
-.intern-status,
-.intern-role {
-  font-size: 1rem;
-  color: #333;
-  text-transform: capitalize;
-}
-
-.sub-details {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.profile-picture-container {
-  flex-shrink: 0;
-  cursor: default;
-}
-
-.profile-picture-container.is-editable {
-  cursor: pointer;
-}
-
-.profile-picture-placeholder {
-  width: 90px;
-  height: 90px;
-  border: 2px solid #333;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f0f2f5;
-  transition: all 0.2s;
-}
-
-.plus-icon {
-  font-size: 40px;
-  font-weight: 300;
-  color: #333;
-}
-
-.profile-picture-image {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-  transition: opacity 0.2s;
-}
-
-.profile-picture-container.is-editable:hover .profile-picture-image,
-.profile-picture-container.is-editable:hover .profile-picture-placeholder {
-  opacity: 0.7;
-  border-color: #0b64e0;
-}
-
-.tabs {
-  display: flex;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 20px;
-}
-
-.tab-button {
-  padding: 12px 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #666;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -1px;
-}
-
-.tab-button.active {
-  color: #0b64e0;
-  border-bottom-color: #0b64e0;
-  font-weight: 600;
-}
-
-.info-body {
-  padding: 0 5px;
-}
-
-.info-section-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  margin-top: 25px;
-  margin-bottom: 20px;
-}
-
-.info-group {
-  margin-bottom: 20px;
-}
-
-.info-label {
-  display: block;
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-  color: #333;
-  font-weight: 500;
-}
-
-.info-input {
-  width: 100%;
-  font-size: 1rem;
-  color: #1c1e21;
-  border-radius: 6px;
-  transition: all 0.2s;
-  border: 1px solid #ddd;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.info-input:disabled {
-  background-color: #e9ecef;
-  border-color: #dee2e6;
-  color: #555;
-}
-
-.info-input:focus:not(:disabled) {
-  border-color: #0b64e0;
-  box-shadow: 0 0 0 2px rgba(11, 100, 224, 0.2);
-  outline: none;
-}
-
-.footer-actions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  background-color: #ffffff;
-  padding: 15px 20px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.action-button {
-  width: 100%;
-  max-width: 510px;
-  padding: 15px;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.edit-button {
-  background-color: #e4e6eb;
-  color: #050505;
-}
-
-.edit-button:hover {
-  background-color: #d8dbdf;
-}
-
-.save-button {
-  background-color: #1b74e4;
-  color: #ffffff;
-}
-
-.save-button:hover {
-  background-color: #1868cd;
-}
-</style>
+<template>
+  <div class="px-4 sm:px-6 lg:px-8 py-8">
+    <div v-if="pending" class="text-center py-12 text-black dark:text-white">
+      <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8" />
+      <p>Loading intern details...</p>
+    </div>
+    <UAlert v-else-if="error || !form" icon="i-heroicons-exclamation-triangle" color="red" variant="soft" title="Error Loading Data" description="Could not find intern data." />
+    <UForm v-else :state="form" @submit="saveChanges">
+      <div class="flex items-center justify-between mb-4">
+        <UButton to="/interns/list-of-interns" icon="i-heroicons-arrow-left-20-solid" color="gray" variant="ghost" label="Back to Interns" size="xl"/>
+      </div>
+      <UCard class="mb-6">
+        <InternProfileHeader 
+          :intern="form" 
+          :is-editing="isEditing"
+          :preview-src="avatarPreviewUrl"
+          @update:status="handleStatusUpdate" 
+          @upload-picture="handlePictureUpload" 
+        />
+      </UCard>
+      <UTabs :items="items" variant="link" :ui="{ trigger: 'grow' }"  class="w-full">
+        <template #personalinfo>
+          <UCard class="mt-4">
+            <AccountDetails :details="form" :is-editing="isEditing" />
+            <div class="flex flex-col gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <template v-if="isEditing">
+                <UButton type="submit" label="Save Changes" size="xl" block  />
+                <UButton color="primary" variant="outline" label="Cancel" size="xl" block @click="cancelEditing" />
+              </template>
+              <template v-else>
+                <UButton type="button" icon="i-heroicons-pencil-square" label="Edit Info" size="xl" block @click="startEditing" />
+                <UButton v-if="form.status !== 'COMPLETED'" icon="i-heroicons-check-badge" color="primary" variant="outline" label="Mark as Completed" size="xl" block @click="markAsCompleted" />
+              </template>
+            </div>
+          </UCard>
+        </template>
+        <template #timelog>
+          <UCard class="mt-4">
+            <TimeLog :details="form" />
+          </UCard>
+        </template>
+      </UTabs>
+    </UForm>
+  </div>
+</template>

@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
     contactPersonNumber,
     requiredHours,
     role,
+    status,
   } = body;
 
   if (!internId || !userId) {
@@ -53,7 +54,8 @@ export default defineEventHandler(async (event) => {
           required_hours: requiredHours,
           emergency_contact_person: contactPerson,
           emergency_contact_number: contactPersonNumber,
-          role,
+          role: role,
+          status: status,
         },
       }),
     ]);
