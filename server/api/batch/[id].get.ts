@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
         id: true,
         batch_number: true,
         status: true,
+        start_date: true,
         Intern: {     
           select: {
             id: true,
@@ -50,6 +51,8 @@ export default defineEventHandler(async (event) => {
         id: batchDataFromDb.id,
         batchNumber: batchDataFromDb.batch_number,
         statusText: batchDataFromDb.status ? 'Ongoing' : 'Inactive',
+        start_date: batchDataFromDb.start_date.toISOString().split('T')[0],
+        internCount: batchDataFromDb.Intern.length,
       },
       interns: batchDataFromDb.Intern.map((intern) => ({
         id: intern.id,

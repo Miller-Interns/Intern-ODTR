@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UFormField, UInput } from '#components';
 import type { InternDetails } from '~/interfaces/interfaces';
 
 defineProps<{
@@ -31,15 +32,27 @@ defineProps<{
         </UFormField>
         <UFormField>
           <template #label>
+            Email <span v-if="!details.email" class="text-red-500">*</span>
+          </template>
+          <UInput v-model="details.email" :disabled="!isEditing" size="xl" class="w-full" />
+        </UFormField>
+          <UFormField>
+          <template #label>
             Contact Number <span v-if="!details.contactNumber" class="text-red-500">*</span>
           </template>
           <UInput v-model="details.contactNumber" :disabled="!isEditing" size="xl" class="w-full" />
         </UFormField>
         <UFormField>
           <template #label>
-            Email <span v-if="!details.email" class="text-red-500">*</span>
+            Emergency Contact Person <span v-if="!details.contactPerson" class="text-red-500">*</span>
           </template>
-          <UInput v-model="details.email" :disabled="!isEditing" size="xl" class="w-full" />
+          <UInput v-model="details.contactPerson" :disabled="!isEditing" size="xl" class="w-full" />
+        </UFormField>
+        <UFormField>
+          <template #label>
+            Emergency Contact Number <span v-if="!details.contactPersonNumber" class="text-red-500">*</span>
+          </template>
+          <UInput v-model="details.contactPersonNumber" :disabled="!isEditing" size="xl" class="w-full" />
         </UFormField>
       </div>
     </div>
@@ -71,18 +84,6 @@ defineProps<{
             Role/Position <span v-if="!details.role" class="text-red-500">*</span>
           </template>
           <UInput v-model="details.role" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Emergency Contact Name <span v-if="!details.contactPerson" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.contactPerson" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Emergency Contact Number <span v-if="!details.contactPersonNumber" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.contactPersonNumber" :disabled="!isEditing" size="xl" class="w-full" />
         </UFormField>
         <UFormField label="Note/Remarks (Optional):" class="lg:col-span-3">
           <UTextarea v-model="details.note" :disabled="!isEditing" size="xl" class="w-full" />

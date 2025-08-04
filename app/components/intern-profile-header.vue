@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UAvatar, UBadge, UButton } from '#components'
 import type { PropType } from 'vue'
 import { ref } from 'vue'
 import type { InternDetails } from '~/interfaces/interfaces'
@@ -39,7 +40,7 @@ function handleFileUpload(event: Event) {
 <template>
   <div class="flex items-center gap-4 sm:gap-6">
     <div class="relative flex-shrink-0">
-      <UAvatar :src="previewSrc || intern.internPicture || undefined" :alt="intern.fullName" size="3  xl" />
+      <UAvatar :src="previewSrc || intern.internPicture || undefined" :alt="intern.fullName" size="3xl" />
       <div v-if="isEditing" class="absolute bottom-0 -right-1">
         <UButton
           icon="i-heroicons-camera-solid"

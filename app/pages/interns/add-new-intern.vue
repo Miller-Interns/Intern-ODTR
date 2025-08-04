@@ -1,193 +1,178 @@
-<template>
-    <div class="app-container">
-        <div class="header">
-            <NuxtLink to="/interns/view_interns" class="back-button">
-                ←
-            </NuxtLink>
-            <h1>Add Intern</h1>
-        </div>
-
-        <form class="form" @submit.prevent="addIntern">
-            <div class="form-group">
-                <label for="first-name">First Name:</label>
-                <input id="first-name" type="text" v-model.trim="form.firstName" required />
-            </div>
-
-            <div class="form-group">
-                <label for="middle-name">Middle Name (Optional):</label>
-                <input id="middle-name" type="text" v-model.trim="form.middleName" />
-            </div>
-
-            <div class="form-group">
-                <label for="last-name">Last Name:</label>
-                <input id="last-name" type="text" v-model.trim="form.lastName" required />
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address:</label>
-                <input id="email" type="email" v-model.trim="form.email" required />
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input id="password" type="password" v-model.trim="form.password" required />
-            </div>
-
-            <div class="form-group">
-                <label for="school">School(CODE):</label>
-                <input id="password" type="text" v-model.trim="form.school" required />
-            </div>
-
-            <div class="form-group">
-                <label for="required-hours">Required Hours:</label>
-                <input id="required-hours" type="number" v-model.number="form.requiredHours" required />
-            </div>
-
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select id="status" v-model="form.status" required>
-                    <option value="" disabled>
-                        Select a status
-                    </option>
-                    <option value="INCOMING">Incoming</option>
-                    <option value="ONGOING">Ongoing</option>
-                    <option value="COMPLETED">Completed</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="note">Note (Optional):</label>
-                <input id="note" type="text" v-model="form.note" />
-            </div>
-
-            <button type="submit" class="submit-button">
-                Add Intern
-            </button>
-        </form>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
 
 const router = useRouter()
 
-const form = ref({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    school: '',
-    requiredHours: null as number | null,
-    status: '',
-    note: '',
+const { data: schools, pending: isSchoolsLoading } = useAsyncData('schools', () => {
+  return $fetch<string[]>('/api/school')
+}, {
+  default: () => []
 })
 
-async function addIntern() {
-    try {
-        const response = await $fetch('/api/add_interns', {
-            method: 'POST',
-            body: form.value,
-        })
+const schema = z.object({
+  firstName: z.string().min(1, 'First Name is required'),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, 'Last Name is required'),
+  contactNumber: z.string().optional(),
+  emergencyContactPerson: z.string().optional(),
+  emergencyContactNumber: z.string().optional(),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  school: z.string().min(1, 'School is required'),
+  courseYear: z.string().min(1, 'Course and Year Level is required'),
+  requiredHours: z.number().min(1, 'Required hours must be a positive number'),
+  role: z.string().optional(),
+  note: z.string().optional(),
+})
 
-        alert('Intern added successfully!')
-        console.log('Server response:', response)
+type Schema = z.infer<typeof schema>
 
-        router.push('/interns/list-of-interns')
-    } catch (error: any) {
-        console.error('Error adding intern:', error)
-        alert(`Failed to add intern: ${error.data?.statusMessage || 'Please check your input.'}`)
+const state = reactive<Partial<Schema>>({
+  firstName: undefined,
+  middleName: undefined,
+  lastName: undefined,
+  contactNumber: undefined,
+  emergencyContactPerson: undefined,
+  emergencyContactNumber: undefined,
+  email: undefined,
+  password: undefined,
+  school: undefined,
+  courseYear: undefined,
+  requiredHours: undefined,
+  role: undefined,
+  note: undefined,
+})
+
+const isLoading = ref(false)
+const toast = useToast()
+
+async function onSubmit (event: FormSubmitEvent<Schema>) {
+  isLoading.value = true
+  try {
+    const { error } = await useFetch('/api/add_interns', {
+      method: 'POST',
+      body: event.data,
+    })
+
+    if (error.value) {
+      toast.add({
+        title: 'Error Creating Intern',
+        description: error.value.data?.statusMessage || 'An unexpected error occurred.',
+        color: 'error'
+      })
+    } else {
+      toast.add({
+        title: 'Success!',
+        description: 'Intern has been added successfully.',
+        color: 'success'
+      })
+       router.push('/interns/list-of-interns')
     }
+  } catch (err) {
+    toast.add({
+      title: 'Network Error',
+      description: 'Could not connect to the server. Please try again.',
+      color: 'error'
+    })
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
-<style scoped>
-.app-container {
-    font-family: 'Times New Roman', Times, serif;
-    background-color: #ffffff;
-    padding: 20px;
-    max-width: 500px;
-    margin: auto;
-}
+<template>
+  <UContainer class="py-8">
+    <div class="flex items-center gap-4 mb-6">
+      <UButton
+        icon="i-heroicons-arrow-left"
+        color="gray"
+        variant="ghost"
+        size="xl"
+        class="-ml-4"
+        aria-label="Back"
+        @click="$router.back()"
+      />
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
+    </div>
+    <UForm :schema="schema" :state="state" class="space-y-8" @submit="onSubmit">
+      <div class="space-y-6">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Intern details:</h2>
+        
+        <UFormField label="First Name:" name="firstName" required>
+          <UInput v-model="state.firstName" placeholder="Enter First Name" size="xl" class="w-full"/>
+        </UFormField>
+        
+        <UFormField label="Middle Name (Optional):" name="middleName">
+          <UInput v-model="state.middleName" placeholder="Enter Middle Name" size="xl" class="w-full"/>
+        </UFormField>
 
-.header {
-    margin-bottom: 20px;
-}
+        <UFormField label="Last Name:" name="lastName" required>
+          <UInput v-model="state.lastName" placeholder="Enter Last Name" size="xl" class="w-full"/>
+        </UFormField>
 
-.back-button {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #333;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 15px;
-    text-decoration: none;
-}
+        <UFormField label="Email:" name="email" required>
+          <UInput v-model="state.email" placeholder="Enter Email Address" size="xl" class="w-full"/>
+        </UFormField>
 
-.header h1 {
-    font-size: 28px;
-    color: #333;
-    margin: 0;
-    font-weight: normal;
-}
+        <UFormField label="Password:" name="password" required>
+          <UInput v-model="state.password" type="password" placeholder="Enter Password" size="xl" class="w-full"/>
+        </UFormField>
 
-.form {
-    display: flex;
-    flex-direction: column;
-}
+        <UFormField label="Contact Number:" name="contactNumber" >
+          <UInput v-model="state.contactNumber" placeholder="Enter Contact Number" size="xl" class="w-full"/>
+        </UFormField>
 
-.form-group {
-    display: flex;
-    align-items: center;
-    background-color: #e0e0e0;
-    margin-bottom: 15px;
-    padding-left: 12px;
-}
+        <UFormField label="Emergency Contact Person:" name="emergencyContactPerson" >
+          <UInput v-model="state.emergencyContactPerson" placeholder="Enter Emergency Contact Person" size="xl" class="w-full"/>
+        </UFormField>
 
-label {
-    color: #555;
-    font-size: 16px;
-    flex-shrink: 0;
-    padding-right: 8px;
-    white-space: nowrap;
-}
+        <UFormField label="Emergency Contact Number:" name="emergencyContactNumber" >
+          <UInput v-model="state.emergencyContactNumber" placeholder="Enter Emergency Contact Number" size="xl" class="w-full"/>
+        </UFormField>
 
-input,
-select {
-    flex-grow: 1;
-    padding: 12px 12px 12px 0;
-    border: none;
-    background-color: transparent;
-    font-size: 16px;
-    font-family: 'Times New Roman', Times, serif;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
+      </div>
+      <div class="space-y-6">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Internship information:</h2>
+        <UFormField label="School:" name="school" required>
+          <UInputMenu
+            v-model="state.school"
+            :items="schools"
+            :loading="isSchoolsLoading"
+            creatable
+            placeholder="Select or enter a new school"
+            size="xl"
+            class="w-full"
+          />
+        </UFormField>
 
-input:focus,
-select:focus {
-    outline: none;
-}
+        <UFormField label="Course and Year Level:" name="courseYear" required>
+          <UInput v-model="state.courseYear" placeholder="Enter Course and Year Level eg.BSCPE - 3rd Year" size="xl" class="w-full"/>
+        </UFormField>
 
-select {
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 30px;
-}
+        <UFormField label="Required hours:" name="requiredHours" required>
+          <UInput v-model.number="state.requiredHours" type="number" placeholder="Enter Required hours" size="xl" class="w-full"/>
+        </UFormField>
 
-.submit-button {
-    width: 100%;
-    padding: 15px;
-    background-color: #cccccc;
-    color: #333;
-    border: none;
-    font-size: 18px;
-    font-family: 'Times New Roman', Times, serif;
-    cursor: pointer;
-    margin-top: 10px;
-}
-</style>
+        <UFormField label="Role/Position :" name="role">
+          <UTextarea v-model="state.role" placeholder="Role/Position" size="xl" class="w-full"/>
+        </UFormField>
+
+        <UFormField label="Note/Remarks (Optional):" name="note">
+          <UTextarea v-model="state.note" placeholder="Note and Remarks" size="xl" class="w-full"/>
+        </UFormField>
+
+
+      </div>
+      
+      <UButton
+        type="submit"
+        label="Save Intern"
+        color="primary"
+        size="lg"
+        block
+        :loading="isLoading"
+      />
+    </UForm>
+  </UContainer>
+</template>

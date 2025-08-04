@@ -6,9 +6,10 @@ import type { TabsItem } from '#ui/types'
 import type { Status } from '~/generated/prisma'
 import InternProfileHeader from '~/components/intern-profile-header.vue'
 import type { InternDetails } from '~/interfaces/interfaces'
+import { UAlert, UButton, UCard, UForm, UIcon, UTabs } from '#components'
 
 const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
-const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue'))
+const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
 const route = useRoute()
 const toast = useToast()
 const internId = route.params.id as string
@@ -113,10 +114,10 @@ onUnmounted(() => {
       <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8" />
       <p>Loading intern details...</p>
     </div>
-    <UAlert v-else-if="error || !form" icon="i-heroicons-exclamation-triangle" color="red" variant="soft" title="Error Loading Data" description="Could not find intern data." />
+    <UAlert v-else-if="error || !form" icon="i-heroicons-exclamation-triangle" color="error" variant="soft" title="Error Loading Data" description="Could not find intern data." />
     <UForm v-else :state="form" @submit="saveChanges">
       <div class="flex items-center justify-between mb-4">
-        <UButton to="/interns/list-of-interns" icon="i-heroicons-arrow-left-20-solid" color="gray" variant="ghost" label="Back to Interns" size="xl"/>
+        <UButton to="/interns/list-of-interns" icon="i-heroicons-arrow-left-20-solid" color="secondary" variant="ghost" label="Back to Interns" size="xl"/>
       </div>
       <UCard class="mb-6">
         <InternProfileHeader 

@@ -5,7 +5,7 @@ import type { BatchData } from '~/interfaces/interfaces';
 const route = useRoute();
 
 // const batchId = route.params.id as string;
-const batchId = '1';
+const batchId = '1'; //test
 
 const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batch/${batchId}`);
 </script>
@@ -17,7 +17,7 @@ const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batc
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center">
             <UButton to="/dashboard" icon="i-heroicons-arrow-left" variant="ghost" color="secondary" />
-            <h1 class="text-lg font-bold ml-4 text-gray-900 dark:text-white">Active Interns</h1>
+            <h1 class="text-lg font-bold ml-4 text-gray-900 dark:text-white">Batch Details</h1>
           </div>
         </div>
       </div>
@@ -25,40 +25,41 @@ const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batc
 
     <main class="py-8">
       <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <!-- Loading State -->
         <div v-if="pending" class="text-center py-12 text-gray-500">Loading Batch Details...</div>
-
-        <!-- Error State -->
         <div v-else-if="error || !batchData" class="text-center py-12 text-red-500">
           Could not load batch details. Please try again.
         </div>
-
-        <!-- Content State -->
         <UCard v-else :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>
             <div class="flex justify-between items-center">
               <h2 class="text-base font-bold text-gray-900 dark:text-white">
-                Batch Details
-                <!-- Autocompletion works here for batchData.details.statusText -->
-                <UBadge class="font-base rounded-full" color="primary">{{ batchData.details.statusText }}</UBadge>
+                {{ `Batch ${batchData.details.batchNumber}` }}
               </h2>
+              <UBadge class="font-base rounded-full text-green-500" variant="soft" color="success"> {{ batchData.details.statusText }}</UBadge>  
             </div>
           </template>
-
-          <!-- The grid of interns. `intern` is automatically typed as InternSummary -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="flex justify-between items-center text-xs">
+            <h2 >No. of Interns</h2>
+            <h2>Start Date</h2>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <h2 >{{ batchData.details.internCount }} {{ batchData.details.internCount === 1 || batchData.details.internCount === 0  ? 'Intern' : 'Interns' }}</h2>
+            <h2>{{ batchData.details.start_date}}</h2>
+          </div>
+          <div class="mt-5">
+            <h2 class="text-lg   font-semibold">Interns</h2>
+          </div>
+          <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <NuxtLink v-for="intern in batchData.interns" :key="intern.id" :to="`/interns/${intern.id}`" class="block">
               <div class="overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800/50 h-full">
                 <div class="flex items-center gap-3 p-3">
-                  <!-- Autocompletion works here for intern.pictureUrl and intern.name -->
                   <UAvatar :src="intern.internPicture || undefined" :alt="intern.fullName" />
                   <p class="font-base text-black dark:text-white">{{ intern.fullName }}</p>
                 </div>
                 <hr class="border-gray-200 dark:border-gray-700" />
                 <div class="p-3">
                   <p class="text-base text-black dark:text-white">
-                    <!-- Autocompletion works here for intern.hoursCompleted and intern.requiredHours -->
-                    Hours Completed: {{ intern.hoursCompleted ?? 0 }}/{{ intern.requiredHours }} hours
+                    Hours Rendered: {{ intern.hoursCompleted ?? 0 }}/{{ intern.requiredHours }} hours
                   </p>
                 </div>
               </div>
@@ -66,7 +67,7 @@ const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batc
           </div>
 
           <template #footer>
-            <UButton to="/interns/add-new-intern" block icon="i-heroicons-plus" variant="outline" size="xl" color="primary">
+            <UButton v-if="batchData.details.internCount < 5" to="/interns/add-new-intern" block icon="i-heroicons-plus" size="xl" color="primary">
               Add Intern
             </UButton>
           </template>
