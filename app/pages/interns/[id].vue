@@ -6,7 +6,7 @@ import type { TabsItem } from '#ui/types'
 import type { Status } from '~/generated/prisma'
 import InternProfileHeader from '~/components/intern-profile-header.vue'
 import type { InternDetails } from '~/interfaces/interfaces'
-import { UAlert, UButton, UCard, UForm, UIcon, UTabs } from '#components'
+import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal} from '#components'
 
 const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
 const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
@@ -16,7 +16,7 @@ const internId = route.params.id as string
 const isEditing = ref(false)
 const newAvatarFile = ref<File | null>(null)  
 const avatarPreviewUrl = ref<string | null>(null)  
-
+const isModalOpen = ref(false)
 const items: TabsItem[] = [
   { slot: 'personalinfo', label: 'Personal Info' },
   { slot: 'timelog', label: 'Time Log' },
@@ -68,8 +68,8 @@ async function saveChanges(event: FormSubmitEvent<InternDetails>) {
 }
 
 async function markAsCompleted() {
+  isModalOpen.value = false
   if (!form.value) return
-  if (!confirm('Are you sure you want to mark this intern as completed?')) return
 
   const statusToast = toast.add({ title: 'Updating status...', color: 'secondary' })
   try {
@@ -139,7 +139,19 @@ onUnmounted(() => {
               </template>
               <template v-else>
                 <UButton type="button" icon="i-heroicons-pencil-square" label="Edit Info" size="xl" block @click="startEditing" />
-                <UButton v-if="form.status !== 'COMPLETED'" icon="i-heroicons-check-badge" color="primary" variant="outline" label="Mark as Completed" size="xl" block @click="markAsCompleted" />
+                <UModal title="Mark as Completed?" close-icon="i-lucide-arrow-right" v-model="isModalOpen">
+                  <UButton v-if="form.status !== 'COMPLETED'" icon="i-heroicons-check-badge" color="primary" variant="outline" label="Mark as Completed" size="xl" block @click="isModalOpen = true" />
+                  <template #header ="{close}">
+                    <div class="flex flex-col items-left text-left p-4">
+                      <h3 class="text-xl font-bold text-black dark:text-white">Are you sure to mark as completed intern?</h3>
+                      <h4 class="mt-2 text-sm text-black dark:text-white">This action cannot be undone.</h4>
+                      <div class="mt-6 flex space-x-3 justify-center">
+                        <UButton label="Cancel" color="primary" variant="outline" class="px-6 py-2.5 " @click="close" />
+                        <UButton label="Confirm" color="primary" variant="solid" class="px-6 py-2.5" @click="markAsCompleted" />
+                      </div>
+                    </div>
+                  </template>
+                </UModal>
               </template>
             </div>
           </UCard>

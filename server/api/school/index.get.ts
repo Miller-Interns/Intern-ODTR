@@ -15,8 +15,6 @@ export default defineEventHandler(async () => {
       .map(intern => intern.school)
       .filter(school => school); 
 
-    console.log('Returning school names:', schoolNames); 
-
     return schoolNames
   } catch (error) {
     console.error('API Error: Failed to fetch schools:', error)
