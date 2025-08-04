@@ -15,7 +15,7 @@
         </div>
       </template>
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="handleLogin">
-        <UFormField name="email" label="Email:*">
+        <UFormField name="email" label="Email:" required>
           <UInput v-model="state.email" placeholder="username@gmail.com"
             class="w-full rounded-md border text-sm italic placeholder-gray-400"
             :class="emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'" />
@@ -23,7 +23,7 @@
         <p v-if="emailError" class="text-sm text-red-500 mt-1">
           Please Enter a Valid Email Address
         </p>
-        <UFormField name="password" label="Password:*">
+        <UFormField name="password" label="Password:" required>
           <UInput v-model="state.password" :type="isPasswordVisible ? 'text' : 'password'" revealable="false"
             placeholder="Password" class="w-full rounded-md border text-sm italic placeholder-gray-400"
             :class="passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'">
