@@ -11,6 +11,7 @@
 
 
     <UForm :state="{}" @submit="submitBatch" class="space-y-6 ">
+    
 
       <div class="flex space-x-4 ">
         <UFormGroup name="batchNumber" class="grow " required>
@@ -44,10 +45,6 @@
         </UFormGroup>
       </section>
 
-  
-
-
-
 
       <UButton type="submit" text=regular label="Save Batch" :loading="isSubmitting" color=primary block size="lg"
         class="mt-8" />
@@ -64,9 +61,11 @@
 
 <script setup lang="ts">
 import { Status } from "~/enums/status";
-import { type BatchWithInternCount} from '~/interfaces/batch-response';
+import { type BatchWithInternCount} from '~/interfaces/interfaces';
 import { getTodayDateString } from '~/composables/today-date';
 import {format} from 'date-fns'
+
+
 
 definePageMeta({
   path: '/editBatch'
@@ -76,6 +75,8 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const batchId = route.query.id as string;
+const { setToast } = useAppToast();
+
 
 
 const batchData = ref<BatchWithInternCount | null>(null);
@@ -150,11 +151,19 @@ const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONG
     });
     isSubmitting.value = true;
     errorMessage.value = '';
-    successMessage.value = 'Batch updated successfully! Redirecting...';
-    setTimeout(() => router.push('/'), 1500);
+     setToast({
+      title: 'Batch Edit Successful',
+      description: `Successfully edited Batch ${batchNumber.value}`,
+      timeout: 5000 // Display for 5 seconds
+    });
+    router.push('/');
 
   } catch (error: any) {
-    errorMessage.value = error.data?.statusMessage || 'An unexpected error occurred.';
+   setToast({
+      title: 'Error',
+      description: 'There was a problem saving your changes.',
+      timeout: 5000
+    });
   } finally {
     isSubmitting.value = false;
   }

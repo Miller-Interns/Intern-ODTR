@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { Status } from "~/enums/status";
-import { type BatchApiResponse } from '~/interfaces/batch-response';
+import { type BatchApiResponse } from '~/interfaces/interfaces';
 import { getTodayDateString } from '~/composables/today-date';
 
 

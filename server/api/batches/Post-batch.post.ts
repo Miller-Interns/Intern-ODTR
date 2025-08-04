@@ -2,7 +2,7 @@
 
 import { prisma } from '~/server/db/db';
 import { z } from 'zod';
-import type { BatchApiResponse } from '~/interfaces/batch-response';
+import type { BatchApiResponse } from '~/interfaces/interfaces';
 import { Status } from "@prisma/client";
 
 

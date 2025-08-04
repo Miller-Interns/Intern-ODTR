@@ -1,12 +1,13 @@
-
-
 import { db } from '~/server/db/index'; 
 
 
-import { createError } from 'h3';
+
+
 
 export default defineEventHandler(async (event) => {
-  try {
+
+
+  try{
     const adminUsers = await db
       .selectFrom('users')
       .select(['id', 'name'])

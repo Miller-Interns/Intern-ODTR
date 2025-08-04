@@ -31,5 +31,10 @@ export interface Batch{
     status: Status;
     supervisorId: User
 }
+export interface ToastOptions {
+  title: string;
+  description: string;
+  timeout?: number;
 
+}
 
