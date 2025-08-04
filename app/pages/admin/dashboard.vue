@@ -1,9 +1,11 @@
 <script setup lang="ts">
 	import type { TimeLogForUI } from '../../types/composites.ts'
+
 	definePageMeta({
 		layout: 'default',
 	})
 	const toast = useToast()
+	const bus = useEventBus<void>('log:approved')
 
 	const STANDARD_WORK_HOURS = 8
 	const BREAK_HOURS = 1
@@ -38,29 +40,33 @@
 		},
 	})
 
-	async function handleApproval(payload: { id: string; remarks: string }) {
-		const logToApprove = pendingLogs.value?.find((log) => log.id === payload.id)
-		if (!logToApprove) return
+	bus.on(() => {
+		refresh()
+	})
 
-		try {
-			await $fetch('/api/admin/approval/approval', {
-				method: 'PATCH',
-				body: {
-					logId: payload.id,
-					remarks: payload.remarks,
-					status: true,
-					total_hours: logToApprove.total_hours, // Pass calculated hours
-					overtime: logToApprove.overtime, // Pass calculated overtime
-				},
-			})
+	// async function handleApproval(payload: { id: string; remarks: string }) {
+	// 	const logToApprove = pendingLogs.value?.find((log) => log.id === payload.id)
+	// 	if (!logToApprove) return
 
-			toast.add({ title: 'Log Approved', description: `Log for ${logToApprove.intern.name} has been approved.`, color: 'success' })
-			await refresh()
-		} catch (e: any) {
-			console.error('Failed to approve log:', e)
-			toast.add({ title: 'Approval Failed', description: e.data?.message || 'Please try again.', color: 'error' })
-		}
-	}
+	// 	try {
+	// 		await $fetch('/api/admin/approval/approval', {
+	// 			method: 'PATCH',
+	// 			body: {
+	// 				logId: payload.id,
+	// 				remarks: payload.remarks,
+	// 				status: true,
+	// 				total_hours: logToApprove.total_hours, // Pass calculated hours
+	// 				overtime: logToApprove.overtime, // Pass calculated overtime
+	// 			},
+	// 		})
+
+	// 		toast.add({ title: 'Log Approved', description: `Log for ${logToApprove.intern.name} has been approved.`, color: 'success' })
+	// 		await refresh()
+	// 	} catch (e: any) {
+	// 		console.error('Failed to approve log:', e)
+	// 		toast.add({ title: 'Approval Failed', description: e.data?.message || 'Please try again.', color: 'error' })
+	// 	}
+	// }
 	async function approveAll() {
 		if (!pendingLogs.value || pendingLogs.value.length === 0) {
 			toast.add({ title: 'No logs to approve.', color: 'warning' })
@@ -156,7 +162,6 @@
 					v-for="log in pendingLogs"
 					:key="log.id"
 					:log="log"
-					@approve-with-remarks="handleApproval"
 				/>
 			</div>
 
