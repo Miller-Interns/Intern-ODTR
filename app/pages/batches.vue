@@ -17,8 +17,7 @@ definePageMeta({
 
 const { data: allBatches, pending, error } = await useFetch<BatchWithInternCount[]>('/api/batches/batch');
 const openModal = ref(false)
-const { toast: appToast, clearToast } = useAppToast();
-const toast = useToast();
+
 
 const triggerServerStatusUpdate = async () => {
   try {
@@ -51,13 +50,6 @@ watchEffect((onInvalidate) => {
 
 });
 
-watchEffect(() => {
-  if (appToast.value) {
-    console.log('Toast watcher triggered! Showing toast:', appToast.value);
-    toast.add(appToast.value);
-    clearToast();
-  }
-});
 
 const endTime = async (batchId: string) => {
 
@@ -98,10 +90,8 @@ defineShortcuts({
 })
 </script>
 <template>
-
+<UApp>
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto font-sans">
-
-<UNotifications />
     <div v-if="pending">
       <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Manage Batch</h2>
       <USkeleton class="h-56 w-full mb-4" />
@@ -249,4 +239,5 @@ defineShortcuts({
 
 
   </div>
+  </UApp>
 </template>

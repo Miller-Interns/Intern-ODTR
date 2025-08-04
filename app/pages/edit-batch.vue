@@ -1,5 +1,5 @@
 <template>
-
+<UApp>
   <div class="max-w-md mx-auto p-6 w-full h-full">
 
     <div class="flex items-center space-x-4">
@@ -11,7 +11,7 @@
 
 
     <UForm :state="{}" @submit="submitBatch" class="space-y-6 ">
-    
+
 
       <div class="flex space-x-4 ">
         <UFormGroup name="batchNumber" class="grow " required>
@@ -23,7 +23,7 @@
       </div>
 
 
-    
+
       <section class="items-center space-x-10 w-full max-w-md">
         <UFormGroup name="startDate" class="grow" required>
 
@@ -40,8 +40,8 @@
           <div>
             Intern Supervisor : <span class="text-red-500">*</span>
           </div>
-          <USelect v-model="selectedSupervisorId" :items="supervisorList" placeholder="Select Intern Supervisor" value-key="value"
-            class="w-48 items-center space-x-10 w-full max-w-md" />
+          <USelect v-model="selectedSupervisorId" :items="supervisorList" placeholder="Select Intern Supervisor"
+            value-key="value" class="w-48 items-center space-x-10 w-full max-w-md" />
         </UFormGroup>
       </section>
 
@@ -50,20 +50,22 @@
         class="mt-8" />
 
 
-      <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
+      <!-- <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
         :title="successMessage" @close="successMessage = ''" />
       <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
-        @close="errorMessage = ''" />
+        @close="errorMessage = ''" /> -->
     </UForm>
   </div>
+  </UApp>
 </template>
 
 
 <script setup lang="ts">
 import { Status } from "~/enums/status";
-import { type BatchWithInternCount} from '~/interfaces/interfaces';
+import { type BatchWithInternCount } from '~/interfaces/interfaces';
 import { getTodayDateString } from '~/composables/today-date';
-import {format} from 'date-fns'
+import { format } from 'date-fns'
+
 
 
 
@@ -75,7 +77,8 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const batchId = route.query.id as string;
-const { setToast } = useAppToast();
+
+const toast = useToast();
 
 
 
@@ -85,15 +88,10 @@ const fetchError = ref<Error | null>(null);
 
 
 const batchNumber = ref('');
-const startDate =ref<string>('');
+const startDate = ref<string>('');
 const selectedSupervisorId = ref<string>('');
 
-const todayString =  getTodayDateString();
-
-console.log("start")
-console.log(startDate)
-console.log("today")
-console.log(todayString)
+const todayString = getTodayDateString();
 const isSubmitting = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
@@ -125,14 +123,14 @@ onMounted(async () => {
 watchEffect(() => {
   if (batchData.value) {
     batchNumber.value = batchData.value.batch_number.toString();
-    startDate.value=format(new Date(batchData.value.start_date), 'yyyy-MM-dd');
+    startDate.value = format(new Date(batchData.value.start_date), 'yyyy-MM-dd');
   }
 });
 
 
 async function submitBatch() {
-  
-const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
+
+  const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONGOING;
   if (!selectedSupervisorId.value) {
     errorMessage.value = "Please select a supervisor.";
     return;
@@ -149,24 +147,27 @@ const statusToSet = startDate.value > todayString ? Status.INCOMING : Status.ONG
         supervisorId: selectedSupervisorId.value,
       },
     });
-    isSubmitting.value = true;
-    errorMessage.value = '';
-     setToast({
+    toast.add({
       title: 'Batch Edit Successful',
       description: `Successfully edited Batch ${batchNumber.value}`,
-      timeout: 5000 // Display for 5 seconds
-    });
-    router.push('/');
+    })
+    isSubmitting.value = true;
+    errorMessage.value = '';
+    
+  
+      router.push('/');
+  
 
   } catch (error: any) {
-   setToast({
+    toast.add({
       title: 'Error',
       description: 'There was a problem saving your changes.',
-      timeout: 5000
+
     });
   } finally {
     isSubmitting.value = false;
   }
+
 }
 
 

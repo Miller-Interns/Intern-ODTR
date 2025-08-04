@@ -1,5 +1,5 @@
 <template>
-
+<UApp>
   <div class="max-w-md mx-auto p-6 w-full">
 
     <div class="flex items-center space-x-4">
@@ -46,13 +46,13 @@
         class="mt-8" />
 
 
-      <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
+      <!-- <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
         :title="successMessage" @close="successMessage = ''" />
       <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
-        @close="errorMessage = ''" />
+        @close="errorMessage = ''" /> -->
     </UForm>
   </div>
-
+</UApp>
 </template>
 
 <script setup lang="ts">
@@ -67,10 +67,11 @@ definePageMeta({
 });
 
 const router = useRouter()
-
+const toast= useToast()
 const batchNumber = ref<string>('');
 const startDate = ref<string>('');
 
+;
 
 
 const selectedSupervisorId = ref<string>('');
@@ -125,9 +126,15 @@ async function submitBatch() {
     });
     console.log("API response received:", response);
     if (response.success) {
-      successMessage.value = `Batch "${response.batch.batch_number}" created successfully!`;
+        toast.add({
+      title: 'Batch create Successful',
+      description: `Successfully created Batch ${batchNumber.value}`,
+        
+    })
+
       batchNumber.value = '';
       startDate.value = getTodayDateString();
+      router.push('/');
     }
   } catch (error: any) {
     errorMessage.value = error.data?.statusMessage || 'An unexpected error occurred.';
