@@ -155,7 +155,7 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
         </UFormField>
 
         <UFormField label="Role/Position :" name="role">
-          <UTextarea v-model="state.role" placeholder="Role/Position" size="xl" class="w-full"/>
+          <UInput v-model="state.role" placeholder="Role/Position" size="xl" class="w-full"/>
         </UFormField>
 
         <UFormField label="Note/Remarks (Optional):" name="note">
