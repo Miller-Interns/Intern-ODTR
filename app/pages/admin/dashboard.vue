@@ -3,6 +3,7 @@
 	definePageMeta({
 		layout: 'default',
 	})
+	const toast = useToast()
 
 	const STANDARD_WORK_HOURS = 8
 	const BREAK_HOURS = 1
@@ -53,17 +54,16 @@
 				},
 			})
 
-			alert(`Log with ID ${payload.id} has been approved.`)
+			toast.add({ title: 'Log Approved', description: `Log for ${logToApprove.intern.name} has been approved.`, color: 'success' })
 			await refresh()
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Failed to approve log:', e)
-			alert('Failed to approve the log. Please try again.')
+			toast.add({ title: 'Approval Failed', description: e.data?.message || 'Please try again.', color: 'error' })
 		}
 	}
-
 	async function approveAll() {
 		if (!pendingLogs.value || pendingLogs.value.length === 0) {
-			alert('No logs to approve.')
+			toast.add({ title: 'No logs to approve.', color: 'warning' })
 			return
 		}
 
@@ -79,11 +79,11 @@
 				body: { logs: approvalPayload },
 			})
 
-			alert(`Approving all ${pendingLogs.value?.length || 0} logs.`)
+			toast.add({ title: 'Success', description: `Approving all ${pendingLogs.value?.length || 0} logs.`, color: 'success' })
 			await refresh()
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Failed to approve all logs:', e)
-			alert('Failed to approve all logs. Please try again.')
+			toast.add({ title: 'Approval Failed', description: e.data?.message || 'Could not approve all logs.', color: 'error' })
 		}
 	}
 
@@ -96,45 +96,61 @@
 </script>
 
 <template>
-	<div>
-		<header class="mb-6">
-			<h1 class="text-2xl font-bold text-gray-800">Pending Logs</h1>
-			<div class="mt-2 flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<span class="text-sm text-gray-500">{{ today }}</span>
-					<span
-						v-if="!pending"
-						class="flex h-5 w-5 items-center justify-center rounded-full bg-teal-500 text-xs font-bold text-white"
-					>
-						{{ pendingLogs?.length || 0 }}
-					</span>
+	<UContainer>
+		<header class="mb-6 md:mb-8">
+			<div class="flex flex-wrap items-start justify-between gap-4">
+				<div>
+					<div class="flex items-center gap-3">
+						<h1 class="text-2xl font-bold text-gray-800 md:text-3xl dark:text-white">Pending Approvals</h1>
+						<UBadge
+							v-if="!pending"
+							color="primary"
+							variant="solid"
+							size="sm"
+							class="flex h-6 w-6 items-center justify-center rounded-full"
+						>
+							{{ pendingLogs?.length || 0 }}
+						</UBadge>
+					</div>
 				</div>
-				<button
-					@click="approveAll"
+			</div>
+			<div class="flex items-center justify-between">
+				<p class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">{{ today }}</p>
+				<UButton
+					icon="i-lucide-check-check"
+					label="Approve All"
+					color="primary"
+					variant="solid"
 					:disabled="!pendingLogs || pendingLogs.length === 0"
-					class="rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 disabled:opacity-50"
-				>
-					Approve All
-				</button>
+					@click="approveAll"
+				/>
 			</div>
 		</header>
 
 		<main>
 			<div
 				v-if="pending"
-				class="py-10 text-center text-gray-500"
+				class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
 			>
-				Loading...
+				<USkeleton
+					v-for="i in 3"
+					:key="i"
+					class="h-60 w-full"
+				/>
 			</div>
-			<div
+
+			<UAlert
 				v-else-if="error"
-				class="rounded-lg bg-red-100 p-4 text-center text-red-700"
-			>
-				Failed to load data.
-			</div>
+				icon="i-lucide-triangle-alert"
+				color="error"
+				variant="subtle"
+				title="Failed to load data"
+				:description="error.message"
+			/>
+
 			<div
 				v-else-if="pendingLogs && pendingLogs.length > 0"
-				class="space-y-4"
+				class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
 			>
 				<TimeLogsContainer
 					v-for="log in pendingLogs"
@@ -143,12 +159,18 @@
 					@approve-with-remarks="handleApproval"
 				/>
 			</div>
+
 			<div
 				v-else
-				class="mt-8 rounded-lg bg-white py-10 text-center shadow-sm"
+				class="mt-8 rounded-lg border-2 border-dashed border-gray-300 py-12 text-center dark:border-gray-700"
 			>
-				<p class="text-gray-500">No pending approvals.</p>
+				<UIcon
+					name="i-lucide-circle-check"
+					class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+				/>
+				<p class="mt-2 text-base font-normal text-gray-600 dark:text-gray-300">No Pending Approvals</p>
+				<p class="text-sm text-gray-500 dark:text-gray-400">Everything is up to date!</p>
 			</div>
 		</main>
-	</div>
+	</UContainer>
 </template>
