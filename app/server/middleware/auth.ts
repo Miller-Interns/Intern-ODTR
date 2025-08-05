@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 
 export default defineEventHandler((event) => {
-  console.log(`[Server Middleware] Running for: ${event.path}`);
 
   const token = getCookie(event, 'auth_token');
   const jwtSecret = process.env.JWT_SECRET;

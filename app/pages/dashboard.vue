@@ -1,7 +1,7 @@
 <template>
   <div v-if="user" class="dashboard-container">
     <h1>Dashboard</h1>
-    <p>Welcome!</p>
+    <p>Welcome, {{ user.name }}!</p>
     <p>This page is protected.</p>
     <button @click="handleLogout" class="submit-button">Log Out</button>
   </div>
@@ -12,7 +12,11 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const { user, clearUser } = useAuth();
+const { user, clearUser, fetchUser } = useAuth();
+
+onMounted(() => {
+  fetchUser()
+})
 
 const handleLogout = async () => {
   await $fetch('/api/logout', { method: 'POST' });

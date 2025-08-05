@@ -45,10 +45,10 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import { UForm, UFormField, UInput, UCard, UButton } from '#components'
 import Logo from '../assets/images/logo-cadet-blue.svg'
+import { loginSchema, type LoginSchema } from '~/server/usecase/auth/auth.schema'
 
 definePageMeta({ middleware: 'guest' })
 
@@ -59,12 +59,8 @@ const isPasswordVisible = ref(false)
 const emailError = ref(false)
 const passwordError = ref<string | undefined>(undefined)
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type Schema = z.output<typeof schema>
+const schema = loginSchema
+type Schema = LoginSchema
 
 const state = reactive({
   email: '',

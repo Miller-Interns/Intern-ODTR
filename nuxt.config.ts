@@ -12,4 +12,22 @@ export default defineNuxtConfig({
 
 	modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image'],
 	css: ['@/assets/css/main.css'],
+	serverHandlers: [
+		{
+			route: '/api/login',
+			handler: '~/server/api/login.post.ts',
+		},
+		{
+			route: '/api/logout',
+			handler: '~/server/api/logout.post.ts',
+		},
+		{
+			route: '/api/user',
+			handler: '~/server/api/user.get.ts',
+		},
+		{
+			handler: '~/server/middleware/auth.ts',
+			middleware: true,
+		}
+	],
 })
