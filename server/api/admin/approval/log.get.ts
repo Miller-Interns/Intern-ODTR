@@ -1,10 +1,18 @@
 export default defineEventHandler(async (event) => {
   try {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const tomorrow = new Date(today)
+    tomorrow.setHours(tomorrow.getDate() + 1)
+
     const pendingLogsFromDb = await db
       .selectFrom('time_logs')
       .innerJoin('interns', 'interns.id', 'time_logs.intern_id')
       .innerJoin('users', 'users.id', 'interns.user_id')
       .where('time_logs.status', '=', false)
+      .where('time_logs.time_in', '>=', today)
+      .where('time_logs.time_in', '<', tomorrow)
       .select([
         'time_logs.id',
         'time_logs.time_in',
@@ -21,8 +29,8 @@ export default defineEventHandler(async (event) => {
       .execute();
 
     const formattedLogs = pendingLogsFromDb.map((log) => {
-     return {
-       id: log.id,
+      return {
+        id: log.id,
         intern_id: log.intern_id,
         admin_id: log.admin_id,
         status: log.status,
@@ -35,8 +43,8 @@ export default defineEventHandler(async (event) => {
         time_out: log.time_out ? log.time_out.toISOString() : null,
 
         intern: {
-        id: log.intern_id,
-        name: log.intern_name ?? 'Unnamed Intern', // Provide a fallback for safety
+          id: log.intern_id,
+          name: log.intern_name ?? 'Unnamed Intern', // Provide a fallback for safety
         },
       };
     });
