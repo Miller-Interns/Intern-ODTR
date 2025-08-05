@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { UAvatar, UBadge, UButton } from '#components'
 import type { PropType } from 'vue'
-import { ref } from 'vue'
+import { ref,computed } from 'vue'
 import type { InternDetails } from '~/interfaces/interfaces'
 
-defineProps({
+const props = defineProps({
   intern: {
     type: Object as PropType<InternDetails>,
     required: true
@@ -21,6 +21,7 @@ defineProps({
 
 const emit = defineEmits(['update:status', 'upload-picture'])
 const fileInput = ref<HTMLInputElement | null>(null)
+const isCompleted = computed(() => props.intern.status === 'COMPLETED')
 
 function toggleCompletedStatus(isCompleted: boolean) {
   emit('update:status', isCompleted ? 'COMPLETED' : 'ONGOING')
@@ -59,7 +60,7 @@ function handleFileUpload(event: Event) {
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h1 class="text-2xl font-bold text-black dark:text-white">{{ intern.fullName }}</h1>
         <UToggle
-          :model-value="intern.status === 'COMPLETED'"
+          :model-value="isCompleted"
           @update:model-value="toggleCompletedStatus"
           :disabled="!isEditing"
           on-icon="i-heroicons-check-20-solid"
