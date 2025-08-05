@@ -1,38 +1,3 @@
-<script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-import { useRoute } from 'vue-router'
-import type { TabsItem } from '#ui/types'
-import { useInternProfile } from '~/composable/useInternProfle'
-import InternProfileHeader from '~/components/intern-profile-header.vue'
-import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal } from '#components'
-
-
-const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
-const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
-const route = useRoute()
-const internId = route.params.id as string
-
-const items: TabsItem[] = [
-  { slot: 'personalinfo', label: 'Personal Info' },
-  { slot: 'timelog', label: 'Time Log' },
-]
-
-const {
-  form,
-  pending,
-  error,
-  isEditing,
-  avatarPreviewUrl,
-  isModalOpen,
-  startEditing,
-  cancelEditing,
-  saveChanges,
-  markAsCompleted,
-  handleStatusUpdate,
-  handlePictureUpload,
-} = useInternProfile(internId)
-</script>
-
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8">
     <div v-if="pending" class="text-center py-12 text-black dark:text-white">
@@ -90,3 +55,38 @@ const {
     </UForm>
   </div>
 </template>
+
+<script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
+import { useRoute } from 'vue-router'
+import type { TabsItem } from '#ui/types'
+import { useInternProfile } from '~/composable/useInternProfle'
+import InternProfileHeader from '~/components/intern-profile-header.vue'
+import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal } from '#components'
+
+
+const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
+const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
+const route = useRoute()
+const internId = route.params.id as string
+
+const items: TabsItem[] = [
+  { slot: 'personalinfo', label: 'Personal Info' },
+  { slot: 'timelog', label: 'Time Log' },
+]
+
+const {
+  form,
+  pending,
+  error,
+  isEditing,
+  avatarPreviewUrl,
+  isModalOpen,
+  startEditing,
+  cancelEditing,
+  saveChanges,
+  markAsCompleted,
+  handleStatusUpdate,
+  handlePictureUpload,
+} = useInternProfile(internId)
+</script>
