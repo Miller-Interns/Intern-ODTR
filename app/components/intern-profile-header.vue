@@ -1,43 +1,3 @@
-<script setup lang="ts">
-import { UAvatar, UBadge, UButton } from '#components'
-import type { PropType } from 'vue'
-import { ref,computed } from 'vue'
-import type { InternDetails } from '~/interfaces/interfaces'
-
-const props = defineProps({
-  intern: {
-    type: Object as PropType<InternDetails>,
-    required: true
-  },
-  isEditing: {
-    type: Boolean,
-    default: false
-  },
-  previewSrc: {
-    type: String as PropType<string | null>,
-    default: null
-  }
-})
-
-const emit = defineEmits(['update:status', 'upload-picture'])
-const fileInput = ref<HTMLInputElement | null>(null)
-const isCompleted = computed(() => props.intern.status === 'COMPLETED')
-
-function toggleCompletedStatus(isCompleted: boolean) {
-  emit('update:status', isCompleted ? 'COMPLETED' : 'ONGOING')
-}
-
-function triggerFileInput() {
-  fileInput.value?.click()
-}
-
-function handleFileUpload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-  emit('upload-picture', file)
-}
-</script>
-
 <template>
   <div class="flex items-center gap-4 sm:gap-6">
     <div class="relative flex-shrink-0">
@@ -81,3 +41,43 @@ function handleFileUpload(event: Event) {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { UAvatar, UBadge, UButton } from '#components'
+import type { PropType } from 'vue'
+import { ref,computed } from 'vue'
+import type { InternDetails } from '~/interfaces/interfaces'
+
+const props = defineProps({
+  intern: {
+    type: Object as PropType<InternDetails>,
+    required: true
+  },
+  isEditing: {
+    type: Boolean,
+    default: false
+  },
+  previewSrc: {
+    type: String as PropType<string | null>,
+    default: null
+  }
+})
+
+const emit = defineEmits(['update:status', 'upload-picture'])
+const fileInput = ref<HTMLInputElement | null>(null)
+const isCompleted = computed(() => props.intern.status === 'COMPLETED')
+
+function toggleCompletedStatus(isCompleted: boolean) {
+  emit('update:status', isCompleted ? 'COMPLETED' : 'ONGOING')
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function handleFileUpload(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  emit('upload-picture', file)
+}
+</script>

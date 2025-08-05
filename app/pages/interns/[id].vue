@@ -1,111 +1,36 @@
 <script setup lang="ts">
-import { defineAsyncComponent, ref, onUnmounted } from 'vue'
+import { defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
-import type { FormSubmitEvent } from '#ui/types'
 import type { TabsItem } from '#ui/types'
-import type { Status } from '~/generated/prisma'
+import { useInternProfile } from '~/composable/useInternProfle'
 import InternProfileHeader from '~/components/intern-profile-header.vue'
-import type { InternDetails } from '~/interfaces/interfaces'
-import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal} from '#components'
+import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal } from '#components'
+
 
 const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
 const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
 const route = useRoute()
-const toast = useToast()
 const internId = route.params.id as string
-const isEditing = ref(false)
-const newAvatarFile = ref<File | null>(null)  
-const avatarPreviewUrl = ref<string | null>(null)  
-const isModalOpen = ref(false)
+
 const items: TabsItem[] = [
   { slot: 'personalinfo', label: 'Personal Info' },
   { slot: 'timelog', label: 'Time Log' },
 ]
 
-const { data: form, pending, error, refresh } = await useFetch<InternDetails>(`/api/interns_details/${internId}`)
-
-function startEditing() {
-  isEditing.value = true
-}
-
-async function cancelEditing() {
-  newAvatarFile.value = null
-  avatarPreviewUrl.value = null
-
-  await refresh()
-  isEditing.value = false
-  toast.add({ title: 'Edit cancelled', color: 'info' })
-}
-
-async function saveChanges(event: FormSubmitEvent<InternDetails>) {
-  if (!form.value) return
-  const savingToast = toast.add({ title: 'Saving changes...', color: 'secondary' })
-  try {
-    if (newAvatarFile.value) {
-      const formData = new FormData()
-      formData.append('avatar', newAvatarFile.value)
-      await $fetch(`/api/interns/${internId}/upload-picture`, {
-        method: 'POST',
-        body: formData,
-      })
-    }
-
-    await $fetch(`/api/interns_details/${internId}`, {
-      method: 'PUT',
-      body: event.data,
-    })
-
-    toast.update(savingToast.id, { title: 'Intern details updated successfully!', color: 'success' })
-    isEditing.value = false
-    
-    newAvatarFile.value = null
-    avatarPreviewUrl.value = null
-    await refresh()
-
-  } catch (err: any) {
-    toast.update(savingToast.id, { title: 'Error Saving', description: err.data?.statusMessage || 'Could not save changes.', color: 'error' })
-  }
-}
-
-async function markAsCompleted() {
-  isModalOpen.value = false
-  if (!form.value) return
-
-  const statusToast = toast.add({ title: 'Updating status...', color: 'secondary' })
-  try {
-    const payload = { ...form.value, status: 'COMPLETED' }
-    await $fetch(`/api/interns_details/${internId}`, {
-      method: 'PUT',
-      body: payload,
-    })
-    toast.update(statusToast.id, { title: 'Intern marked as Completed!', color: 'success' })
-    await refresh()
-  } catch (err: any)
-  {
-    toast.update(statusToast.id, { title: 'Error Updating Status', description: err.data?.statusMessage || 'Could not update status.', color: 'error' })
-  }
-}
-
-function handleStatusUpdate(newStatus: Status) {
-  if (!form.value) return
-  form.value.status = newStatus
-}
-
-function handlePictureUpload(file: File) {
-  if (!form.value) return
-  newAvatarFile.value = file
-
-  if (avatarPreviewUrl.value) {
-    URL.revokeObjectURL(avatarPreviewUrl.value)
-  }
-  avatarPreviewUrl.value = URL.createObjectURL(file)
-}
-
-onUnmounted(() => {
-  if (avatarPreviewUrl.value) {
-    URL.revokeObjectURL(avatarPreviewUrl.value)
-  }
-})
+const {
+  form,
+  pending,
+  error,
+  isEditing,
+  avatarPreviewUrl,
+  isModalOpen,
+  startEditing,
+  cancelEditing,
+  saveChanges,
+  markAsCompleted,
+  handleStatusUpdate,
+  handlePictureUpload,
+} = useInternProfile(internId)
 </script>
 
 <template>
