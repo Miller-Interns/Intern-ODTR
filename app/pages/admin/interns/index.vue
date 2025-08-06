@@ -2,11 +2,7 @@
 	import { computed } from 'vue'
 	import type { ActiveInternsApiResponse } from '~/types/composites'
 
-	definePageMeta({
-		layout: 'default',
-	})
-
-	const { data, pending, error } = await useFetch<ActiveInternsApiResponse>(`/api/admin/approval/active-interns`)
+	const { data, pending, error } = await useFetch<ActiveInternsApiResponse>(`/api/active-interns`)
 
 	const batchStatus = computed(() => {
 		if (!data.value) {

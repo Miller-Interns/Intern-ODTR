@@ -1,148 +1,139 @@
 <script setup lang="ts">
-	import { useRoute } from 'vue-router'
-	import type { TabsItem } from '@nuxt/ui'
-	import type { InternDetailsResponse, TimeLogForUI } from '~/types/composites'
-	import { useApprovalModal } from '~/composables/use-approval-modal'
+	import type { InternDetailsResponse } from '~/types/composites'
 
 	const route = useRoute()
 	const internId = route.params.id
 
-	const items = [
-		{
-			label: 'Personal Info',
-			slot: 'personalInfo' as const,
-		},
-		{
-			label: 'Time Logs',
-			slot: 'timeLogs' as const,
-		},
-	] satisfies TabsItem[]
+	const { data, pending, error, refresh } = await useFetch<InternDetailsResponse>(`/api/${internId}`)
 
-	const { data, pending, error, refresh } = await useFetch<InternDetailsResponse>(`/api/admin/approval/${internId}`)
+	const isEditing = ref(false)
+	const avatarPreviewUrl = ref<string | null>(null)
+	const internFullName = computed(() => data.value?.intern.user.name || '...')
+	const form = computed(() => data.value?.intern)
 
-	const bus = useEventBus<string>('log:approved')
-	bus.on(() => {
-		refresh()
-	})
+	const tabItems = [
+		{ slot: 'personalinfo', label: 'Personal Info' },
+		{ slot: 'timelog', label: 'Time Log' },
+	]
 
-	definePageMeta({
-		layout: 'default',
+	async function saveChanges() {
+		console.log('Saving changes to:', form.value)
+		isEditing.value = false
+	}
+
+	async function handleStatusUpdate(newStatus: string) {
+		console.log('Updating status to:', newStatus)
+	}
+
+	function handlePictureUpload(file: File) {
+		if (avatarPreviewUrl.value) {
+			URL.revokeObjectURL(avatarPreviewUrl.value)
+		}
+		avatarPreviewUrl.value = URL.createObjectURL(file)
+	}
+
+	onUnmounted(() => {
+		if (avatarPreviewUrl.value) {
+			URL.revokeObjectURL(avatarPreviewUrl.value)
+		}
 	})
 </script>
 
 <template>
-	<div>
-		<UContainer>
-			<header class="mb-4">
+	<div class="p-4 sm:p-6 lg:p-8">
+		<div
+			v-if="pending"
+			class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+		>
+			<USkeleton
+				v-for="i in 3"
+				:key="i"
+				class="h-60 w-full"
+			/>
+		</div>
+
+		<UAlert
+			v-else-if="error || !form"
+			icon="i-lucide-triangle-alert"
+			color="error"
+			variant="subtle"
+			title="Error Loading Data"
+			description="Could not find intern data."
+		/>
+
+		<UForm
+			v-else
+			:state="form"
+			@submit="saveChanges"
+		>
+			<div class="mb-4 flex items-center justify-between">
 				<UButton
 					to="/admin/interns"
 					icon="i-lucide-arrow-left"
 					color="neutral"
 					variant="ghost"
-					aria-label="Back"
+					aria-label="Back to interns list"
 				/>
-			</header>
+			</div>
 
-			<main class="p-4">
-				<!-- Loading State -->
-				<div v-if="pending">
+			<UCard class="mb-6">
+				<InternProfileHeader
+					:intern="form"
+					:is-editing="isEditing"
+					:preview-src="avatarPreviewUrl"
+					@update:status="handleStatusUpdate"
+					@upload-picture="handlePictureUpload"
+				/>
+			</UCard>
+
+			<UTabs
+				:items="tabItems"
+				variant="link"
+				:ui="{ trigger: 'grow' }"
+				class="w-full gap-4"
+				color="neutral"
+			>
+				<!-- Personal Info Tab -->
+				<template #personalinfo>
 					<UCard>
-						<div class="flex items-center justify-between">
-							<USkeleton class="h-8 w-48" />
-							<USkeleton class="h-6 w-20 rounded-full" />
-						</div>
-						<div class="mt-4 space-y-3">
-							<USkeleton
-								v-for="i in 3"
-								:key="i"
-								class="h-20 w-full"
+						<p class="text-gray-500">Personal information section.</p>
+					</UCard>
+				</template>
+
+				<!-- Time Log Tab -->
+				<template #timelog>
+					<div class="space-y-4">
+						<div
+							v-if="data?.timeLogs && data.timeLogs.length > 0"
+							class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+						>
+							<LogApprovalComponent
+								v-for="log in data.timeLogs"
+								:key="log.id"
+								:log="log"
+								:intern-name="internFullName"
+								@approved="refresh"
 							/>
 						</div>
-					</UCard>
-				</div>
 
-				<!-- Error State -->
-				<div v-else-if="error">
-					<UAlert
-						icon="i-lucide-alert-triangle"
-						color="error"
-						variant="subtle"
-						title="Could not load data"
-						:description="error.statusMessage || 'An unexpected error occurred.'"
+						<div
+							v-else
+							class="text-center text-gray-500"
+						>
+							No time logs found.
+						</div>
+					</div>
+
+					<UButton
+						label="Export DTR"
+						color="primary"
+						variant="solid"
+						icon="i-heroicons-arrow-down-tray"
+						block
+						class="mt-6"
 					/>
-				</div>
-
-				<!-- Data Display -->
-				<div v-else-if="data">
-					<!-- Intern Details Card -->
-					<UCard :ui="{ body: 'px-4 py-5 sm:p-6' }">
-						<div class="flex items-start space-x-4">
-							<UAvatar
-								:src="data.intern.user.avatar || '/default-avatar.png'"
-								alt="Avatar"
-								size="xl"
-							/>
-							<div class="flex-1 space-y-1">
-								<p class="text-xl font-bold text-gray-900 dark:text-white">{{ data.intern.user.name }}</p>
-								<p class="text-gray-700 dark:text-gray-300">Ongoing - {{ 'UI/UX Designer' }}</p>
-								<!-- data.intern.position || -->
-								<p class="text-sm text-gray-500 dark:text-gray-400">
-									{{ data.intern.course }} - {{ data.intern.year }} Year | {{ data.intern.school }}
-								</p>
-								<p class="pt-1 text-sm text-gray-500 dark:text-gray-400">
-									Hours Completed: {{ data.intern.completed_hours }}/{{ data.intern.required_hours }}
-								</p>
-							</div>
-						</div>
-					</UCard>
-
-					<!-- Tab Navigation -->
-
-					<UTabs
-						:items="items"
-						variant="link"
-						:ui="{ trigger: 'grow' }"
-						color="neutral"
-						class="w-full gap-4"
-						size="md"
-					>
-						<template #personalInfo>
-							<p class="text-muted mb-4">PERSONAL INFO OF INTERNS GOES HERE</p>
-						</template>
-
-						<template #timeLogs>
-							<!-- <div
-								v-if="pending"
-								class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
-							>
-								<USkeleton
-									v-for="i in 3"
-									:key="i"
-									class="h-60 w-full"
-								/>
-							</div> -->
-
-							<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-								<InternLogs
-									v-for="log in data.timeLogs"
-									:key="log.id"
-									:log="log"
-								/>
-							</div>
-
-							<UButton
-								label="Export DTR"
-								icon="i-lucide-download"
-								color="primary"
-								variant="solid"
-								size="lg"
-								block
-								class="mt-4"
-							/>
-						</template>
-					</UTabs>
-				</div>
-			</main>
-		</UContainer>
+				</template>
+			</UTabs>
+		</UForm>
 	</div>
 </template>

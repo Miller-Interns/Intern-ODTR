@@ -2,15 +2,30 @@
 	import { onClickOutside } from '@vueuse/core'
 	import useLogApproval from '~/composables/use-approve-logs'
 	import { useFormatting } from '@/composables/use-formatting'
-	import type { TimeLogForUI } from '../types/composites.js'
+	import type { PendingTimeLog } from '../types/composites.js'
 
-	const { formatTimeOnly, formatDuration } = useFormatting()
+	const toast = useToast()
+	const { formatTimeOnly } = useFormatting()
 	const { isApproving, approve } = useLogApproval()
+	const { calculateMinutes, formatMinutesAsHours } = useTimeLogCalculator()
 
-	const { log } = defineProps<{ log: TimeLogForUI }>()
+	const props = defineProps<{
+		log: PendingTimeLog
+	}>()
+
+	const calculatedPreview = computed(() => {
+		return calculateMinutes(props.log.time_in, props.log.time_out)
+	})
+
+	const avatarUrl = computed(() => {
+		if (props.log.intern.intern_picture) {
+			return `/uploads/avatars/${props.log.intern.intern_picture}`
+		}
+		return null
+	})
 
 	const isEditingRemarks = ref(false)
-	const remarksText = ref(log.remarks || '')
+	const remarksText = ref(props.log.remarks || '')
 	const remarksContainer = ref<HTMLDivElement | null>(null)
 
 	onClickOutside(remarksContainer, () => {
@@ -24,14 +39,30 @@
 	}
 
 	async function handleApprove() {
-		await approve(log, remarksText.value)
+		if (!props.log.intern.name) {
+			console.error('Attempted to approve a log for an intern with no name.', props.log)
+			toast.add({
+				title: 'Approval Failed',
+				description: 'Cannot approve a log for an intern without a name.',
+				color: 'error',
+			})
+			return
+		}
+		await approve({ id: props.log.id, time_in: props.log.time_in, time_out: props.log.time_out }, props.log.intern.name, remarksText.value)
 	}
 </script>
 
 <template>
-	<UCard>
+	<UCard class="h-90 overflow-y-auto">
 		<template #header>
-			<p class="text-base font-semibold text-gray-800 dark:text-white">{{ log.intern.name }}</p>
+			<div class="flex items-center space-x-3">
+				<UAvatar
+					:src="avatarUrl || ''"
+					alt="intern.user.name ?? 'Intern'"
+					size="3xl"
+				/>
+				<p class="text-base font-semibold text-gray-800 dark:text-white">{{ log.intern.name }}</p>
+			</div>
 		</template>
 
 		<!-- Main Content Body -->
@@ -48,7 +79,7 @@
 				</div>
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Hours:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatDuration(log.total_hours) }}</p>
+					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatMinutesAsHours(calculatedPreview.totalMinutes) }}</p>
 				</div>
 			</div>
 
@@ -68,7 +99,7 @@
 			<!-- Remarks Display -->
 			<div v-else-if="log.remarks">
 				<UDivider label="Remarks" />
-				<p class="mt-2 text-base font-normal text-gray-700 italic dark:text-gray-300">"{{ log.remarks }}"</p>
+				<p class="mt-2 text-base font-normal text-gray-700 italic dark:text-gray-300">Intern Notes: "{{ log.remarks }}"</p>
 			</div>
 		</div>
 

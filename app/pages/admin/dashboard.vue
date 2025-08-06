@@ -1,91 +1,46 @@
 <script setup lang="ts">
-	import type { TimeLogForUI } from '../../types/composites.ts'
+	import type { PendingTimeLog } from '../../types/composites.ts'
+	import { useTimeLogCalculator } from '~/composables/use-compute-hours'
 
-	definePageMeta({
-		layout: 'default',
-	})
 	const toast = useToast()
+	const { data: pendingLogs, pending, error, refresh } = useFetch<PendingTimeLog[]>('/api/log')
+	const { calculateMinutes } = useTimeLogCalculator()
 	const bus = useEventBus<void>('log:approved')
-
-	const STANDARD_WORK_HOURS = 8
-	const BREAK_HOURS = 1
-
-	const {
-		data: pendingLogs,
-		pending,
-		error,
-		refresh,
-	} = useFetch<TimeLogForUI[]>('/api/admin/approval/log', {
-		transform: (logs) => {
-			return logs.map((log) => {
-				if (!log.time_in || !log.time_out) {
-					return { ...log, total_hours: 0, overtime: 0 }
-				}
-				const timeIn = new Date(log.time_in)
-				const timeOut = new Date(log.time_out)
-				if (isNaN(timeIn.getTime()) || isNaN(timeOut.getTime())) {
-					return { ...log, total_hours: 0, overtime: 0 }
-				}
-
-				const grossDurationHours = (timeOut.getTime() - timeIn.getTime()) / (1000 * 60 * 60)
-				const calculatedTotalHours = Math.max(0, grossDurationHours - BREAK_HOURS)
-				const calculatedOvertime = Math.max(0, calculatedTotalHours - STANDARD_WORK_HOURS)
-
-				return {
-					...log,
-					total_hours: parseFloat(calculatedTotalHours.toFixed(2)),
-					overtime: parseFloat(calculatedOvertime.toFixed(2)),
-				}
-			})
-		},
-	})
 
 	bus.on(() => {
 		refresh()
 	})
 
-	// async function handleApproval(payload: { id: string; remarks: string }) {
-	// 	const logToApprove = pendingLogs.value?.find((log) => log.id === payload.id)
-	// 	if (!logToApprove) return
-
-	// 	try {
-	// 		await $fetch('/api/admin/approval/approval', {
-	// 			method: 'PATCH',
-	// 			body: {
-	// 				logId: payload.id,
-	// 				remarks: payload.remarks,
-	// 				status: true,
-	// 				total_hours: logToApprove.total_hours, // Pass calculated hours
-	// 				overtime: logToApprove.overtime, // Pass calculated overtime
-	// 			},
-	// 		})
-
-	// 		toast.add({ title: 'Log Approved', description: `Log for ${logToApprove.intern.name} has been approved.`, color: 'success' })
-	// 		await refresh()
-	// 	} catch (e: any) {
-	// 		console.error('Failed to approve log:', e)
-	// 		toast.add({ title: 'Approval Failed', description: e.data?.message || 'Please try again.', color: 'error' })
-	// 	}
-	// }
 	async function approveAll() {
 		if (!pendingLogs.value || pendingLogs.value.length === 0) {
 			toast.add({ title: 'No logs to approve.', color: 'warning' })
 			return
 		}
 
-		const approvalPayload = pendingLogs.value.map((log) => ({
-			id: log.id,
-			total_hours: log.total_hours,
-			overtime: log.overtime,
-		}))
+		const completeLogs = pendingLogs.value.filter((log) => log.time_out)
+
+		if (completeLogs.length === 0) {
+			toast.add({ title: 'No completed logs to approve.', color: 'info' })
+			return
+		}
+
+		const approvalPayload = pendingLogs.value.map((log) => {
+			const { totalMinutes, overtimeMinutes } = calculateMinutes(log.time_in, log.time_out)
+
+			return {
+				id: log.id,
+				total_hours: totalMinutes,
+				overtime: overtimeMinutes,
+			}
+		})
 
 		try {
-			await $fetch('/api/admin/approval/all', {
+			await $fetch('/api/all', {
 				method: 'POST',
 				body: { logs: approvalPayload },
 			})
 
-			toast.add({ title: 'Success', description: `Approving all ${pendingLogs.value?.length || 0} logs.`, color: 'success' })
+			toast.add({ title: 'Success', description: `All ${approvalPayload.length} completed logs have been approved.`, color: 'success' })
 			await refresh()
 		} catch (e: any) {
 			console.error('Failed to approve all logs:', e)
@@ -158,7 +113,7 @@
 				v-else-if="pendingLogs && pendingLogs.length > 0"
 				class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
 			>
-				<TimeLogsContainer
+				<DashboardLogs
 					v-for="log in pendingLogs"
 					:key="log.id"
 					:log="log"

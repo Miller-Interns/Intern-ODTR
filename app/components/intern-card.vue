@@ -1,12 +1,18 @@
 <script setup lang="ts">
-	import type { PropType } from 'vue'
 	import type { InternWithDetails } from '../types/composites.js'
+	import { useFormatting } from '~/composables/use-formatting'
 
-	defineProps({
-		intern: {
-			type: Object as PropType<InternWithDetails>,
-			required: true,
-		},
+	const { intern } = defineProps<{
+		intern: InternWithDetails
+	}>()
+
+	const { formatDuration } = useFormatting()
+
+	const avatarUrl = computed(() => {
+		if (intern.intern_picture) {
+			return `/uploads/avatars/${intern.intern_picture}`
+		}
+		return null
 	})
 </script>
 
@@ -14,8 +20,8 @@
 	<UCard :ui="{ body: 'p-3 sm:p-3' }">
 		<div class="flex items-center space-x-3">
 			<UAvatar
-				:src="intern.user.avatar || ''"
-				alt="Intern Avatar"
+				:src="avatarUrl || ''"
+				alt="intern.user.name ?? 'Intern'"
 				size="3xl"
 			/>
 			<div class="flex-1">
