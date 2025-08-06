@@ -1,5 +1,3 @@
-// composables/useInternProfile.ts
-
 import { ref, onUnmounted } from 'vue'
 import type { FormSubmitEvent } from '#ui/types'
 import type { Status } from '~/generated/prisma'
@@ -8,16 +6,13 @@ import type { InternDetails } from '~/interfaces/interfaces'
 export function useInternProfile(internId: string) {
   const toast = useToast()
 
-  // Reactive state for UI control
   const isEditing = ref(false)
   const newAvatarFile = ref<File | null>(null)
   const avatarPreviewUrl = ref<string | null>(null)
   const isModalOpen = ref(false)
 
-  // Data fetching with useFetch
   const { data: form, pending, error, refresh } = useFetch<InternDetails>(`/api/interns_details/${internId}`)
 
-  // Core functions
   function startEditing() {
     isEditing.value = true
   }
@@ -26,7 +21,7 @@ export function useInternProfile(internId: string) {
     newAvatarFile.value = null
     avatarPreviewUrl.value = null
     isEditing.value = false
-    await refresh() // Revert changes by refreshing data
+    await refresh()
     toast.add({ title: 'Edit cancelled', color: 'info' })
   }
 
@@ -77,7 +72,6 @@ export function useInternProfile(internId: string) {
     }
   }
 
-  // Event handlers passed to child components
   function handleStatusUpdate(newStatus: Status) {
     if (form.value) {
       form.value.status = newStatus
@@ -92,7 +86,6 @@ export function useInternProfile(internId: string) {
     avatarPreviewUrl.value = URL.createObjectURL(file)
   }
 
-  // Cleanup side-effects
   onUnmounted(() => {
     if (avatarPreviewUrl.value) {
       URL.revokeObjectURL(avatarPreviewUrl.value)
