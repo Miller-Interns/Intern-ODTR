@@ -1,32 +1,34 @@
-import type { TimeLogForUI } from '~/types/composites'
+import type { LogForApproval } from '~/types/composites'
+import { useTimeLogCalculator } from '~/composables/use-compute-hours'
 
 export default function useLogApproval() {
     const isApproving = ref(false)
+    const { calculateMinutes } = useTimeLogCalculator()
     const bus = useEventBus<void>('log:approved')
     const toast = useToast()
 
-    // const bus = useEventBus<void>('log:approved')
-
-    const approve = async (log: TimeLogForUI, remarks: string): Promise<boolean> => {
-        if (!log) {
+    const approve = async (logData: LogForApproval, internName: string, remarks: string): Promise<boolean> => {
+        if (!logData) {
             console.error('approve function called without a log.')
+            toast.add({ title: 'Internal Error', description: 'No log data provided.', color: 'error' })
             return false
         }
 
         isApproving.value = true
         try {
-            await $fetch('/api/admin/approval/approval', {
+            const { totalMinutes, overtimeMinutes } = calculateMinutes(logData.time_in, logData.time_out)
+            await $fetch('/api/approve-log', {
                 method: 'PATCH',
                 body: {
-                    logId: log.id,
+                    logId: logData.id,
                     remarks: remarks,
                     status: true,
-                    total_hours: log.total_hours,
-                    overtime: log.overtime,
+                    total_hours: totalMinutes,
+                    overtime: overtimeMinutes,
                 },
             })
             bus.emit()
-            toast.add({ title: 'Log Approved', description: `Log for ${log.intern.name} has been approved.`, color: 'success', icon: 'i-lucide-check-circle' })
+            toast.add({ title: 'Log Approved', description: `Log for ${internName} has been approved.`, color: 'success', icon: 'i-lucide-check-circle' })
             return true
 
         } catch (error: any) {
