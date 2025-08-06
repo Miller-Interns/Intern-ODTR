@@ -1,3 +1,6 @@
+import { Transaction } from 'kysely'
+import type { DB } from '~/server/db/types';
+
 type LogPayload = {
   id: string;
   total_hours: number;
@@ -5,6 +8,7 @@ type LogPayload = {
 }
 
 export default defineEventHandler(async (event) => {
+  const db = event.context.db;
   const { logs } = await readBody(event);
 
   if (!Array.isArray(logs) || logs.length === 0) {
@@ -15,7 +19,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await db.transaction().execute(async (trx) => {
+    await db.transaction().execute(async (trx: Transaction<DB>) => {
       for (const log of logs as LogPayload[]) {
         if (!log.id || typeof log.total_hours !== 'number' || typeof log.overtime !== 'number') {
           throw new Error('Invalid log object found in payload.');

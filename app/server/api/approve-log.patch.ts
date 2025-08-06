@@ -1,7 +1,8 @@
-import type { DB } from '../../../../app/server/db/types'; 
+import type { DB } from '../db/types';
 import type { Updateable } from 'kysely';
 
 export default defineEventHandler(async (event) => {
+  const db = event.context.db;
   const body = await readBody(event);
   const { logId, remarks, status, total_hours, overtime } = body;
 
@@ -18,17 +19,17 @@ export default defineEventHandler(async (event) => {
   if (status === true) {
     dataToUpdate.status = true;
 
-     if (typeof total_hours !== 'number' || typeof overtime !== 'number') {
+    if (typeof total_hours !== 'number' || typeof overtime !== 'number') {
       throw createError({
         statusCode: 400,
         statusMessage: 'When approving a log, total_hours and overtime are required.',
       });
     }
-    dataToUpdate.total_hours = total_hours;
-    dataToUpdate.overtime = overtime;
+    dataToUpdate.total_hours = Math.round(total_hours);
+    dataToUpdate.overtime = Math.round(overtime);
   }
 
-   if (Object.keys(dataToUpdate).length === 0) {
+  if (Object.keys(dataToUpdate).length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'No valid fields were provided for update.' });
   }
 

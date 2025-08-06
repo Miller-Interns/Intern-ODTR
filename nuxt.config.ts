@@ -26,4 +26,6 @@ export default defineNuxtConfig({
       ),
     }
   },
+
+  serverDir: './app/server'
 })
