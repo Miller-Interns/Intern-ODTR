@@ -48,7 +48,7 @@ import { ref, reactive } from 'vue'
 import type { FormSubmitEvent } from '#ui/types'
 import { UForm, UFormField, UInput, UCard, UButton } from '#components'
 import Logo from '../assets/images/logo-cadet-blue.svg'
-import { loginSchema, type LoginSchema } from '~/server/usecase/auth/auth.schema'
+import { loginSchema, type LoginSchema } from '~/server/use-cases/useAuth.schema'
 
 definePageMeta({ middleware: 'guest' })
 
