@@ -1,13 +1,3 @@
-<script setup lang="ts">
-import { UFormField, UInput } from '#components';
-import type { InternDetails } from '~/interfaces/interfaces';
-
-defineProps<{
-  details: InternDetails;
-  isEditing: boolean;
-}>();
-</script>
-
 <template>
   <div class="space-y-8">
     <div>
@@ -92,3 +82,13 @@ defineProps<{
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { UFormField, UInput } from '#components';
+import type { InternDetails } from '~/interfaces/interfaces';
+
+defineProps<{
+  details: InternDetails;
+  isEditing: boolean;
+}>();
+</script>

@@ -1,15 +1,3 @@
-<script setup lang="ts">
-import { useRoute } from 'vue-router';
-import type { BatchData } from '~/interfaces/interfaces';
-
-const route = useRoute();
-
-// const batchId = route.params.id as string;
-const batchId = '1'; //test
-
-const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batch/${batchId}`);
-</script>
-
 <template>
   <div class="bg-gray-50 dark:bg-gray-900 min-h-screen">
     <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -76,3 +64,15 @@ const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batc
     </main>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useRoute } from 'vue-router';
+import type { BatchData } from '~/interfaces/interfaces';
+
+const route = useRoute();
+
+// const batchId = route.params.id as string;
+const batchId = '1'; //test
+
+const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batch/${batchId}`);
+</script>
