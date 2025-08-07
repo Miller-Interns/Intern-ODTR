@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import type { H3Event } from 'h3';
+import type { H3Event } from 'h3'
 
 const prisma = new PrismaClient()
 
@@ -9,7 +9,7 @@ export const getCurrentUser = async (event: H3Event) => {
     if (!userContext) {
         throw createError({
             statusCode: 401,
-            statusMessage: 'Unauthorized: No valid session found by middleware.',
+            statusMessage: 'Unauthorized: No valid session found.',
         })
     }
 
@@ -17,7 +17,6 @@ export const getCurrentUser = async (event: H3Event) => {
         where: { id: userContext.userId },
         select: {
             id: true,
-            email: true,
             name: true,
         },
     })
@@ -25,7 +24,7 @@ export const getCurrentUser = async (event: H3Event) => {
     if (!user) {
         throw createError({
             statusCode: 404,
-            statusMessage: 'User not found in database.',
+            statusMessage: 'User not found.',
         })
     }
 
