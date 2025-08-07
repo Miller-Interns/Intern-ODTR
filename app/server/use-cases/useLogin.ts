@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { loginSchema } from './auth.schema'
+import { loginSchema } from './useAuth.schema'
 import type { H3Event } from 'h3'
 
 const prisma = new PrismaClient()

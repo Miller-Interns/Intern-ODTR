@@ -1,4 +1,4 @@
-import { getCurrentUser } from '~/server/usecase/auth/get-user'
+import { getCurrentUser } from '~/server/use-cases/useGetUser'
 
 export default defineEventHandler(async (event) => {
   return getCurrentUser(event)
