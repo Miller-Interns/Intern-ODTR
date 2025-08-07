@@ -1,20 +1,19 @@
 <script setup lang="ts">
 	import { onClickOutside } from '@vueuse/core'
-	import useLogApproval from '~/composables/use-approve-logs'
-	import { useFormatting } from '@/composables/use-formatting'
-	import type { PendingTimeLog } from '../types/composites.js'
+	import useLogApproval from '~/composables/useApproveLog'
+	import type { PendingTimeLog } from '~/types/composites'
+	import { useTimeLog } from '~/composables/useTimeLog'
 
 	const toast = useToast()
-	const { formatTimeOnly } = useFormatting()
 	const { isApproving, approve } = useLogApproval()
-	const { calculateMinutes, formatMinutesAsHours } = useTimeLogCalculator()
+	const { calculateHours, formatHours, formatTimeOnly } = useTimeLog()
 
 	const props = defineProps<{
 		log: PendingTimeLog
 	}>()
 
 	const calculatedPreview = computed(() => {
-		return calculateMinutes(props.log.time_in, props.log.time_out)
+		return calculateHours(props.log.time_in, props.log.time_out)
 	})
 
 	const avatarUrl = computed(() => {
@@ -48,7 +47,7 @@
 			})
 			return
 		}
-		await approve({ id: props.log.id, time_in: props.log.time_in, time_out: props.log.time_out }, props.log.intern.name, remarksText.value)
+		await approve(props.log, props.log.intern.name, remarksText.value)
 	}
 </script>
 
@@ -79,7 +78,7 @@
 				</div>
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Hours:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatMinutesAsHours(calculatedPreview.totalMinutes) }}</p>
+					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatHours(calculatedPreview.totalHours) }}</p>
 				</div>
 			</div>
 

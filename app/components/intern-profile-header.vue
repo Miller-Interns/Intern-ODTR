@@ -1,13 +1,13 @@
 <script setup lang="ts">
 	import type { InternWithDetails } from '~/types/composites'
-	import { useFormatting } from '~/composables/use-formatting'
+	import { useTimeLog } from '~/composables/useTimeLog'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails
 	}>()
 
 	const emit = defineEmits(['update:status', 'upload-picture'])
-	const { formatDuration } = useFormatting()
+	const { formatDuration } = useTimeLog()
 
 	const avatarUrl = computed(() => {
 		if (intern.intern_picture) {
@@ -15,13 +15,6 @@
 		}
 		return null
 	})
-
-	function minutesToHours(minutes: number | null | undefined): number {
-		if (typeof minutes !== 'number') {
-			return 0
-		}
-		return minutes / 60
-	}
 </script>
 
 <template>
@@ -51,7 +44,7 @@
 					<p class="text-sm text-gray-500 dark:text-gray-400">{{ intern.role }}</p>
 					<p class="text-sm text-gray-500 dark:text-gray-400">{{ intern.course }} - {{ intern.year }} | {{ intern.school }}</p>
 					<p class="text-sm text-gray-500 dark:text-gray-400">
-						Hours Completed: {{ formatDuration(minutesToHours(intern.completed_hours)) }} /
+						Hours Completed: {{ formatDuration(intern.completed_hours) }} /
 						{{ intern.required_hours }}
 					</p>
 				</div>

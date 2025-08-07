@@ -1,7 +1,7 @@
 import { computed } from 'vue';
-import type { RawTimeLog } from '~/types/composites';
+import type { PendingTimeLog } from '~/types/composites';
 
-export function useTimeLogState(log: RawTimeLog) {
+export function useTimeLogState(log: PendingTimeLog) {
     const isPending = computed(() => !log.status);
 
     const derivedStatus = computed<'pending' | 'approved'>(() => {

@@ -1,12 +1,9 @@
 <script setup lang="ts">
-	import type { InternWithDetails } from '../types/composites.js'
-	import { useFormatting } from '~/composables/use-formatting'
+	import type { InternWithDetails } from '~/types/composites.js'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails
 	}>()
-
-	const { formatDuration } = useFormatting()
 
 	const avatarUrl = computed(() => {
 		if (intern.intern_picture) {

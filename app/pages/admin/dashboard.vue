@@ -1,10 +1,10 @@
 <script setup lang="ts">
-	import type { PendingTimeLog } from '../../types/composites.ts'
-	import { useTimeLogCalculator } from '~/composables/use-compute-hours'
+	import type { PendingTimeLog } from '~//types/composites'
+	import { useTimeLog } from '~/composables/useTimeLog'
 
 	const toast = useToast()
 	const { data: pendingLogs, pending, error, refresh } = useFetch<PendingTimeLog[]>('/api/log')
-	const { calculateMinutes } = useTimeLogCalculator()
+	const { calculateHours } = useTimeLog()
 	const bus = useEventBus<void>('log:approved')
 
 	bus.on(() => {
@@ -25,12 +25,12 @@
 		}
 
 		const approvalPayload = pendingLogs.value.map((log) => {
-			const { totalMinutes, overtimeMinutes } = calculateMinutes(log.time_in, log.time_out)
+			const { totalHours, overtimeHours } = calculateHours(log.time_in, log.time_out)
 
 			return {
 				id: log.id,
-				total_hours: totalMinutes,
-				overtime: overtimeMinutes,
+				total_hours: totalHours,
+				overtime: overtimeHours,
 			}
 		})
 

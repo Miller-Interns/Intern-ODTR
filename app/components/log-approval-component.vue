@@ -1,20 +1,25 @@
 <!-- components/LogApprovalCard.vue -->
 <script setup lang="ts">
-	import type { RawTimeLog } from '~/types/composites'
-	import useLogApproval from '~/composables/use-approve-logs'
-	import { useLogDisplay } from '~/composables/use-log-display'
-	import { useTimeLogState } from '~/composables/use-timelog-state'
+	import type { PendingTimeLog } from '~/types/composites'
+	import useLogApproval from '~/composables/useApproveLog'
+	import { useTimeLogState } from '~/composables/useTimelogStates'
+	import { useTimeLog } from '~/composables/useTimeLog'
 
 	const props = defineProps<{
-		log: RawTimeLog
+		log: PendingTimeLog
 		internName: string
 	}>()
 
 	const emit = defineEmits(['approved'])
 	const { isApproving, approve } = useLogApproval()
-	const { formattedDate, timeIn, timeOut, totalHours, overtime } = useLogDisplay(props.log)
 	const { isPending } = useTimeLogState(props.log)
 	const remarks = ref(props.log.remarks || '')
+	const { calculateHours, formatHours, formatTimeOnly, formattedDate } = useTimeLog()
+
+	const calculated = computed(() => calculateHours(props.log.time_in, props.log.time_out))
+	const timeInDisplay = computed(() => formatTimeOnly(props.log.time_in))
+	const timeOutDisplay = computed(() => formatTimeOnly(props.log.time_out))
+	const totalHoursDisplay = computed(() => formatHours(calculated.value.totalHours))
 
 	async function handleApprove(closeModal: () => void) {
 		const success = await approve(props.log, props.internName, remarks.value)
@@ -52,9 +57,9 @@
 					</template>
 
 					<LogDetails
-						:time-in="timeIn"
-						:time-out="timeOut"
-						:total-hours="totalHours"
+						:time-in="timeInDisplay"
+						:time-out="timeOutDisplay"
+						:total-hours="totalHoursDisplay"
 					/>
 				</UCard>
 			</template>
@@ -67,9 +72,9 @@
 					</template>
 
 					<LogDetails
-						:time-in="timeIn"
-						:time-out="timeOut"
-						:total-hours="totalHours"
+						:time-in="timeInDisplay"
+						:time-out="timeOutDisplay"
+						:total-hours="totalHoursDisplay"
 					/>
 
 					<template #footer>
@@ -110,9 +115,9 @@
 			</template>
 
 			<LogDetails
-				:time-in="timeIn"
-				:time-out="timeOut"
-				:total-hours="totalHours"
+				:time-in="timeInDisplay"
+				:time-out="timeOutDisplay"
+				:total-hours="totalHoursDisplay"
 			/>
 
 			<div

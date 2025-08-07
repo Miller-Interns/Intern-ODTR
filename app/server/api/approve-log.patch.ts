@@ -25,8 +25,8 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'When approving a log, total_hours and overtime are required.',
       });
     }
-    dataToUpdate.total_hours = Math.round(total_hours);
-    dataToUpdate.overtime = Math.round(overtime);
+    dataToUpdate.total_hours = total_hours;
+    dataToUpdate.overtime = overtime;
   }
 
   if (Object.keys(dataToUpdate).length === 0) {

@@ -1,13 +1,14 @@
-import type { LogForApproval } from '~/types/composites'
-import { useTimeLogCalculator } from '~/composables/use-compute-hours'
+import type { PendingTimeLog } from '~/types/composites'
+import { useTimeLog } from '~/composables/useTimeLog'
 
 export default function useLogApproval() {
     const isApproving = ref(false)
-    const { calculateMinutes } = useTimeLogCalculator()
+    const { calculateHours } = useTimeLog()
     const bus = useEventBus<void>('log:approved')
     const toast = useToast()
 
-    const approve = async (logData: LogForApproval, internName: string, remarks: string): Promise<boolean> => {
+
+    const approve = async (logData: PendingTimeLog, internName: string, remarks: string): Promise<boolean> => {
         if (!logData) {
             console.error('approve function called without a log.')
             toast.add({ title: 'Internal Error', description: 'No log data provided.', color: 'error' })
@@ -16,15 +17,15 @@ export default function useLogApproval() {
 
         isApproving.value = true
         try {
-            const { totalMinutes, overtimeMinutes } = calculateMinutes(logData.time_in, logData.time_out)
+            const { totalHours, overtimeHours } = calculateHours(logData.time_in, logData.time_out)
             await $fetch('/api/approve-log', {
                 method: 'PATCH',
                 body: {
                     logId: logData.id,
                     remarks: remarks,
                     status: true,
-                    total_hours: totalMinutes,
-                    overtime: overtimeMinutes,
+                    total_hours: totalHours,
+                    overtime: overtimeHours,
                 },
             })
             bus.emit()
