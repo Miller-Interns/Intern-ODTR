@@ -1,8 +1,16 @@
 import type { ColumnType } from "kysely";
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+    ? ColumnType<S, I | undefined, U>
+    : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export const Status = {
+    INCOMING: "INCOMING",
+    ONGOING: "ONGOING",
+    COMPLETED: "COMPLETED"
+} as const;
+
+export type Status = (typeof Status)[keyof typeof Status];
 
 export type Batch = {
     id: string;
@@ -16,13 +24,17 @@ export type Intern = {
     user_id: string;
     batch_id: string;
     school: string;
+    required_hours: number;
+    status: Status;
     course: string;
     year: string;
     contact_number: string;
     emergency_contact_person: string;
     emergency_contact_number: string;
-    required_hours: number;
-    status: boolean;
+    role: Generated<string>;
+    intern_picture: string | null;
+    hours_completed: number | null;
+    note: string | null;
 };
 export type TimeLog = {
     id: string;
