@@ -155,7 +155,7 @@ async function onSubmit (event: FormSubmitEvent<any>) {
     } else {
       toast.add({
         title: 'Success!',
-        description: 'Intern has been added successfully.',
+        description: `${state.lastName},${state.firstName} ${state.middleName} added to batch successfully`,
         color: 'success'
       })
        router.push('/interns/list-of-interns')

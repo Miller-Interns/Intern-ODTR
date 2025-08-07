@@ -14,9 +14,10 @@ export async function getBatchDetailsUseCase(batchId: string) {
     details: {
       id: batchDataFromDb.id,
       batchNumber: batchDataFromDb.batch_number,
-      statusText: batchDataFromDb.status ? 'Ongoing' : 'Inactive',
+      statusText: batchDataFromDb.status,
       start_date: batchDataFromDb.start_date.toISOString().split('T')[0],
       internCount: batchDataFromDb.Intern.length,
+      supervisor: batchDataFromDb.intern_supervisor.name,
     },
     interns: batchDataFromDb.Intern.map((intern) => ({
       id: intern.id,

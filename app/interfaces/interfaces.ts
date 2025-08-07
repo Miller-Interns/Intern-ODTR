@@ -38,6 +38,7 @@ export interface BatchData {
     statusText: string;
     start_date: string;
     internCount: number;
+    supervisor: string;
   };
   interns: InternSummary[];
 }

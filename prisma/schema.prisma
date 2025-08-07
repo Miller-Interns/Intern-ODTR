@@ -36,6 +36,7 @@ model User {
 
   Intern  Intern[]
   TimeLog TimeLog[]
+  supervised_batches Batch[] @relation("SupervisorToBatch")
 
   @@map("users")
 }
@@ -45,7 +46,9 @@ model Batch {
   batch_number String
   start_date   DateTime  @default(now())
   end_date     DateTime?
-  status       Boolean   @default(true)
+  status       Status   @default(INCOMING)
+  supervisorId String
+  intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
 
   Intern Intern[]
 

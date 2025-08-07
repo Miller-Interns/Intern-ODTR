@@ -18,22 +18,18 @@
           Could not load batch details. Please try again.
         </div>
         <UCard v-else :ui="{ body: 'p-4 sm:p-6' }">
-          <template #header>
-            <div class="flex justify-between items-center">
+          <template #header>  
+            <div class="flex justify-between">
               <h2 class="text-base font-bold text-gray-900 dark:text-white">
                 {{ `Batch ${batchData.details.batchNumber}` }}
               </h2>
-              <UBadge class="font-base rounded-full text-green-500" variant="soft" color="success"> {{ batchData.details.statusText }}</UBadge>  
+              <StatusBadge :status="batchData.details.statusText"/>  
             </div>
           </template>
-          <div class="flex justify-between items-center text-xs">
-            <h2 >No. of Interns</h2>
-            <h2>Start Date</h2>
+          <div>
+            <BatchDetailsHeader :batch-data="batchData" />
           </div>
-          <div class="flex justify-between items-center text-sm">
-            <h2 >{{ batchData.details.internCount }} {{ batchData.details.internCount === 1 || batchData.details.internCount === 0  ? 'Intern' : 'Interns' }}</h2>
-            <h2>{{ batchData.details.start_date}}</h2>
-          </div>
+          <USeparator class="mt-5"/>
           <div class="mt-5">
             <h2 class="text-lg   font-semibold">Interns</h2>
           </div>
@@ -53,7 +49,6 @@
               </div>
             </NuxtLink>
           </div>
-
           <template #footer>
             <UButton v-if="batchData.details.internCount < 5" to="/interns/add-new-intern" block icon="i-heroicons-plus" size="xl" color="primary">
               Add Intern
@@ -68,8 +63,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import type { BatchData } from '~/interfaces/interfaces';
-
-const route = useRoute();
 
 // const batchId = route.params.id as string;
 const batchId = '1'; //test

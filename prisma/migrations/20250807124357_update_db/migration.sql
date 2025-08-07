@@ -53,7 +53,8 @@ CREATE TABLE "batches" (
     "batch_number" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "end_date" TIMESTAMP(3),
-    "status" BOOLEAN NOT NULL DEFAULT true,
+    "status" "Status" NOT NULL DEFAULT 'INCOMING',
+    "supervisorId" TEXT NOT NULL,
 
     CONSTRAINT "batches_pkey" PRIMARY KEY ("id")
 );
@@ -99,6 +100,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "interns_user_id_key" ON "interns"("user_id");
+
+-- AddForeignKey
+ALTER TABLE "batches" ADD CONSTRAINT "batches_supervisorId_fkey" FOREIGN KEY ("supervisorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "interns" ADD CONSTRAINT "interns_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

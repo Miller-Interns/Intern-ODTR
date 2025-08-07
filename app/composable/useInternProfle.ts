@@ -65,7 +65,7 @@ export function useInternProfile(internId: string) {
         method: 'PUT',
         body: payload,
       })
-      toast.update(statusToast.id, { title: 'Intern marked as Completed!', color: 'success'})
+      toast.update(statusToast.id, { title: `${form.value.fullName} marked as Completed!`, color: 'success'})
       await refresh()
     } catch (err: any) {
       toast.update(statusToast.id, { title: 'Error Updating Status', description: err.data?.statusMessage || 'Could not update status.', color: 'error' })

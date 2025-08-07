@@ -10,6 +10,11 @@ export async function findBatchById(batchId: string) {
       batch_number: true,
       status: true,
       start_date: true,
+      intern_supervisor: {
+        select: {
+          name: true,
+        },
+      },
       Intern: {
         select: {
           id: true,

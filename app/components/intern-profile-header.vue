@@ -27,7 +27,7 @@
           off-icon="i-heroicons-x-mark-20-solid"
         />
       </div>
-      <UBadge class="font-base rounded-full" color="primary" >{{intern.status}}</UBadge>
+      <StatusBadge :status="intern.status"/>  
       <p class="text-black dark:text-white">{{ intern.role }}</p>
       <p class="text-sm text-black dark:text-white">
         {{ intern.course }} - {{ intern.year }} | {{ intern.school }}
