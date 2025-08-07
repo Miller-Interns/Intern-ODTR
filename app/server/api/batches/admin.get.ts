@@ -1,5 +1,5 @@
 
-import { getAdminUsersUseCase } from '~/use-case/use-get-admin';
+import { getAdminUsersUseCase } from '~/server/use-case/use-get-admin';
 export default defineEventHandler(async (event) => {
   try {
     const adminUsers = await getAdminUsersUseCase()

@@ -1,4 +1,4 @@
-import { getAllBatchesUseCase } from '~/use-case/use-get-batch';
+import { getAllBatchesUseCase } from '~/server/use-case/use-get-batch';
 
 export default defineEventHandler(async (event) => {
   try {

@@ -58,7 +58,7 @@
 //     }
 //   });
 
-import { updateStatusUseCase } from '~/use-case/use-patch-auto-status';
+import { updateStatusUseCase } from '~/server/use-case/use-patch-auto-status';
 
 export default defineEventHandler(async (event) => {
   try {

@@ -1,5 +1,5 @@
 
-import { GetBatchQuerySchema, getBatchUseCase} from '~/use-case/use-get-single';
+import { GetBatchQuerySchema, getBatchUseCase} from '~/server/use-case/use-get-single';
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const validation = GetBatchQuerySchema.safeParse(query);

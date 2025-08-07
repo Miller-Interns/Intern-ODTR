@@ -1,5 +1,5 @@
-import {editBatchDetailsUseCase} from '~/use-case/use-patch-edit';
-import { BatchUpdateSchema } from '~/services/patch-edit-batch.service';
+import {editBatchDetailsUseCase} from '~/server/use-case/use-patch-edit';
+import { BatchUpdateSchema } from '~/server/services/patch-edit-batch.service';
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const validation = BatchUpdateSchema.safeParse(body);

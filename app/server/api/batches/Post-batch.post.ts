@@ -1,6 +1,6 @@
 
-import {postBatchUseCase } from '~/use-case/use-post-batch'
-import { BatchCreateInputSchema } from '~/services/post-batch.service';
+import {postBatchUseCase } from '~/server/use-case/use-post-batch'
+import { BatchCreateInputSchema } from '~/server/services/post-batch.service';
 
 
 export default defineEventHandler(async (event) => {
