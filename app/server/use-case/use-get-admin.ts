@@ -1,6 +1,6 @@
 
 
-import { UserService } from '~/services/get-admin.services';
+import { UserService } from '~/server/services/get-admin.services';
 
 
 export async function getAdminUsersUseCase() {

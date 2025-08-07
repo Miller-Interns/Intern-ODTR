@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BatchService } from '~/services/get-single-batch.service';
+import { BatchService } from '~/server/services/get-single-batch.service';
 
 
 export const GetBatchQuerySchema = z.object({

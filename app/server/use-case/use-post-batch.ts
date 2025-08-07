@@ -1,5 +1,5 @@
 
-import { BatchService, type BatchCreateInput } from "~/services/post-batch.service"
+import { BatchService, type BatchCreateInput } from "~/server/services/post-batch.service"
 export async function postBatchUseCase(data: BatchCreateInput){
   const newBatch= await BatchService.createBatch(data)
 
