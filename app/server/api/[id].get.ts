@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
 import type { Selectable } from 'kysely';
-import type { RawTimeLog, InternDetailsResponse, InternWithDetails, InternDetailQueryResult } from '../../types/composites.js';
+import type { PendingTimeLog, InternDetailsResponse, InternWithDetails, InternDetailQueryResult } from '../../types/composites.js';
 import type { TimeLog } from '~/server/db/types'
 
 export default defineEventHandler(async (event): Promise<InternDetailsResponse> => {
@@ -47,11 +47,17 @@ export default defineEventHandler(async (event): Promise<InternDetailsResponse> 
       .selectAll()
       .execute();
 
-    const timeLogs: RawTimeLog[] = timeLogsResult.map(log => ({
+    const timeLogs: PendingTimeLog[] = timeLogsResult.map(log => ({
       ...log,
       time_in: log.time_in.toISOString(),
       time_out: log.time_out ? log.time_out.toISOString() : null,
-      admin_id: log.admin_id || null
+      admin_id: log.admin_id || null,
+      intern: {
+        id: intern.id,
+        name: intern.user.name,
+        role: intern.role,
+        intern_picture: intern.intern_picture,
+      }
     }));
 
     return {

@@ -13,7 +13,6 @@ export type PendingTimeLog = Omit<TimeLog, 'time_in' | 'time_out' | 'status' | '
   status: boolean;
 };
 
-// This type describes the FLAT data from the database JOIN query
 export type PendingLogQueryResult = {
   id: string;
   intern_id: string;
@@ -29,25 +28,12 @@ export type PendingLogQueryResult = {
   overtime: number | null;
 };
 
-export type TimeLogForUI = Omit<TimeLog, 'time_in' | 'time_out' | 'status'> & {
-  intern: {
-    id: string;
-    name: string | null;
-    role: string;
-    intern_picture: string | null;
-  };
-  time_in: string;
-  time_out: string | null;
-  status: boolean;
-};
-
 export type InternWithDetails = Selectable<Intern> & {
   user: Pick<User, 'name' | 'email'>;
   batch: Pick<Batch, 'batch_number'>;
   completed_hours: number;
   remaining_hours: number;
 };
-
 
 export type ActiveInternsApiResponse = {
   batch: Selectable<Batch>;
@@ -56,7 +42,7 @@ export type ActiveInternsApiResponse = {
 
 export type InternDetailsResponse = {
   intern: InternWithDetails;
-  timeLogs: RawTimeLog[];
+  timeLogs: PendingTimeLog[];
 };
 
 export type InternQueryResult = Selectable<Intern> &
@@ -69,18 +55,6 @@ export type InternDetailQueryResult = Selectable<Intern> &
   Pick<Batch, 'batch_number'> & {
     completed_hours: number;
   };
-
-export type RawTimeLog = {
-  id: string;
-  intern_id: string;
-  time_in: string;
-  time_out: string | null;
-  total_hours: number;
-  overtime: number | null;
-  remarks: string | null;
-  status: boolean;
-  admin_id: string | null;
-};
 
 export type TimeLogEntry = {
   id: string;
@@ -98,11 +72,4 @@ export type TimeLogEntry = {
     role: string;
     intern_picture: string | null;
   };
-};
-
-//for log approval functions
-export type LogForApproval = {
-  id: string;
-  time_in: string | Date;
-  time_out: string | Date | null;
 };
