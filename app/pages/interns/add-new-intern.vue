@@ -12,7 +12,8 @@
       />
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
     </div>
-    <UForm :state="state" class="space-y-8" @submit="onSubmit">
+    
+    <UForm :state="state" class="space-y-8" @submit="handleFormSubmit">
       <div class="space-y-6">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Intern details:</h2>
         
@@ -33,7 +34,23 @@
         </UFormField>
 
         <UFormField label="Password:" name="password" required>
-          <UInput v-model="state.password" type="password" placeholder="Enter Password" size="xl" class="w-full"/>
+          <UInput
+            v-model="state.password"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            placeholder="Enter Password"
+            size="xl"
+            class="w-full">
+            <template #trailing>
+              <UButton
+                :icon="isPasswordVisible ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                variant="link"
+                color="secondary"
+                :padded="false"
+                aria-label="Toggle password visibility"
+                @click="isPasswordVisible = !isPasswordVisible"
+              />
+            </template>
+          </UInput>
         </UFormField>
 
         <UFormField label="Contact Number:" name="contactNumber" >
@@ -47,8 +64,8 @@
         <UFormField label="Emergency Contact Number:" name="emergencyContactNumber" >
           <UInput v-model="state.emergencyContactNumber" placeholder="Enter Emergency Contact Number" size="xl" class="w-full"/>
         </UFormField>
-
       </div>
+
       <div class="space-y-6">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Internship information:</h2>
         <UFormField label="School:" name="school" required>
@@ -79,8 +96,6 @@
         <UFormField label="Note/Remarks (Optional):" name="note">
           <UTextarea v-model="state.note" placeholder="Note and Remarks" size="xl" class="w-full"/>
         </UFormField>
-
-
       </div>
       
       <UButton
@@ -96,11 +111,11 @@
 </template>
 
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
-import { UInput } from '#components'
+import { reactive, ref, watch } from 'vue'
 
 const router = useRouter()
-
+const toast = useToast()
+const isPasswordVisible = ref(false)
 const { data: schools, pending: isSchoolsLoading } = useAsyncData('schools', () => {
   return $fetch<string[]>('/api/school')
 }, {
@@ -120,52 +135,60 @@ function onCreate(newItem: string) {
 }
 
 const state = reactive({
-  firstName: undefined,
-  middleName: undefined,
-  lastName: undefined,
-  contactNumber: undefined,
-  emergencyContactPerson: undefined,
-  emergencyContactNumber: undefined,
-  email: undefined,
-  password: undefined,
-  school: undefined,
-  courseYear: undefined,
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  contactNumber: '',
+  emergencyContactPerson: '',
+  emergencyContactNumber: '',
+  email: '',
+  password: '',
+  school: '',
+  courseYear: '',
   requiredHours: undefined,
-  role: undefined,
-  note: undefined,
+  role: '',
+  note: '',
 })
 
 const isLoading = ref(false)
-const toast = useToast()
 
-async function onSubmit (event: FormSubmitEvent<any>) {
-  isLoading.value = true
-  try {
-    const { error } = await useFetch('/api/add_interns', {
-      method: 'POST',
-      body: event.data,
-    })
+const { data, error, execute } = useFetch('/api/add_interns', {
+  method: 'POST',
+  body: state,
+  immediate: false,
+  watch: false,
+})
 
-    if (error.value) {
-      toast.add({
-        title: 'Error Creating Intern',
-        description: error.value.data?.statusMessage || 'An unexpected error occurred.',
-        color: 'error'
-      })
-    } else {
-      toast.add({
-        title: 'Success!',
-        description: `${state.lastName},${state.firstName} ${state.middleName} added to batch successfully`,
-        color: 'success'
-      })
-       router.push('/interns/list-of-interns')
-    }
-  } catch (err) {
+watch(data, (newData) => {
+  if (newData) {
     toast.add({
-      title: 'Network Error',
-      description: 'Could not connect to the server. Please try again.',
+      title: 'Success!',
+      description: `${state.lastName}, ${state.firstName} added successfully.`,
+      color: 'success'
+    })
+    router.push('/interns/list-of-interns')
+  }
+})
+
+watch(error, (newError) => {
+  if (newError) {
+    toast.add({
+      title: 'Error Creating Intern',
+      description: newError.data?.statusMessage || 'An unexpected error occurred.',
       color: 'error'
     })
+  }
+})
+
+async function handleFormSubmit () {
+  if (isLoading.value) return
+
+  isLoading.value = true
+  data.value = undefined
+  error.value = undefined
+
+  try {
+    await execute()
   } finally {
     isLoading.value = false
   }
