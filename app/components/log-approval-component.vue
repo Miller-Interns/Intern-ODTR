@@ -1,4 +1,3 @@
-<!-- components/LogApprovalCard.vue -->
 <script setup lang="ts">
 	import type { PendingTimeLog } from '~/types/composites'
 	import useLogApproval from '~/composables/useApproveLog'

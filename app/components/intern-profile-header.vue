@@ -1,13 +1,11 @@
 <script setup lang="ts">
 	import type { InternWithDetails } from '~/types/composites'
-	import { useTimeLog } from '~/composables/useTimeLog'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails
 	}>()
 
 	const emit = defineEmits(['update:status', 'upload-picture'])
-	const { formatDuration } = useTimeLog()
 
 	const avatarUrl = computed(() => {
 		if (intern.intern_picture) {
@@ -44,8 +42,7 @@
 					<p class="text-sm text-gray-500 dark:text-gray-400">{{ intern.role }}</p>
 					<p class="text-sm text-gray-500 dark:text-gray-400">{{ intern.course }} - {{ intern.year }} | {{ intern.school }}</p>
 					<p class="text-sm text-gray-500 dark:text-gray-400">
-						Hours Completed: {{ formatDuration(intern.completed_hours) }} /
-						{{ intern.required_hours }}
+						Hours Completed: {{ intern.completed_hours }} / {{ intern.required_hours }} Hours
 					</p>
 				</div>
 			</div>

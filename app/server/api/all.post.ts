@@ -28,9 +28,9 @@ export default defineEventHandler(async (event) => {
         await trx
           .updateTable('time_logs')
           .set({
-            status: true,                   // Set status to approved
-            total_hours: log.total_hours,   // USE THE CALCULATED VALUE
-            overtime: log.overtime,         // USE THE CALCULATED VALUE
+            status: true,
+            total_hours: log.total_hours,
+            overtime: log.overtime,
           })
           .where('id', '=', log.id)
           .execute();
