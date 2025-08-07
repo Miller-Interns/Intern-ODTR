@@ -49,6 +49,7 @@ import type { FormSubmitEvent } from '#ui/types'
 import { UForm, UFormField, UInput, UCard, UButton } from '#components'
 import Logo from '../assets/images/logo-cadet-blue.svg'
 import { loginSchema, type LoginSchema } from '~/server/usecase/auth/auth.schema'
+import { RouterNames } from '~/types/RouterNames';
 
 definePageMeta({ middleware: 'guest' })
 
@@ -82,7 +83,7 @@ const handleLogin = async (event: FormSubmitEvent<Schema>) => {
     })
 
     await fetchUser()
-    await navigateTo('/dashboard')
+    await navigateTo({ name: RouterNames.DASHBOARD }, { replace: true });
   } catch (error: any) {
     emailError.value = true
     passwordError.value = error.data?.statusMessage || 'Incorrect Password'

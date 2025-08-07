@@ -8,6 +8,8 @@
 </template>
 
 <script setup lang="ts">
+import { RouterNames } from '~/types/RouterNames';
+
 definePageMeta({
   middleware: 'auth',
 });
@@ -21,7 +23,7 @@ onMounted(() => {
 const handleLogout = async () => {
   await $fetch('/api/logout', { method: 'POST' });
   clearUser();
-  await navigateTo('/login');
+  await navigateTo({ name: RouterNames.LOGIN }, { replace: true });
 };
 </script>
 

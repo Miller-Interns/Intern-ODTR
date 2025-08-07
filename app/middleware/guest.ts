@@ -1,3 +1,5 @@
+import { RouterNames } from '~/types/RouterNames';
+
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { user, fetchUser } = useAuth();
 
@@ -6,6 +8,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   if (user.value) {
-    return navigateTo('/dashboard', { replace: true });
+    return navigateTo({ name: RouterNames.DASHBOARD }, { replace: true });
   }
 });

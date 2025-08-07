@@ -1,3 +1,5 @@
+import { RouterNames } from '~/types/RouterNames';
+
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { user, fetchUser } = useAuth();
 
@@ -7,12 +9,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   if (!user.value) {
     return navigateTo({
-      path: '/login',
+      name: RouterNames.LOGIN,
       query: {
         from: to.fullPath
       }
     }, {
-      replace: true // Use replace to not pollute the history
+      replace: true
     });
   }
 });
