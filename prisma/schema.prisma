@@ -1,6 +1,11 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about it in the docs: https://pris.ly/d/prisma-sc
 
+enum Status{
+  INCOMING
+  ONGOING
+  COMPLETED
+}
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -16,7 +21,7 @@ generator kysely {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_CONNECTION_URL")
+  url      = env("POSTGRES_CONNECTION_URL") 
 }
 
 model User {
@@ -30,6 +35,7 @@ model User {
 
   Intern  Intern[]
   TimeLog TimeLog[]
+  supervised_batches Batch[] @relation("SupervisorToBatch")
 
   @@map("users")
 }
@@ -39,7 +45,11 @@ model Batch {
   batch_number String
   start_date   DateTime  @default(now())
   end_date     DateTime?
-  status       Boolean   @default(true)
+  status       Status   @default(INCOMING)
+  supervisorId String
+  intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
+ 
+
 
   Intern Intern[]
 
@@ -60,6 +70,7 @@ model Intern {
   emergency_contact_number String
   required_hours           Int
   status                   Boolean
+  
 
   TimeLog TimeLog[]
 
