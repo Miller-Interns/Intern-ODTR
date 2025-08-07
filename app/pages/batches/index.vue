@@ -1,94 +1,3 @@
-<script setup lang="ts">
-import { capitalize } from '~/server/db/utils/format'
-import { type BatchWithInternCount } from '~/interfaces/interfaces';
-import { formatDate } from '~/server/db/utils/format'
-import { getTodayDateString } from '~/composables/today-date';
-
-
-
-
-
-definePageMeta({
-  path: '/',
-  layout: 'batch'
-})
-
-
-
-const { data: allBatches, pending, error } = await useFetch<BatchWithInternCount[]>('/api/batches/batch');
-const openModal = ref(false)
-
-
-const triggerServerStatusUpdate = async () => {
-  try {
-    const updatedBatchList = await $fetch<BatchWithInternCount[]>('/api/batches/status', {
-      method: 'PATCH'
-    });
-    allBatches.value = updatedBatchList;
-
-  } catch (e) {
-    console.error('Client: Failed to trigger the server-side status update:', e);
-  }
-
-};
-
-watchEffect((onInvalidate) => {
-  const batches = allBatches.value;
-  if (!batches || batches.length === 0) {
-    return;
-  }
-  console.log("watchEffect is running with loaded batches.");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const needsUpdate = batches.some(batch =>
-    batch.status === 'INCOMING' && new Date(batch.start_date) <= today
-  );
-  
-  if (needsUpdate) {
-    triggerServerStatusUpdate();
-  }
-
-});
-
-
-const endTime = async (batchId: string) => {
-
-
-  try {
-    const today = getTodayDateString()
-    const batchComplete = await $fetch<BatchWithInternCount[]>('api/batches/endTime', {
-      method: 'PATCH',
-      body: {
-        id: batchId,
-        end_date: today,
-      }
-    });
-    allBatches.value = batchComplete;
-
-  }
-  catch (error: any) {
-    console.error('Failed to update batch end time:', error);
-
-  }
-}
-
-
-const currentBatches = computed(() => {
-  if (!allBatches.value) return [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return allBatches.value.filter(batch => batch.end_date === null);
-});
-
-const previousBatches = computed(() => {
-  if (!allBatches.value) return [];
-  return allBatches.value.filter(batch => batch.end_date !== null);
-});
-
-defineShortcuts({
-  o: () => openModal.value = !openModal.value
-})
-</script>
 <template>
 <UApp>
   <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto font-sans">
@@ -128,7 +37,7 @@ defineShortcuts({
                     </UBadge>
                   </div>
                   <div class="flex right items-center">
-                    <NuxtLink :to="`/editBatch?id=${batch.id}`">
+                    <NuxtLink :to="`batches/edit-batch?id=${batch.id}`">
                       <UButton icon="i-lucide-pencil-line" color=secondary variant="ghost" size="sm"
                         aria-label="Edit Batch" />
                     </NuxtLink>
@@ -162,8 +71,9 @@ defineShortcuts({
 
 
             <div class="mt-3">
+
               <UModal v-model:open="openModal" :dismissible="false">
-                <UButton label="Mark Batch As Completed" class="py-2.5" color="primary" variant="solid" block />
+                <UButton label="Mark Batch As Completed" class="py-2.5" color="primary" variant="solid" @click="openConfirmationModal(batch.id)" block />
 
                 <template #header="{ close }">
                   <div class="flex flex-col items-left text-left p-4">
@@ -174,7 +84,7 @@ defineShortcuts({
                     <div class="mt-6 flex space-x-3 justify-center">
                       <UButton label="Cancel" color="primary" variant="outline" class="px-6 py-2.5 " @click="close" />
                       <UButton label="Confirm" color="primary" variant="solid" class="px-6 py-2.5"
-                        @click="endTime(batch.id)" />
+                        @click="endTime" />
 
                     </div>
                   </div>
@@ -186,17 +96,14 @@ defineShortcuts({
         <p v-else class="text-gray-500 dark:text-gray-400 mt-4">No active batches.</p>
       </section>
 
-
       <section class="mt-3 flex flex-col  mb-4">
-        <NuxtLink to="/createBatch">
+        <NuxtLink to="/batches/create-batch">
           <UButton class="py-2.5" icon="i-lucide-plus" label="Create Batch" variant=solid color=primary block size=xl />
         </NuxtLink>
       </section>
 
-
       <section>
         <h2 class="text-regular font-bold text-gray-800 dark:text-gray-100 mb-4 md:text-3xl">Previous Batches</h2>
-
         <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           <UCard v-for="batch in previousBatches" :key="batch.id">
             <template #header>
@@ -225,7 +132,6 @@ defineShortcuts({
               </div>
             </div>
             <template #footer>
-
               <!-- <UButton class="py-2.5" :to="`/viewBatch?id=${batch.id}`" label="View Batch Details" color=primary
                 variant="outline" block /> -->
 
@@ -234,10 +140,130 @@ defineShortcuts({
         </div>
         <p v-else class="text-gray-500 dark:text-gray-400 mt-4">No previous batches found.</p>
       </section>
-
     </div>
-
-
   </div>
   </UApp>
 </template>
+
+<script setup lang="ts">
+import { capitalize } from '~/server/db/utils/format'
+import { type BatchWithInternCount } from '~/types/Types';
+import { formatDate } from '~/server/db/utils/format'
+import { getTodayDateString } from '~/composables/today-date';
+
+definePageMeta({
+
+  layout: 'batch'
+})
+const allBatches = ref<BatchWithInternCount[]>([]);
+const pending = ref(false);
+const error = ref<Error | null>(null);
+const toast= useToast()
+const data = await $fetch<BatchWithInternCount[]>('/api/batches/batch');
+    allBatches.value = data;
+
+const openModal = ref(false)
+const selectedBatchId = ref<string | null>(null);
+const openConfirmationModal = (batchId: string) => {
+  selectedBatchId.value = batchId;
+  openModal.value = true;     
+};
+
+const triggerServerStatusUpdate = async () => {
+  try {
+    const updatedBatchList = await $fetch<BatchWithInternCount[]>('/api/batches/status', {
+      method: 'PATCH'
+    });
+   
+    if (updatedBatchList) {
+      const updatedBatches = await $fetch<BatchWithInternCount[]>('/api/batches/batch');
+      allBatches.value = updatedBatches;
+    } else {
+      throw new Error('API indicated a failure without throwing an error.');
+    }
+
+  } catch (error: any) {
+    console.error('Failed to update batch end time:', error);
+    toast.add({
+      title: 'Update Failed',
+      description: error.data?.message || 'Could not complete the batch. Please try again.',
+    
+    });
+  }
+};
+watchEffect((onInvalidate) => {
+  const batches = allBatches.value;
+  if (!batches || batches.length === 0) {
+    return;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const needsUpdate = batches.some(batch =>
+    batch.status === 'INCOMING' && new Date(batch.start_date) <= today
+  );
+
+  if (needsUpdate) {
+    triggerServerStatusUpdate();
+  }
+});
+
+
+const endTime = async () => {
+  if (!selectedBatchId.value) {
+    console.error("No batch selected to end.");
+    toast.add({
+      title: 'Error',
+      description: 'Please select a batch first.',
+    });
+    return;
+  }
+
+  try {
+    const today = new Date(); 
+
+    const response = await $fetch('/api/batches/end-time', {
+      method: 'PATCH',
+      body: {
+        id: selectedBatchId.value,
+        end_date: today.toISOString(), // Send as ISO string for consistency
+      }
+    });
+
+
+    if (response) {
+ 
+      openModal.value = false;
+      toast.add({
+        title: 'Batch Completed Successfully',
+        description: 'The batch has been marked as completed.',
+    
+      });
+      const updatedBatches = await $fetch<BatchWithInternCount[]>('/api/batches/batch');
+      allBatches.value = updatedBatches;
+    } else {
+      throw new Error('API indicated a failure without throwing an error.');
+    }
+
+  } catch (error: any) {
+    console.error('Failed to update batch end time:', error);
+    toast.add({
+      title: 'Update Failed',
+      description: error.data?.message || 'Could not complete the batch. Please try again.',
+    
+    });
+  }
+};
+const currentBatches = computed(() => {
+  if (!allBatches.value) return [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return allBatches.value.filter(batch => batch.end_date === null);
+});
+const previousBatches = computed(() => {
+  if (!allBatches.value) return [];
+  return allBatches.value.filter(batch => batch.end_date !== null);
+});
+defineShortcuts({
+  o: () => openModal.value = !openModal.value
+})
+</script>

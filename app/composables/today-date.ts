@@ -1,4 +1,4 @@
-import type { BatchWithInternCount } from '~/interfaces/interfaces';
+import type { BatchWithInternCount } from '~/types/Types';
 
 export function getTodayDateString(): string {
   const today = new Date();
