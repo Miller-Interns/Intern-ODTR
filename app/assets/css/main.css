@@ -1,2 +1,9 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --color-primary-500: #5DA7AF;
+  --color-secondary-500:  gray;
+}
