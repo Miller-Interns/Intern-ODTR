@@ -1,8 +1,7 @@
 <script setup lang="ts">
-	import { computed } from 'vue'
-	import type { ActiveInternsApiResponse } from '~/types/composites'
+	import type { ActiveInternsResponse } from '~/interfaces/api'
 
-	const { data, pending, error } = await useFetch<ActiveInternsApiResponse>(`/api/active-interns`)
+	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/active-interns`)
 
 	const batchStatus = computed(() => {
 		if (!data.value) {
@@ -10,7 +9,7 @@
 				text: 'Loading...',
 			}
 		}
-		if (data.value.batch.status) {
+		if (data.value.batch?.status) {
 			return {
 				text: 'Ongoing',
 			}

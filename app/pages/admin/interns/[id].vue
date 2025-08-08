@@ -1,8 +1,8 @@
 <script setup lang="ts">
-	import type { InternDetailsResponse } from '~/types/composites'
+	import type { InternDetailsResponse } from '~/interfaces/api'
 
 	const route = useRoute()
-	const internId = route.params.id
+	const internId = computed(() => route.params.id as string)
 
 	const { data, pending, error, refresh } = await useFetch<InternDetailsResponse>(`/api/${internId}`)
 

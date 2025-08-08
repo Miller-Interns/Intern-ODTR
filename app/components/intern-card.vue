@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import type { InternWithDetails } from '~/types/composites.js'
+	import type { InternWithDetails } from '~/interfaces/interns'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails

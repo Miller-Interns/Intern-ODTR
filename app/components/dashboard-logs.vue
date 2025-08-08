@@ -1,20 +1,15 @@
 <script setup lang="ts">
 	import { onClickOutside } from '@vueuse/core'
-	import useLogApproval from '~/composables/useApproveLog'
-	import type { PendingTimeLog } from '~/types/composites'
-	import { useTimeLog } from '~/composables/useTimeLog'
-
-	const toast = useToast()
-	const { isApproving, approve } = useLogApproval()
-	const { calculateHours, formatHours, formatTimeOnly } = useTimeLog()
+	import { useLogApproval } from '~/composables/useApproveLog'
+	import type { TimeLogEntry } from '~/interfaces/time-logs'
+	import { formatHours, formatTimeOnly } from '~/utils/formatters'
 
 	const props = defineProps<{
-		log: PendingTimeLog
+		log: TimeLogEntry
 	}>()
 
-	const calculatedPreview = computed(() => {
-		return calculateHours(props.log.time_in, props.log.time_out)
-	})
+	const { isApproving, approve } = useLogApproval()
+	const bus = useEventBus<void>('log:approved')
 
 	const avatarUrl = computed(() => {
 		if (props.log.intern.intern_picture) {
@@ -38,21 +33,15 @@
 	}
 
 	async function handleApprove() {
-		if (!props.log.intern.name) {
-			console.error('Attempted to approve a log for an intern with no name.', props.log)
-			toast.add({
-				title: 'Approval Failed',
-				description: 'Cannot approve a log for an intern without a name.',
-				color: 'error',
-			})
-			return
+		const success = await approve(props.log.id, remarksText.value)
+		if (success) {
+			bus.emit()
 		}
-		await approve(props.log, props.log.intern.name, remarksText.value)
 	}
 </script>
 
 <template>
-	<UCard class="h-90 overflow-y-auto">
+	<UCard class="overflow-y-auto">
 		<template #header>
 			<div class="flex items-center space-x-3">
 				<UAvatar
@@ -78,7 +67,7 @@
 				</div>
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Hours:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatHours(calculatedPreview.totalHours) }}</p>
+					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatHours(log.total_hours) }}</p>
 				</div>
 			</div>
 

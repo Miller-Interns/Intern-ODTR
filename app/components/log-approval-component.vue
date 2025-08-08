@@ -1,27 +1,30 @@
 <script setup lang="ts">
-	import type { PendingTimeLog } from '~/types/composites'
-	import useLogApproval from '~/composables/useApproveLog'
+	import type { TimeLogEntry } from '~/interfaces/time-logs'
+	import { useLogApproval } from '~/composables/useApproveLog'
 	import { useTimeLogState } from '~/composables/useTimelogStates'
-	import { useTimeLog } from '~/composables/useTimeLog'
+	import { formatHours, formatTimeOnly, formattedDate } from '~/utils/formatters'
 
 	const props = defineProps<{
-		log: PendingTimeLog
+		log: TimeLogEntry
 		internName: string
 	}>()
 
-	const emit = defineEmits(['approved'])
+	const emit = defineEmits<{
+		(e: 'approved'): void
+	}>()
+
 	const { isApproving, approve } = useLogApproval()
 	const { isPending } = useTimeLogState(props.log)
 	const remarks = ref(props.log.remarks || '')
-	const { calculateHours, formatHours, formatTimeOnly, formattedDate } = useTimeLog()
 
-	const calculated = computed(() => calculateHours(props.log.time_in, props.log.time_out))
+	const dateDisplay = computed(() => formattedDate(props.log.time_in))
 	const timeInDisplay = computed(() => formatTimeOnly(props.log.time_in))
 	const timeOutDisplay = computed(() => formatTimeOnly(props.log.time_out))
-	const totalHoursDisplay = computed(() => formatHours(calculated.value.totalHours))
+	const totalHoursDisplay = computed(() => formatHours(props.log.total_hours))
 
 	async function handleApprove(closeModal: () => void) {
-		const success = await approve(props.log, props.internName, remarks.value)
+		const success = await approve(props.log.id, remarks.value)
+
 		if (success) {
 			closeModal()
 			emit('approved')
@@ -44,7 +47,7 @@
 				>
 					<template #header>
 						<div class="flex items-center justify-between">
-							<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ formattedDate }}</p>
+							<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ dateDisplay }}</p>
 							<UBadge
 								class="font-base rounded-full"
 								color="warning"

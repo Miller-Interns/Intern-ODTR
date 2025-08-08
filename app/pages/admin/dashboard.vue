@@ -1,50 +1,34 @@
 <script setup lang="ts">
-	import type { PendingTimeLog } from '~//types/composites'
-	import { useTimeLog } from '~/composables/useTimeLog'
+	import type { TimeLogEntry } from '~/interfaces/time-logs'
+	import { useBulkApproval } from '~/composables/useBulkApprove'
 
 	const toast = useToast()
-	const { data: pendingLogs, pending, error, refresh } = useFetch<PendingTimeLog[]>('/api/log')
-	const { calculateHours } = useTimeLog()
+	const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogEntry[]>('/api/log')
+	const { isApproving, approveAll } = useBulkApproval()
 	const bus = useEventBus<void>('log:approved')
 
 	bus.on(() => {
 		refresh()
 	})
 
-	async function approveAll() {
-		if (!pendingLogs.value || pendingLogs.value.length === 0) {
+	async function handleApproveAllClick() {
+		if (!pendingLogs.value) {
 			toast.add({ title: 'No logs to approve.', color: 'warning' })
 			return
 		}
 
-		const completeLogs = pendingLogs.value.filter((log) => log.time_out)
+		const logIdsToApprove = pendingLogs.value
+			.filter((log) => log.time_out) // Only logs with a time_out can be approved.
+			.map((log) => log.id)
 
-		if (completeLogs.length === 0) {
+		if (logIdsToApprove.length === 0) {
 			toast.add({ title: 'No completed logs to approve.', color: 'info' })
 			return
 		}
 
-		const approvalPayload = pendingLogs.value.map((log) => {
-			const { totalHours, overtimeHours } = calculateHours(log.time_in, log.time_out)
-
-			return {
-				id: log.id,
-				total_hours: totalHours,
-				overtime: overtimeHours,
-			}
-		})
-
-		try {
-			await $fetch('/api/all', {
-				method: 'POST',
-				body: { logs: approvalPayload },
-			})
-
-			toast.add({ title: 'Success', description: `All ${approvalPayload.length} completed logs have been approved.`, color: 'success' })
+		const success = await approveAll(logIdsToApprove)
+		if (success) {
 			await refresh()
-		} catch (e: any) {
-			console.error('Failed to approve all logs:', e)
-			toast.add({ title: 'Approval Failed', description: e.data?.message || 'Could not approve all logs.', color: 'error' })
 		}
 	}
 
@@ -82,8 +66,9 @@
 					label="Approve All"
 					color="primary"
 					variant="solid"
-					:disabled="!pendingLogs || pendingLogs.length === 0"
-					@click="approveAll"
+					:disabled="!pendingLogs || pendingLogs.length === 0 || isApproving"
+					:loading="isApproving"
+					@click="handleApproveAllClick"
 				/>
 			</div>
 		</header>

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-	import type { InternWithDetails } from '~/types/composites'
+	import type { InternWithDetails } from '~/interfaces/interns'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails
 	}>()
-
-	const emit = defineEmits(['update:status', 'upload-picture'])
 
 	const avatarUrl = computed(() => {
 		if (intern.intern_picture) {
