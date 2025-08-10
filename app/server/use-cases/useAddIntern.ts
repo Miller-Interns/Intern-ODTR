@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
 import { createInternAndUser } from '~/server/services/add-intern.service'
-import type { InternRequestBody } from '~/interfaces/interfaces'
+import type { InternRequestBody, InternCreationData } from '~/interfaces/interfaces'
 
 const InternSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required.' }),
@@ -23,9 +23,25 @@ export async function createInternUseCase(requestBody: InternRequestBody) {
   const validationResult = InternSchema.safeParse(requestBody);
 
   if (!validationResult.success) {
+    // Create an object to hold errors, with field names as keys.
+    const fieldErrors: Record<string, string> = {};
+
+    // Loop through all the issues Zod found.
+    for (const issue of validationResult.error.issues) {
+      // 'issue.path[0]' gives you the name of the field (e.g., "email").
+      // 'issue.message' is the error string you defined in the schema.
+      if (issue.path[0]) {
+        const fieldName = String(issue.path[0]);
+        fieldErrors[fieldName] = issue.message;
+      }
+    }
+
+    // Throw a single error that contains all the field-specific messages.
+    // The client can now use the 'data' property to display the errors.
     throw createError({
-      statusCode: 400,
-      statusMessage: validationResult.error.issues[0].message,
+      statusCode: 400, // Bad Request
+      statusMessage: 'Validation failed. Please check the form for errors.',
+      data: fieldErrors, // This carries the structured error object.
     });
   }
 
@@ -54,22 +70,23 @@ export async function createInternUseCase(requestBody: InternRequestBody) {
   const [course, year_level] = courseParts;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const internData = {
-    firstName: firstName,
-    middleName: middleName,
-    lastName: lastName,
-    email: email,
-    hashedPassword: hashedPassword,
-    school: school,
-    course: course,
-    year_level: year_level,
-    requiredHours: requiredHours,
-    note: note,
-    role: role,
-    contactNumber: contactNumber,
-    emergencyContactPerson: emergencyContactPerson,
-    emergencyContactNumber: emergencyContactNumber,
+  const internData: InternCreationData = {
+    firstName,
+    middleName, 
+    lastName,
+    email,
+    hashedPassword,
+    school,
+    course,
+    year: year_level,
+    requiredHours,
+    note,
+    role,
+    contactNumber,
+    emergencyContactPerson,
+    emergencyContactNumber,
   };
+
   const newIntern = await createInternAndUser(internData);
   return newIntern;
 }

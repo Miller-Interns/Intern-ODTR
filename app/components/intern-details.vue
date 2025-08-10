@@ -34,15 +34,15 @@
         </UFormField>
         <UFormField>
           <template #label>
-            Emergency Contact Person <span v-if="!details.contactPerson" class="text-red-500">*</span>
+            Emergency Contact Person <span v-if="!details.emergencyContactPerson" class="text-red-500">*</span>
           </template>
-          <UInput v-model="details.contactPerson" :disabled="!isEditing" size="xl" class="w-full" />
+          <UInput v-model="details.emergencyContactPerson" :disabled="!isEditing" size="xl" class="w-full" />
         </UFormField>
         <UFormField>
           <template #label>
-            Emergency Contact Number <span v-if="!details.contactPersonNumber" class="text-red-500">*</span>
+            Emergency Contact Number <span v-if="!details.emergencyContactNumber" class="text-red-500">*</span>
           </template>
-          <UInput v-model="details.contactPersonNumber" :disabled="!isEditing" size="xl" class="w-full" />
+          <UInput v-model="details.emergencyContactNumber" :disabled="!isEditing" size="xl" class="w-full" />
         </UFormField>
       </div>
     </div>

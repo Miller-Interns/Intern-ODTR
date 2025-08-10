@@ -1,8 +1,8 @@
 import prisma from '~/server/utils/prisma'
 import { Status } from '~/generated/prisma'
-import type { InternData } from '~/server/use-cases/useAddIntern'
+import type { InternCreationData } from '~/interfaces/interfaces'
 
-export async function createInternAndUser(internData: InternData) {
+export async function createInternAndUser(internData: InternCreationData) {
 	const {
 		firstName,
 		middleName,
@@ -11,7 +11,7 @@ export async function createInternAndUser(internData: InternData) {
 		hashedPassword,
 		school,
 		course,
-		year_level,
+		year,
 		requiredHours,
 		note,
 		role,
@@ -50,9 +50,9 @@ export async function createInternAndUser(internData: InternData) {
 				school: school,
 				required_hours: requiredHours,
 				status: Status.INCOMING,
-				note: note || '',
-				course: course,
-				year: year_level,
+				note: note || null,
+				course: course,	
+				year: year,
 				contact_number: contactNumber,
 				role: role,
 				emergency_contact_number: emergencyContactNumber,

@@ -4,7 +4,15 @@
       <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center">
-            <UButton to="/dashboard" icon="i-heroicons-arrow-left" variant="ghost" color="secondary" />
+            <UButton
+              icon="i-lucide-arrow-left"
+              color="secondary"
+              variant="ghost"
+              size="xl"
+              class="-ml-4"
+              aria-label="Back"
+              to="/batches"
+            />
             <h1 class="text-lg font-bold ml-4 text-gray-900 dark:text-white">Batch Details</h1>
           </div>
         </div>
@@ -42,8 +50,11 @@
                 </div>
                 <hr class="border-gray-200 dark:border-gray-700" />
                 <div class="p-3">
-                  <p class="text-base text-black dark:text-white">
-                    Hours Rendered: {{ intern.hoursCompleted ?? 0 }}/{{ intern.requiredHours }} hours
+                  <p class="text-xs text-black dark:text-white">
+                    Hours Rendered
+                  </p>
+                  <p class="text-sm text-black dark:text-white">
+                    {{ intern.hoursCompleted ?? 0 }}/{{ intern.requiredHours }} hrs
                   </p>
                 </div>
               </div>

@@ -2,13 +2,13 @@
   <UContainer class="py-8">
     <div class="flex items-center gap-4 mb-6">
       <UButton
-        icon="i-heroicons-arrow-left"
+        icon="i-lucide-arrow-left"
         color="secondary"
         variant="ghost"
         size="xl"
         class="-ml-4"
         aria-label="Back"
-        @click="$router.back()"
+        to="/interns/list-of-interns"
       />
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
     </div>
@@ -116,6 +116,8 @@ import { reactive, ref, watch } from 'vue'
 const router = useRouter()
 const toast = useToast()
 const isPasswordVisible = ref(false)
+const isLoading = ref(false)
+
 const { data: schools, pending: isSchoolsLoading } = useAsyncData('schools', () => {
   return $fetch<string[]>('/api/school')
 }, {
@@ -149,8 +151,6 @@ const state = reactive({
   role: '',
   note: '',
 })
-
-const isLoading = ref(false)
 
 const { data, error, execute } = useFetch('/api/add_interns', {
   method: 'POST',

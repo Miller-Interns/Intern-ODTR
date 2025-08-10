@@ -7,7 +7,15 @@
     <UAlert v-else-if="error || !form" icon="i-heroicons-exclamation-triangle" color="error" variant="soft" title="Error Loading Data" description="Could not find intern data." />
     <UForm v-else :state="form" @submit="saveChanges">
       <div class="flex items-center justify-between mb-4">
-        <UButton to="/interns/list-of-interns" icon="i-heroicons-arrow-left-20-solid" color="secondary" variant="ghost" label="Back to Interns" size="xl"/>
+        <UButton
+          icon="i-lucide-arrow-left"
+          color="secondary"
+          variant="ghost"
+          size="xl"
+          class="-ml-4"
+          aria-label="Back"
+          to="/interns/list-of-interns"
+        />
       </div>
       <UCard class="mb-6">
         <InternProfileHeader 

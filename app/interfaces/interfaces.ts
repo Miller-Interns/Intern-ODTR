@@ -8,9 +8,10 @@ export interface InternDetails {
   firstName: string
   middleName: string | null
   email: string
-  contactNumber: string | null
-  contactPerson: string | null
-  contactPersonNumber: string | null
+  hashedPassword: string
+  contactNumber: string 
+  emergencyContactPerson: string 
+  emergencyContactNumber: string 
   school: string
   course: string
   year: string
@@ -58,4 +59,21 @@ export interface InternRequestBody {
   emergencyContactPerson?: string
 	emergencyContactNumber?: string
 	note?: string
+}
+
+export interface InternCreationData {
+  firstName: string;
+  middleName?: string | null;
+  lastName: string;
+  email: string;
+  hashedPassword: string;
+  school: string;
+  course: string;
+  year: string;
+  requiredHours: number;
+  note?: string | null;
+  role?: string;
+  contactNumber?: string;
+  emergencyContactPerson?: string;
+  emergencyContactNumber?: string;
 }
