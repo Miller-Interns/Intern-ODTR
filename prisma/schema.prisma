@@ -34,18 +34,21 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  Intern  Intern[]
-  TimeLog TimeLog[]
+  Intern             Intern[]
+  TimeLog            TimeLog[]
+  supervised_batches Batch[]   @relation("SupervisorToBatch")
 
   @@map("users")
 }
 
 model Batch {
-  id           String    @id @default(uuid())
-  batch_number String
-  start_date   DateTime  @default(now())
-  end_date     DateTime?
-  status       Boolean   @default(true)
+  id                String    @id @default(uuid())
+  batch_number      String
+  start_date        DateTime  @default(now())
+  end_date          DateTime?
+  status            Status    @default(INCOMING)
+  supervisorId      String
+  intern_supervisor User      @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
 
   Intern Intern[]
 
@@ -77,17 +80,17 @@ model Intern {
 }
 
 model TimeLog {
-  id          String   @id @default(uuid())
-  intern      Intern   @relation(fields: [intern_id], references: [id])
-  intern_id   String
-  time_in     DateTime
-  time_out    DateTime
-  overtime    Int?
-  total_hours Int
-  remarks     String?
-  status      Boolean  @default(false)
-  user        User     @relation(fields: [admin_id], references: [id])
-  admin_id    String
+  id            String   @id @default(uuid())
+  intern        Intern   @relation(fields: [intern_id], references: [id])
+  intern_id     String
+  time_in       DateTime
+  time_out      DateTime
+  total_hours   Float
+  admin_remarks String?
+  intern_notes  String?
+  status        Boolean  @default(false)
+  user          User     @relation(fields: [admin_id], references: [id])
+  admin_id      String
 
   @@map("time_logs")
 }

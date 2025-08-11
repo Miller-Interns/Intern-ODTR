@@ -7,19 +7,23 @@ async function main() {
 	console.log('-> Deleting existing data...')
 	await prisma.timeLog.deleteMany()
 	await prisma.intern.deleteMany()
-	await prisma.user.deleteMany()
 	await prisma.batch.deleteMany()
+	await prisma.user.deleteMany()
 	console.log('-> Existing data deleted.')
 
 	console.log('-> Creating users...')
+	const supervisorId = '015084bc-bec3-4373-aec3-729fba0a825a'
+	const internUser1Id = 'ada24d94-f49e-4af1-91f0-64056ad149ec'
+	const internUser2Id = 'a7c4a8a0-2b1d-4f1e-9d6c-2e9b9c0a3b1d'
+
 	const users = await prisma.user.createMany({
 		data: [
 			{
-				// Alyssa Palencia (Admin)
-				id: '015084bc-bec3-4373-aec3-729fba0a825a',
+				// Alyssa Palencia (Admin/Supervisor)
+				id: supervisorId,
 				email: 'alyssa.palencia@mllrdev.com',
 				name: 'Alyssa Palencia',
-				password: 'mllrdev321',
+				password: 'mllrdev321', 
 				isAdmin: true,
 			},
 			{
@@ -46,12 +50,9 @@ async function main() {
 				password: 'mllrdev321',
 				isAdmin: true,
 			},
-
-			//for testing purposes only
-
 			{
 				// Heriel Kaye Paculba (Intern User 1)
-				id: 'ada24d94-f49e-4af1-91f0-64056ad149ec',
+				id: internUser1Id,
 				email: 'paculba.herielkaye@gmail.com',
 				name: 'Heriel Kaye Paculba',
 				password: 'test321',
@@ -59,7 +60,7 @@ async function main() {
 			},
 			{
 				// John Doe (Intern User 2)
-				id: 'a7c4a8a0-2b1d-4f1e-9d6c-2e9b9c0a3b1d',
+				id: internUser2Id,
 				email: 'john.doe@example.com',
 				name: 'John Doe',
 				password: 'test321',
@@ -75,7 +76,8 @@ async function main() {
 			id: 'b2025-01-batch-id',
 			batch_number: 'B2025-01',
 			start_date: new Date('2025-01-15T00:00:00Z'),
-			status: true,
+			supervisorId: supervisorId,
+			status: 'ONGOING',
 		},
 	})
 	console.log(`-> Created batch "${batch.batch_number}".`)
@@ -84,11 +86,11 @@ async function main() {
 	const intern1 = await prisma.intern.create({
 		data: {
 			id: 'intern-heriel-paculba-id',
-			user_id: 'ada24d94-f49e-4af1-91f0-64056ad149ec',
+			user_id: internUser1Id, 
 			batch_id: batch.id,
 			school: 'Negros Oriental State University',
 			required_hours: 300,
-			status: 'ONGOING',
+			status: 'ONGOING', 
 			course: 'BS Computer Engineering',
 			year: '4th',
 			contact_number: '111-222-3333',
@@ -103,7 +105,7 @@ async function main() {
 	const intern2 = await prisma.intern.create({
 		data: {
 			id: 'intern-john-doe-id',
-			user_id: 'a7c4a8a0-2b1d-4f1e-9d6c-2e9b9c0a3b1d',
+			user_id: internUser2Id, 
 			batch_id: batch.id,
 			school: 'City College',
 			required_hours: 300,
@@ -123,7 +125,6 @@ async function main() {
 
 	console.log('-> Creating pending time logs...')
 	const adminIdForLogs = '015084bc-bec3-4373-aec3-729fba0a825a'
-
 	const logsData = []
 	const internsToLog = [intern1.id, intern2.id]
 
@@ -132,18 +133,14 @@ async function main() {
 			const logDate = new Date()
 			logDate.setDate(logDate.getDate() - i * 2)
 
-			/*total hours calculation and overtime is set to zero,
-	   updates when approve button is clicked 
-	   (temporary as we don't have the logic in the user side yet)
-	*/
-
 			logsData.push({
 				intern_id: internId,
 				time_in: new Date(logDate.setHours(9, 0, 0, 0)),
 				time_out: new Date(logDate.setHours(19, 0, 0, 0)),
 				total_hours: 0,
 				overtime: 0,
-				remarks: null,
+				admin_remarks: null, 
+				intern_notes: null,  
 				status: false,
 				admin_id: adminIdForLogs,
 			})
@@ -159,11 +156,11 @@ async function main() {
 }
 
 main()
-	.then(async () => {
-		await prisma.$disconnect()
-	})
 	.catch(async (e) => {
 		console.error(e)
 		await prisma.$disconnect()
 		process.exit(1)
+	})
+	.finally(async () => {
+		await prisma.$disconnect()
 	})

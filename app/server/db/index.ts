@@ -1,19 +1,13 @@
 import { Kysely, PostgresDialect } from 'kysely'
-import { Pool } from 'pg'
+import pg from 'pg'
 import type { DB } from './types'
 
-const connectionString = process.env.POSTGRES_CONNECTION_URL
-
-if (!connectionString) {
-	throw new Error("POSTGRES_CONNECTION_URL environment variable is not set.")
-}
-
-const dialect = new PostgresDialect({
-	pool: new Pool({
-		connectionString: connectionString,
-	}),
-})
+const config = useRuntimeConfig()
 
 export const db = new Kysely<DB>({
-	dialect,
+	dialect: new PostgresDialect({
+		pool: new pg.Pool({
+			connectionString: config.DATABASE_URL,
+		}),
+	}),
 })

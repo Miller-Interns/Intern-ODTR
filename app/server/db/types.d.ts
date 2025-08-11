@@ -1,7 +1,7 @@
 import type { ColumnType } from "kysely";
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S, I | undefined, U>
-    : ColumnType<T, T | undefined, T>;
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export const Status = {
@@ -9,15 +9,14 @@ export const Status = {
     ONGOING: "ONGOING",
     COMPLETED: "COMPLETED"
 } as const;
-
 export type Status = (typeof Status)[keyof typeof Status];
-
 export type Batch = {
     id: string;
     batch_number: string;
     start_date: Generated<Timestamp>;
     end_date: Timestamp | null;
-    status: Generated<boolean>;
+    status: Generated<Status>;
+    supervisorId: string;
 };
 export type Intern = {
     id: string;
@@ -41,9 +40,9 @@ export type TimeLog = {
     intern_id: string;
     time_in: Timestamp;
     time_out: Timestamp;
-    overtime: number | null;
     total_hours: number;
-    remarks: string | null;
+    admin_remarks: string | null;
+    intern_notes: string | null;
     status: Generated<boolean>;
     admin_id: string;
 };

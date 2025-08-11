@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import type { ActiveInternsResponse } from '~/interfaces/api'
 
-	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/active-interns`)
+	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/interns/active-interns`)
 
 	const batchStatus = computed(() => {
 		if (!data.value) {

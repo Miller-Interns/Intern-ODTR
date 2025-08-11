@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { useApproveSingleLog } from '~/server/use-cases/useApproveSingleLog';
+import { useApproveSingleLog } from '~/server/use-cases/useApproveSingleLog'; 
 
 const approveLogSchema = z.object({
   logId: z.string().min(1, 'Log ID cannot be empty.'),
@@ -8,17 +8,26 @@ const approveLogSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
-    const adminId = event.context.auth.userId as string;
+
+    // if (!event.context.user) {
+    //   throw createError({
+    //     statusCode: 401, 
+    //     statusMessage: 'Authentication is required to perform this action.',
+    //   });
+    // }
+
+    // const adminId = event.context.user.id; 
+    const adminId = '015084bc-bec3-4373-aec3-729fba0a825a';
+
     const body = await readBody(event);
     const validation = approveLogSchema.safeParse(body);
 
     if (!validation.success) {
       const firstIssue = validation.error.issues[0];
-
       if (firstIssue) {
         const errorMessage = `${firstIssue.path.join('.')} - ${firstIssue.message}`;
         throw createError({
-          statusCode: 400,
+          statusCode: 400, 
           statusMessage: errorMessage,
         });
       } else {

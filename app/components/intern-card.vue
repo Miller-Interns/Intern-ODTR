@@ -1,8 +1,8 @@
 <script setup lang="ts">
-	import type { InternWithDetails } from '~/interfaces/interns'
+	import type { InternSummary } from '~/interfaces/interns'
 
 	const { intern } = defineProps<{
-		intern: InternWithDetails
+		intern: InternSummary
 	}>()
 
 	const avatarUrl = computed(() => {

@@ -14,7 +14,8 @@ export function useBulkApproval() {
         try {
             const response = await bulkApproveLogsApi({
                 logIds,
-                remarks: 'Bulk Approved',
+                admin_remarks: '',
+                intern_notes: null, 
             });
 
             toast.add({ title: 'Success', description: response.message, color: 'success' });
