@@ -1,51 +1,57 @@
-import { z } from 'zod'
-import { useApproveAllLogs } from '~/server/use-cases/useApproveAll'
+import { z } from 'zod';
+import type { Transaction } from 'kysely';
+import type { DB } from '~/server/db/types';
+import { useApproveSingleLog } from '~/server/use-cases/useApproveSingleLog'; 
 
-const approveAllSchema = z.object({
-	logIds: z.array(z.string().min(1)).min(1, 'At least one log ID is required.'),
-	admin_remarks: z.string().nullable().optional(), // Changed from 'remarks'
-})
+const approveLogSchema = z.object({
+    logId: z.string().min(1, 'Log ID cannot be empty.'),
+    admin_remarks: z.string().nullable().optional(),
+});
+
+const bulkApproveSchema = z.object({
+    logs: z.array(approveLogSchema).min(1, 'At least one log is required.'),
+});
 
 export default defineEventHandler(async (event) => {
-	try {
-		// if (!event.context.auth || !event.context.auth.userId) {
-		//   throw createError({
-		//     statusCode: 401,
-		//     statusMessage: 'Authentication is required to perform this action.',
-		//   });
-		// }
+    try {
+        // const adminId = event.context.user.id;
+        const adminId = '015084bc-bec3-4373-aec3-729fba0a825a'; //temporary
 
-		// const adminId = event.context.auth.userId;
-		const adminId = '015084bc-bec3-4373-aec3-729fba0a825a'
+        const body = await readBody(event);
+        const validation = bulkApproveSchema.safeParse(body);
 
-		const body = await readBody(event)
-		const validation = approveAllSchema.safeParse(body)
+        if (!validation.success) {
+            const firstIssue = validation.error.issues[0];
+            const errorMessage = firstIssue ? `${firstIssue.path.join('.')} - ${firstIssue.message}` : 'Invalid request body.';
+            throw createError({
+                statusCode: 400,
+                statusMessage: errorMessage,
+            });
+        }
 
-		if (!validation.success) {
-			const firstIssue = validation.error.issues[0]
-			const errorMessage = firstIssue ? `${firstIssue.path.join('.')} - ${firstIssue.message}` : 'Invalid request body.'
-			throw createError({
-				statusCode: 400,
-				statusMessage: errorMessage,
-			})
-		}
+        const { logs } = validation.data;
 
-		const { logIds, admin_remarks } = validation.data
-		const result = await useApproveAllLogs(event.context.db, logIds, admin_remarks || null, adminId)
+    
+        await event.context.db.transaction().execute(async (trx: Transaction<DB>) => {
+            for (const log of logs) {
+                await useApproveSingleLog(trx, log.logId, log.admin_remarks || null, adminId);
+            }
+        });
 
-		return {
-			success: true,
-			message: `Successfully approved ${result.approvedCount} logs.`,
-		}
-	} catch (error: any) {
-		if (error.statusCode) {
-			throw error
-		}
+        return {
+            success: true,
+            message: `Successfully approved ${logs.length} logs.`,
+        };
 
-		console.error('Error in approve-all API:', error.message)
-		throw createError({
-			statusCode: 500,
-			statusMessage: 'An error occurred during bulk approval.',
-		})
-	}
-})
+    } catch (error: any) {
+        if (error.statusCode) {
+            throw error;
+        }
+
+        console.error('Error in bulk-approve API:', error.message);
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'An internal server error occurred during bulk approval.',
+        });
+    }
+});

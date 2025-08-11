@@ -1,5 +1,5 @@
-import type { TimeLog } from "~/generated/prisma"
-import type { Selectable } from "kysely"
+import type { TimeLog } from '~/generated/prisma'
+import type { Selectable } from 'kysely'
 
 export interface RawPendingLogQueryResult {
 	id: string
@@ -17,18 +17,16 @@ export interface RawPendingLogQueryResult {
 }
 
 export interface TimeLogEntry extends Omit<Selectable<TimeLog>, 'time_in' | 'time_out'> {
-    time_in: string;      
-    time_out: string | null;  
+	time_in: string
+	time_out: string | null
 }
 
 export interface ApproveLogPayload {
 	logId: string
 	admin_remarks: string | null
-	intern_notes: string | null
 }
 
 export interface BulkApprovePayload {
-	logIds: string[]
-	admin_remarks: string | null
-	intern_notes: string | null
+  logs: ApproveLogPayload[];
 }
+
