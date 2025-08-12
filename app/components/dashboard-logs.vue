@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { useLogApproval } from '~/composables/useApproveLog'
-import type { InternLogs } from '~/interfaces/interns'
+import type { DashboardLog } from '~/interfaces/time-logs'
 import { formatHours, formatTimeOnly } from '~/utils/formatters'
 import { calculateDisplayHours } from '~/utils/total-hours'
 
 const props = defineProps<{
-	log: InternLogs
+	log: DashboardLog
 }>()
 
 const { isApproving, approve } = useLogApproval()
 const bus = useEventBus<void>('log:approved')
 
 const avatarUrl = computed(() => {
-	if (props.log.intern.intern_picture) {
-		return `/uploads/avatars/${props.log.intern.intern_picture}`
+	if (props.log.intern_picture) {
+		return `/uploads/avatars/${props.log.intern_picture}`
 	}
 	return null
 })
@@ -59,7 +59,7 @@ const totalHoursForDisplay = computed(() => {
 		<template #header>
 			<div class="flex items-center space-x-3">
 				<UAvatar :src="avatarUrl || ''" alt="intern.user.name ?? 'Intern'" size="3xl" />
-				<p class="text-base font-semibold text-gray-800 dark:text-white">{{ log.intern.name }}</p>
+				<p class="text-base font-semibold text-gray-800 dark:text-white">{{ log.intern_name }}</p>
 			</div>
 		</template>
 

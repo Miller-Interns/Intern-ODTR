@@ -1,34 +1,61 @@
 <script setup lang="ts">
-import type { TimeLogEntry } from '~/interfaces/time-logs'
-import { useBulkApproval } from '~/composables/useBulkApprove'
+import type { ApproveLogPayload, RawPendingLogQueryResult } from '~/interfaces/time-logs';
+import type { DashboardLog } from '~/interfaces/time-logs';
+import { useBulkApproval } from '~/composables/useBulkApprove';
 
-const toast = useToast()
-const { data: pendingLogs, pending, error, refresh } = useFetch<TimeLogEntry[]>('/api/timelogs/today')
-const { isApproving, approveAll } = useBulkApproval()
-const bus = useEventBus<void>('log:approved')
+const toast = useToast();
+const { approveAll, isApproving } = useBulkApproval();
+const { data: pendingLogs, pending, error, refresh } = useFetch<RawPendingLogQueryResult[]>('/api/timelogs/today');
 
+const formattedLogs = computed((): DashboardLog[] => {
+	if (!pendingLogs.value) {
+		return [];
+	}
+	return pendingLogs.value.map(rawLog => ({
+		id: rawLog.id,
+		status: rawLog.status,
+		time_in: new Date(rawLog.time_in).toISOString(),
+		time_out: rawLog.time_out ? new Date(rawLog.time_out).toISOString() : null,
+		total_hours: rawLog.total_hours,
+		intern_notes: rawLog.intern_notes,
+		admin_remarks: rawLog.admin_remarks,
+		intern_name: rawLog.intern.name || 'Unnamed Intern',
+		intern_picture: rawLog.intern.intern_picture,
+	}));
+});
+
+const bus = useEventBus<void>('log:approved');
 bus.on(() => {
-	refresh()
-})
+	refresh();
+});
+
 
 async function handleApproveAllClick() {
-	if (!pendingLogs.value) {
-		toast.add({ title: 'No logs to approve.', color: 'warning' })
-		return
+	if (!pendingLogs.value || pendingLogs.value.length === 0) {
+		return;
 	}
 
-	const logIdsToApprove = pendingLogs.value
-		.filter((log) => log.time_out) 
-		.map((log) => log.id)
+	const logsPayload: ApproveLogPayload[] = pendingLogs.value
+		.filter(log => log.time_out)
+		.map(log => ({
+			logId: log.id,
+			admin_remarks: 'Bulk Approved',
+		}));
 
-	if (logIdsToApprove.length === 0) {
-		toast.add({ title: 'No completed logs to approve.', color: 'info' })
-		return
+	if (logsPayload.length === 0) {
+		toast.add({
+			title: 'No Completed Logs',
+			description: 'There are no logs with a "Time Out" to approve.',
+			color: 'info'
+		});
+		return;
 	}
 
-	const success = await approveAll(logIdsToApprove)
+	if (isApproving.value) return;
+
+	const success = await approveAll(logsPayload);
 	if (success) {
-		await refresh()
+		await refresh();
 	}
 }
 
@@ -37,7 +64,7 @@ const today = new Intl.DateTimeFormat('en-US', {
 	year: 'numeric',
 	month: 'short',
 	day: 'numeric',
-}).format(new Date())
+}).format(new Date());
 </script>
 
 <template>
@@ -72,7 +99,7 @@ const today = new Intl.DateTimeFormat('en-US', {
 
 			<div v-else-if="pendingLogs && pendingLogs.length > 0"
 				class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-				<DashboardLogs v-for="log in pendingLogs" :key="log.id" :log="log" />
+				<DashboardLogs v-for="log in formattedLogs" :key="log.id" :log="log" />
 			</div>
 
 			<div v-else

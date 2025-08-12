@@ -46,9 +46,3 @@ export interface InternSummary {
     completed_hours: number;
     remaining_hours: number;
 }
-
-export interface InternLogs extends Omit<Selectable<TimeLog>, 'time_in' | 'time_out'> {
-    time_in: string
-	time_out: string | null
-    intern: ActiveInternRow
-}

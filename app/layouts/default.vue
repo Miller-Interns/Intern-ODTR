@@ -29,6 +29,7 @@
 		class="px-safe min-h-screen bg-gray-50 pt-[calc(theme(spacing.8)+env(safe-area-inset-top))] pb-[calc(theme(spacing.24)+env(safe-area-inset-bottom))] font-sans dark:bg-gray-900"
 	>
 		<slot />
+		 
 	</main>
 
 	<footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
