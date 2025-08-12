@@ -6,5 +6,25 @@ export default defineEventHandler(async (event) => {
 	const dto: any = {
 		...body,
 	}
-	return await loginUseCase(dto, event.context as RequestContext, event)
+	const response = await loginUseCase(dto, event.context as RequestContext, event)
+
+	if (!response.user) {
+		return null
+	}
+
+	await setUserSession(event, {
+		user: response.user,
+	})
+
+	setCookie(event, 'auth_token', response.token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: 'lax',
+		maxAge: 60 * 60 * 12,
+		path: '/',
+	})
+
+	return {
+		status: 'success',
+	}
 })

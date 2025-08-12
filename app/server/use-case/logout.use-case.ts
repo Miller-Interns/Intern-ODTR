@@ -8,5 +8,5 @@ export const logoutUseCase = (event: H3Event) => {
 		maxAge: 0, // expire immediately
 	})
 
-	return { status: 'ok', message: 'Logged out' }
+	return { status: true }
 }

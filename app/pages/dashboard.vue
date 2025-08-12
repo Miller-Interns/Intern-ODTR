@@ -24,26 +24,20 @@
 
 	onMounted(() => {
 		fetch()
-		console.log(user.value)
 	})
 
-	// const getUser = async () => {
-	// 	try {
-	//     const user = await $fetch('/api/user', {
-	//       method: 'GET',
-	//       params: {
-	//         id: userId
-	//       }
-	//     })
-	// 	} catch (error) {
-	// 		console.error('Failed to fetch user:', error)
-	// 	}
-	// }
-
 	const handleLogout = async () => {
-		await $fetch('/api/logout', { method: 'POST' })
-		clear()
-		await navigateTo({ name: RouterNames.LOGIN }, { replace: true })
+		try {
+			const response = await $fetch<{ status: boolean }>('/api/auth/logout', { method: 'POST' })
+			if (response.status) {
+				await clear()
+				navigateTo({ name: RouterNames.LOGIN }, { replace: true })
+			} else {
+				console.error('Logout failed: No response from server')
+			}
+		} catch (error) {
+			console.error('Logout failed:', error)
+		}
 	}
 </script>
 

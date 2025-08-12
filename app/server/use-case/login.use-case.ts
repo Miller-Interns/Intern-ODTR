@@ -6,6 +6,8 @@ import z from 'zod'
 import { createSchemaValidator } from '../utils/create-schema-validator'
 import { userService } from '../service/user.service'
 import type { RequestContext } from '../types/RequestContext'
+import { User } from '../db/types'
+import { Selectable } from 'kysely'
 
 const dtoSchema = z.object({
 	email: z.string(),
@@ -15,8 +17,8 @@ const validateDTO = createSchemaValidator(dtoSchema)
 type LoginDTO = z.infer<typeof dtoSchema>
 
 type LoginResult = {
-	status: string
-	message: string
+	token: string
+	user: Selectable<User>
 }
 
 export async function loginUseCase(dto: LoginDTO, context: RequestContext, event: H3Event): Promise<LoginResult> {
@@ -52,16 +54,8 @@ export async function loginUseCase(dto: LoginDTO, context: RequestContext, event
 		expiresIn: '12h',
 	})
 
-	setCookie(event, 'auth_token', token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === 'production',
-		sameSite: 'lax',
-		maxAge: 60 * 60 * 12,
-		path: '/',
-	})
-
 	return {
-		status: 'ok',
-		message: 'Logged in successfully',
+		token,
+		user,
 	}
 }

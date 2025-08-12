@@ -102,6 +102,7 @@
 	const isPasswordVisible = ref(false)
 	const emailError = ref(false)
 	const passwordError = ref<string | undefined>(undefined)
+	const { fetch, user } = useUserSession()
 
 	const state = reactive({
 		email: undefined,
@@ -119,7 +120,6 @@
 		isLoading.value = true
 		emailError.value = false
 		passwordError.value = undefined
-		const { fetch } = useUserSession()
 
 		try {
 			const response = await $fetch<{ status: string; message: string }>('/api/auth/login/', {
@@ -130,7 +130,7 @@
 				},
 			})
 
-			if (response.status === 'ok') {
+			if (response) {
 				await fetch()
 				navigateTo({ name: RouterNames.DASHBOARD }, { replace: true })
 			}

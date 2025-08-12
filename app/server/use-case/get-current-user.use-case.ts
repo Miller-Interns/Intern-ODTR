@@ -1,10 +1,11 @@
 import z from 'zod'
 import { createSchemaValidator } from '../utils/create-schema-validator'
-import type { RequestContext } from '~/types/RequestContext'
+
 import { checkAuthentication } from '../utils/check-authentication'
 import { userService } from '../service/user.service'
 import type { Selectable } from 'kysely'
 import type { User } from '../db/types'
+import { RequestContext } from '../types/RequestContext'
 
 const dtoSchema = z.object({
 	id: z.string(),
