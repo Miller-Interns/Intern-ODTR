@@ -11,6 +11,10 @@
 		}
 		return null
 	})
+
+	const displayCompletedHours = computed(() => {
+		return Math.floor((intern.completed_hours || 0) * 100) / 100
+	})
 </script>
 
 <template>
@@ -18,13 +22,13 @@
 		<div class="flex items-center space-x-3">
 			<UAvatar
 				:src="avatarUrl || ''"
-				alt="intern.user.name ?? 'Intern'"
+				:alt="intern.user.name ?? 'Intern'"
 				size="3xl"
 			/>
 			<div class="flex-1">
 				<p class="font-semibold text-gray-800 dark:text-gray-100">{{ intern.user.name }}</p>
 				<p class="text-sm text-gray-500 dark:text-gray-400">
-					Hours Completed: {{ intern.completed_hours }}/{{ intern.required_hours }} hours
+					Hours Completed: {{ displayCompletedHours }}/{{ intern.required_hours }} hours
 				</p>
 			</div>
 		</div>
