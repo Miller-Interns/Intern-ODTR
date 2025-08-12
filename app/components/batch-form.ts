@@ -1,5 +1,8 @@
-import { format } from 'date-fns';
+
 import type { BatchWithInternCount } from '~/types/Types';
+import { format, parse, isValid } from 'date-fns'
+import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
+
 
 export const useBatchForm = (batchId?: string) => {
 
@@ -7,15 +10,36 @@ export const useBatchForm = (batchId?: string) => {
   const toast = useToast();
   const form = reactive({
     batch_number: '',
-    start_date: format(new Date(), 'yyyy-MM-dd'),
+    start_date: format(new Date(), 'MM/dd/yyyy'),
     selectedSupervisorId: '',
+
   });
 
-  const supervisorList = ref<{ label: string; value: string }[]>([]);
+  const supervisorList = ref<{ label: string; value: string; icon: string}[]>([]);
   const isLoading = ref(true);
   const error = ref<string | null>(null);
   const isEditMode = !!batchId;
 
+const calendarDate = computed({
+  get: () => {
+    if (!form.start_date) {
+      return undefined;
+    }
+    const jsDate = parse(form.start_date, 'MM/dd/yyyy', new Date());
+    if (!isValid(jsDate)) {
+      return undefined;
+    }
+    
+    return new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
+  },
+
+  set: (value) => {
+    if (value) {
+      const jsDate = value.toDate(getLocalTimeZone());
+      form.start_date = format(jsDate, 'MM/dd/yyyy');
+    }
+  }
+});
 
   const fetchSupervisors = async () => {
     try {
@@ -24,6 +48,8 @@ export const useBatchForm = (batchId?: string) => {
         supervisorList.value = rawData.map(user => ({
           label: user.name || 'Unnamed Supervisor',
           value: String(user.id),
+          icon: 'i-lucide-circle-user'
+          
         }));
       }
     } catch (e) {
@@ -40,12 +66,13 @@ export const useBatchForm = (batchId?: string) => {
       });
     
       form.batch_number = data.batch_number.toString();
-      form.start_date = format(new Date(data.start_date), 'yyyy-MM-dd');
+      form.start_date = format(new Date(data.start_date),'MM/dd/yyyy');
       form.selectedSupervisorId = data.supervisorId?.id.toString() ?? ''; 
     } catch (e) {
       error.value = "Failed to fetch batch ID"
     }
   };
+
 
 
   const submit = async () => {
@@ -67,7 +94,7 @@ export const useBatchForm = (batchId?: string) => {
       batch_number: form.batch_number,
       start_date: form.start_date,
       supervisorId: form.selectedSupervisorId,
-      status: form.start_date > format(new Date(), 'yyyy-MM-dd') ? Status.INCOMING : Status.ONGOING,
+      status: form.start_date > format(new Date(), 'MM/dd/yyyy') ? Status.INCOMING : Status.ONGOING,
     };
     if (isEditMode) {
       body.id = batchId; 
@@ -77,8 +104,7 @@ export const useBatchForm = (batchId?: string) => {
       await $fetch(endpoint, { method, body });
       
       toast.add({
-        title: `Batch ${isEditMode ? 'Updated' : 'Created'}`,
-        description: `Successfully ${isEditMode ? 'updated' : 'created'} Batch ${form.batch_number}`,
+        description: `Batch ${form.batch_number} ${isEditMode ? 'updated' : 'added'} successfully`,
       });
       
       await router.push('/batches');
@@ -113,6 +139,7 @@ export const useBatchForm = (batchId?: string) => {
 
   return {
     form,
+    calendarDate,
     supervisorList,
     isLoading,
     error,

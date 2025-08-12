@@ -4,7 +4,7 @@ export default defineAppConfig({
         colors: {
             primary: 'primary',
             secondary: 'black',
-            tertiary: 'indigo',
+            tertiary: 'neutral', 
             success: 'green',
             warning: 'yellow',
             error: 'red',
@@ -42,6 +42,10 @@ export default defineAppConfig({
                 body: 'px-4 py-5 sm:p-6',
             }
         },
+
+        background:{
+            white: '#F1F5F9'
+        }
       
         
     },

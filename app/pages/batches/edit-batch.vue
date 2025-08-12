@@ -3,7 +3,7 @@
     <div class="max-w-md mx-auto p-6 w-full h-full">
       <div class="flex items-center space-x-4">
         <NuxtLink to="/batches">
-          <UButton icon="i-lucide-corner-up-left" color=secondary variant="ghost" aria-label="Go back" />
+          <UButton icon="i-lucide-arrow-left" color=secondary variant="ghost" aria-label="Go back" />
           </NuxtLink>
           <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
             Edit Batch
@@ -12,21 +12,36 @@
 
       <UForm :state="{}" @submit="submit" class="space-y-6 ">
         <div class="flex space-x-4 ">
-          <UFormGroup name="batchNumber" class="grow " required>
+          <UFormGroup name="batchNumber" class="grow ">
             <div>
               Batch Number : <span class="text-red-500">*</span>
             </div>
-            <UInput class="w-full" v-model.trim="form.batch_number" placeholder="Batch" size="xl" />
+            
+            <UInput class="w-full"  required v-model.trim="form.batch_number" placeholder="Batch" size="xl" />
           </UFormGroup>
         </div>
 
-        <section class="items-center space-x-10 w-full max-w-md">
+
+        <section class="items-center  space-x-10 w-full max-w-md">
           <UFormGroup name="startDate" class="grow" required>
-            <div>
-              Start Date : <span class="text-red-500">*</span>
+
+            <div class="flex items-center gap-2">
+
+              <UInput v-model="form.start_date" color="neutral" variant="outline" icon="i-lucide-calendar"
+                class="grow" />
+              <UPopover>
+                <UButton class='bottom-end ' icon="i-lucide-calendar" color="neutral" variant="subtle" />
+
+                <template #content>
+                  <UCalendar class="
+              p-10 text-lg" v-model="calendarDate" />
+                </template>
+              </UPopover>
             </div>
-            <UInput class="w-full" v-model="form.start_date" type="date" size="xl" />
+
+
           </UFormGroup>
+
         </section>
 
         <section class="items-center space-x-10 w-full max-w-md">
@@ -41,8 +56,8 @@
 
         <UButton type="submit" text=regular label="Save Batch" :loading="isLoading" color=primary block size="lg"
           class="mt-8" />
-
-        <!-- <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
+<!-- 
+        <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
         :title="successMessage" @close="successMessage = ''" />
       <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
         @close="errorMessage = ''" /> -->
@@ -59,6 +74,7 @@ const batchId = route.query.id as string;
 const {
   form,       
   supervisorList,  
+  calendarDate,
   isLoading,     
   error,     
   submit,      
