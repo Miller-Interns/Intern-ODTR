@@ -7,8 +7,7 @@ export default defineAppConfig({
             success: 'green',
             warning: 'yellow',
             error: 'red',
-            info: 'indigo',
-            neutral: 'gray'
+            info: 'indigo'
         },
         button: {
             defaultVariants: {
