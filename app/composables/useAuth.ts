@@ -1,32 +1,30 @@
-import type { User } from '@prisma/client';
+// const useUser = () => useState<User | null>('user', () => null)
 
-const useUser = () => useState<User | null>('user', () => null);
+// export const useAuth = () => {
+// 	const user = useUser()
 
-export const useAuth = () => {
-  const user = useUser();
+// 	const fetchUser = async () => {
+// 		if (user.value) {
+// 			return
+// 		}
 
-  const fetchUser = async () => {
-    if (user.value) {
-      return;
-    }
+// 		try {
+// 			const userData = await $fetch<User>('/api/user', {
+// 				headers: useRequestHeaders(['cookie']),
+// 			})
+// 			user.value = userData
+// 		} catch (error) {
+// 			user.value = null
+// 		}
+// 	}
 
-    try {
-      const userData = await $fetch<User>('/api/user', {
-        headers: useRequestHeaders(['cookie']),
-      });
-      user.value = userData;
-    } catch (error) {
-      user.value = null;
-    }
-  };
+// 	const clearUser = () => {
+// 		user.value = null
+// 	}
 
-  const clearUser = () => {
-    user.value = null;
-  };
-
-  return {
-    user,
-    fetchUser,
-    clearUser,
-  };
-};
+// 	return {
+// 		user,
+// 		fetchUser,
+// 		clearUser,
+// 	}
+// }

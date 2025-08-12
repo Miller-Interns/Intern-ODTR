@@ -2,6 +2,7 @@ import type { NuxtConfig } from 'nuxt/config'
 
 const runtimeConfig: NuxtConfig['runtimeConfig'] = {
 	DATABASE_URL: process.env.POSTGRES_CONNECTION_URL,
+	JWT_SECRET: process.env.JWT_SECRET,
 }
 
 export default defineNuxtConfig({
@@ -10,24 +11,8 @@ export default defineNuxtConfig({
 
 	runtimeConfig,
 
-	modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image'],
+	serverDir: 'app/server',
+
+	modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image', 'nuxt-auth-utils'],
 	css: ['@/assets/css/main.css'],
-	serverHandlers: [
-		{
-			route: '/api/login',
-			handler: '~/server/api/login.post.ts',
-		},
-		{
-			route: '/api/logout',
-			handler: '~/server/api/logout.post.ts',
-		},
-		{
-			route: '/api/user',
-			handler: '~/server/api/user.get.ts',
-		},
-		{
-			handler: '~/server/middleware/auth.ts',
-			middleware: true,
-		}
-	],
 })

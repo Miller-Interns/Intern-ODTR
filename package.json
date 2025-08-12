@@ -18,6 +18,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"kysely": "^0.28.3",
 		"nuxt": "^4.0.0",
+		"nuxt-auth-utils": "0.5.23",
 		"pg": "^8.16.3",
 		"prisma-kysely": "^1.8.0",
 		"vue": "^3.5.17",
