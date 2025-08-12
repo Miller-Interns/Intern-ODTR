@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
 export const BatchSchema = z.object({
-  id: z.string(),
-  batch_number: z.string(),
-  start_date: z.date(),
-  end_date: z.date(),
-  status: z.boolean(),
+	id: z.string(),
+	batch_number: z.string(),
+	start_date: z.date(),
+	end_date: z.date(),
+	status: z.boolean(),
 })
 
 export const InternSchema = z.object({
@@ -27,22 +27,23 @@ export const InternSchema = z.object({
 })
 
 export const TimeLogSchema = z.object({
-  id: z.string(),
-  intern_id: z.string(),
-  time_in: z.date(),
-  time_out: z.date(),
-  overtime: z.number().nullable(),
-  total_hours: z.number(),
-  remarks: z.string().nullable(),
-  status: z.boolean(),
-  admin_id: z.string(),
+	id: z.string(),
+	intern_id: z.string(),
+	time_in: z.date(),
+	time_out: z.date(),
+	overtime: z.number().nullable(),
+	total_hours: z.number(),
+	remarks: z.string().nullable(),
+	status: z.boolean(),
+	admin_id: z.string(),
 })
 
 export const UserSchema = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  name: z.string().nullable(),
-  password: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+	id: z.string(),
+	email: z.string().email(),
+	name: z.string().nullable(),
+	password: z.string().nullable(),
+	isAdmin: z.boolean(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
 })
