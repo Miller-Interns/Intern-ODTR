@@ -1,5 +1,5 @@
 import type { Selectable } from 'kysely';
-import type { Intern, User, Batch , Status} from '../../app/server/db/types.d.ts';
+import type { Intern, User, Batch , Status, TimeLog} from '../../app/server/db/types.d.ts';
 
 export interface InternQueryRow extends Selectable<Intern> {
     name: User['name'];
@@ -45,4 +45,10 @@ export interface InternSummary {
 
     completed_hours: number;
     remaining_hours: number;
+}
+
+export interface InternLogs extends Omit<Selectable<TimeLog>, 'time_in' | 'time_out'> {
+    time_in: string
+	time_out: string | null
+    intern: ActiveInternRow
 }

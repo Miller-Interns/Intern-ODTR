@@ -75,7 +75,7 @@ onUnmounted(() => {
 					<div class="space-y-4">
 						<div v-if="data?.timeLogs && data.timeLogs.length > 0"
 							class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							<LogApprovalComponent v-for="log in data.timeLogs" :key="log.id" :log="log"
+							<LogApproval v-for="log in data.timeLogs" :key="log.id" :log="log"
 								:intern-name="internFullName" @approved="refresh" />
 						</div>
 

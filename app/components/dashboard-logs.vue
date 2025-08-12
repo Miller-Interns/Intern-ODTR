@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { useLogApproval } from '~/composables/useApproveLog'
-import type { TimeLogEntry } from '~/interfaces/time-logs'
+import type { InternLogs } from '~/interfaces/interns'
 import { formatHours, formatTimeOnly } from '~/utils/formatters'
 import { calculateDisplayHours } from '~/utils/total-hours'
 
 const props = defineProps<{
-	log: TimeLogEntry
+	log: InternLogs
 }>()
 
 const { isApproving, approve } = useLogApproval()
@@ -22,7 +22,6 @@ const avatarUrl = computed(() => {
 const isEditingRemarks = ref(false)
 const remarksText = ref(props.log.admin_remarks || '')
 const remarksContainer = ref<HTMLDivElement | null>(null)
-const internNotes = props.log.intern_notes
 const remarksButtonLabel = computed(() => {
 	return props.log.admin_remarks ? 'Edit Remarks' : 'Add Remarks'
 })
@@ -38,7 +37,7 @@ async function startEditingRemarks() {
 }
 
 async function handleApprove() {
-	const success = await approve(props.log.id, remarksText.value, internNotes)
+	const success = await approve(props.log.id, remarksText.value)
 	if (success) {
 		bus.emit()
 	}
