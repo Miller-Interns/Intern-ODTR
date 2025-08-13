@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import '@nuxt/ui';
+@import "tailwindcss";
+@import "@nuxt/ui";
 
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
@@ -15,12 +15,4 @@
   --color-primary-800: #22566a;
   --color-primary-900: #214859;
   --color-primary-950: #162e3b;
-}
-
-body[style*="padding-right"] {
-  padding-right: 0px !important;
-}
-
-html {
-  --scrollbar-width: 15px !important; /* Force a realistic scrollbar width */
 }
