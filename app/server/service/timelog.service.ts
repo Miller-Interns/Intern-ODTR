@@ -5,29 +5,25 @@ import type { Selectable } from 'kysely'
 
 async function getActiveTimeLogByInternId(internId: string, ctx: RequestContext): Promise<Selectable<TimeLog> | null> {
   const qb = (ctx.trx ??= db)
-  // FIX: Find the active log by checking for `status: false`
   const result = await qb
     .selectFrom('time_logs')
     .selectAll()
     .where('intern_id', '=', internId)
-    .where('status', '=', false) // This is the new logic for "active"
+    .where('time_out', 'is', null)
     .orderBy('time_in', 'desc')
     .limit(1)
     .executeTakeFirst()
-
   return result ?? null;
 }
 
-// This method is now an UPDATE operation.
-async function timeOut(logId: string, details: { remarks?: string; total_hours: number }, ctx: RequestContext) {
+async function timeOut(logId: string, details: { intern_notes?: string; total_hours: number }, ctx: RequestContext) {
   const qb = (ctx.trx ??= db)
   return await qb
     .updateTable('time_logs')
     .set({
-      time_out: new Date(), // Set the real time_out
-      remarks: details.remarks,
+      time_out: new Date(),
+      intern_notes: details.intern_notes,
       total_hours: details.total_hours,
-      status: true, // Mark the log as "completed"
     })
     .where('id', '=', logId)
     .returningAll()
@@ -36,5 +32,5 @@ async function timeOut(logId: string, details: { remarks?: string; total_hours: 
 
 export const timeLogService = {
     getActiveTimeLogByInternId,
-    timeOut
+    timeOut,
 }

@@ -23,17 +23,18 @@ export type Intern = {
     emergency_contact_number: string;
     required_hours: number;
     status: boolean;
+    hours_completed: number;
 };
 export type TimeLog = {
     id: string;
     intern_id: string;
     time_in: Timestamp;
-    time_out: Timestamp;
-    overtime: number | null;
+    time_out: Timestamp | null;
     total_hours: number;
-    remarks: string | null;
+    admin_remarks: string | null;
+    intern_notes: string | null;
     status: Generated<boolean>;
-    admin_id: string;
+    admin_id: string | null;
 };
 export type User = {
     id: string;

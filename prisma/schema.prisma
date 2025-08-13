@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../app/generated/prisma"
 }
 
 generator kysely {
@@ -57,8 +58,9 @@ model Intern {
   contact_number           String
   emergency_contact_person String
   emergency_contact_number String
-  required_hours           Int
+  required_hours           Float //changed from Int
   status                   Boolean
+  hours_completed          Float // new
 
   TimeLog TimeLog[]
 
@@ -66,17 +68,17 @@ model Intern {
 }
 
 model TimeLog {
-  id          String   @id @default(uuid())
-  intern      Intern   @relation(fields: [intern_id], references: [id])
-  intern_id   String
-  time_in     DateTime
-  time_out    DateTime
-  overtime    Int?
-  total_hours Int
-  remarks     String?
-  status      Boolean  @default(false)
-  user        User     @relation(fields: [admin_id], references: [id])
-  admin_id    String
+  id              String   @id @default(uuid())
+  intern          Intern   @relation(fields: [intern_id], references: [id])
+  intern_id       String
+  time_in         DateTime
+  time_out        DateTime? //made optional
+  total_hours     Float   //changed to float
+  admin_remarks   String?
+  intern_notes    String? //renamed from remarks
+  status          Boolean  @default(false)
+  user            User?     @relation(fields: [admin_id], references: [id])
+  admin_id        String? //changed to optional
 
   @@map("time_logs")
 }
