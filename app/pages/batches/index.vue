@@ -1,5 +1,5 @@
 <template>
-  <UApp>
+
     <div class="p-4 sm:p-6 lg:p-8 min-w-[327px] min-h-[336px] mx-auto font-sans ">
       <div v-if="pending">
         <h2 class="text-2xl font-semi-bold text-gray-800 dark:text-gray-100 mb-4 ">Manage Batch</h2>
@@ -141,7 +141,7 @@
         </section>
       </div>
     </div>
-  </UApp>
+
 </template>
 
 <script setup lang="ts">
@@ -151,7 +151,6 @@ import { formatDate } from '~/server/db/utils/format'
 import { getTodayDateString } from '~/composables/today-date';
 
 definePageMeta({
-
   layout: 'batch'
 })
 const allBatches = ref<BatchWithInternCount[]>([]);
