@@ -6,6 +6,7 @@ import { userService } from '../service/user.service'
 import type { RequestContext } from '../types/RequestContext'
 import { db } from '../db'
 
+// The DTO now expects 'intern_notes', which is optional.
 const dtoSchema = z.object({
   timeLogId: z.string().uuid(),
   intern_notes: z.string().optional(),
@@ -15,6 +16,7 @@ export type TimeoutDTO = z.infer<typeof dtoSchema>
 
 export const timeOutUseCase = async (dto: TimeoutDTO, context: RequestContext) => {
 	const userId = await checkAuthentication(context)
+	// Use the new field name from the DTO
 	const { timeLogId, intern_notes } = await validateDTO(dto)
 
 	const intern = await userService.getInternByUserId(userId, context)
@@ -27,15 +29,14 @@ export const timeOutUseCase = async (dto: TimeoutDTO, context: RequestContext) =
 		.selectFrom('time_logs')
 		.selectAll()
 		.where('id', '=', timeLogId)
-		.where('intern_id', '=', intern.id)
+		.where('intern_id', '=', intern.id) // Security check: user can only time out their own log
 		.executeTakeFirst()
 
 	if (!timeLog) {
 		throw createError({ status: 404, message: 'Active time log not found or access denied.' })
 	}
 
-	// This is the correct check for a nullable schema.
-	// You can only time out a log that has not been timed out yet.
+	// Check if the log is already completed. This is the correct logic for a nullable field.
 	if (timeLog.time_out !== null) {
 		throw createError({ status: 400, message: 'This log has already been timed out.' })
 	}
@@ -46,12 +47,15 @@ export const timeOutUseCase = async (dto: TimeoutDTO, context: RequestContext) =
 	const totalMilliseconds = timeOut.getTime() - timeIn.getTime()
 	const totalHours = totalMilliseconds / (1000 * 60 * 60)
 
-	// Call the service to perform the database update.
+	// Call the service to perform the database update with the correct field name.
 	const updatedLog = await timeLogService.timeOut(
 		timeLogId,
 		{ intern_notes, total_hours: totalHours },
 		context,
 	)
+
+	// Note: We no longer update the intern's 'hours_completed' here.
+	// That value is now calculated dynamically when the dashboard loads.
 
 	return { updatedLog }
 }
