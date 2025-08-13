@@ -1,31 +1,3 @@
-<script setup lang="ts">
-	import type { ActiveInternsResponse } from '~/interfaces/api'
-
-	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/interns/active-interns`)
-
-	const batchStatus = computed(() => {
-		if (!data.value) {
-			return {
-				text: 'Loading...',
-			}
-		}
-		if (data.value.batch?.status) {
-			return {
-				text: 'Ongoing',
-			}
-		} else {
-			return {
-				text: 'Completed',
-			}
-		}
-	})
-
-	const router = useRouter()
-	const goBack = () => {
-		router.back()
-	}
-</script>
-
 <template>
 	<UContainer>
 		<header class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -119,3 +91,35 @@
 		</main>
 	</UContainer>
 </template>
+
+<script setup lang="ts">
+	import type { ActiveInternsResponse } from '~/interfaces/api'
+
+	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/interns/active-interns`)
+
+	const batchStatus = computed(() => {
+		if (!data.value) {
+			return {
+				text: 'Loading...',
+			}
+		}
+		if (data.value.batch?.status) {
+			return {
+				text: 'Ongoing',
+			}
+		} else {
+			return {
+				text: 'Completed',
+			}
+		}
+	})
+
+	const router = useRouter()
+	const goBack = () => {
+		router.back()
+	}
+
+	definePageMeta({
+		layout: 'admin',
+	})
+</script>

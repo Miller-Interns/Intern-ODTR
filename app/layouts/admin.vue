@@ -1,35 +1,8 @@
-<script setup lang="ts">
-	const route = useRoute()
-	const links = [
-		{
-			label: 'Dashboard',
-			icon: 'i-lucide-house',
-			to: '/admin/dashboard',
-		},
-		{
-			label: 'Manage',
-			icon: 'i-lucide-users-round',
-			to: '/admin/manage',
-		},
-		{
-			label: 'Active Interns',
-			icon: 'i-lucide-user-round-check',
-			to: '/admin/interns',
-		},
-		{
-			label: 'Profile',
-			icon: 'i-lucide-circle-user',
-			to: '/admin/profile',
-		},
-	]
-</script>
-
 <template>
 	<main
 		class="px-safe min-h-screen bg-gray-50 pt-[calc(theme(spacing.8)+env(safe-area-inset-top))] pb-[calc(theme(spacing.24)+env(safe-area-inset-bottom))] font-sans dark:bg-gray-900"
 	>
 		<slot />
-		 
 	</main>
 
 	<footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -62,3 +35,29 @@
 		</nav>
 	</footer>
 </template>
+
+<script setup lang="ts">
+	const route = useRoute()
+	const links = [
+		{
+			label: 'Dashboard',
+			icon: 'i-lucide-house',
+			to: '/admin/dashboard',
+		},
+		{
+			label: 'Manage',
+			icon: 'i-lucide-users-round',
+			to: '/admin/manage',
+		},
+		{
+			label: 'Active Interns',
+			icon: 'i-lucide-user-round-check',
+			to: '/admin/interns',
+		},
+		{
+			label: 'Profile',
+			icon: 'i-lucide-circle-user',
+			to: '/admin/profile',
+		},
+	]
+</script>

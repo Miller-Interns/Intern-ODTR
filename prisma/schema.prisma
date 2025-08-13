@@ -9,6 +9,7 @@ enum Status {
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 generator kysely {
@@ -70,7 +71,7 @@ model Intern {
   emergency_contact_number String
   role                     String  @default("Web Developer")
   intern_picture           String?
-  hours_completed          Int?
+  hours_completed          Float?
   note                     String?
 
   TimeLog TimeLog[]
