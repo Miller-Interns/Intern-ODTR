@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-	import type { InternDetailsResponse } from '~/interfaces/api'
+	import type { InternDetailsResponse } from '~/types/Api'
 
 	const route = useRoute()
 

@@ -1,18 +1,3 @@
-<script setup lang="ts">
-	import type { InternWithDetails } from '~/interfaces/interns'
-
-	const { intern } = defineProps<{
-		intern: InternWithDetails
-	}>()
-
-	const avatarUrl = computed(() => {
-		if (intern.intern_picture) {
-			return `/uploads/avatars/${intern.intern_picture}`
-		}
-		return null
-	})
-</script>
-
 <template>
 	<div class="flex items-center gap-4 sm:gap-6">
 		<div class="relative flex-shrink-0">
@@ -47,3 +32,18 @@
 		</div>
 	</div>
 </template>
+
+<script setup lang="ts">
+	import type { InternWithDetails } from '~/types/InternDetails'
+
+	const { intern } = defineProps<{
+		intern: InternWithDetails
+	}>()
+
+	const avatarUrl = computed(() => {
+		if (intern.intern_picture) {
+			return `/uploads/avatars/${intern.intern_picture}`
+		}
+		return null
+	})
+</script>

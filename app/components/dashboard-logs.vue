@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-	import type { DashboardLog } from '~/interfaces/time-logs'
+	import type { DashboardLog } from '~/types/TimeLogs'
 
 	const props = defineProps<{ log: DashboardLog }>()
 	const bus = useEventBus<void>('log:approved')

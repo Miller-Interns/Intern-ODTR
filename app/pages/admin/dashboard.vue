@@ -80,8 +80,8 @@
 </template>
 
 <script setup lang="ts">
-	import type { ApproveLogPayload, RawPendingLogQueryResult } from '~/interfaces/time-logs'
-	import type { DashboardLog } from '~/interfaces/time-logs'
+	import type { ApproveLogPayload, RawPendingLogQueryResult } from '~/types/TimeLogs'
+	import type { DashboardLog } from '~/types/TimeLogs'
 	import { useBulkApproval } from '~/composables/useBulkApprove'
 
 	const toast = useToast()

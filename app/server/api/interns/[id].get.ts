@@ -1,5 +1,5 @@
-import { useGetInternDetails } from '~/server/use-cases/useGetInternDetails'
-import type { InternDetailsResponse } from '~/interfaces/api'
+import { useGetInternDetails } from '~/server/use-case/get-intern-details.use-case'
+import type { InternDetailsResponse } from '~/types/Api'
 
 export default defineEventHandler(async (event): Promise<InternDetailsResponse> => {
 	const internId = event.context.params?.id

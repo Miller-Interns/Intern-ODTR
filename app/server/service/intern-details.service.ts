@@ -1,6 +1,6 @@
 import { sql, type Kysely } from 'kysely'
 import type { DB, TimeLog } from '../db/types'
-import type { InternQueryRow } from '../../interfaces/interns'
+import type { InternQueryRow } from '../../types/InternDetails'
 import type { Selectable } from 'kysely'
 
 export async function getInternDetailsById(db: Kysely<DB>, internId: string): Promise<InternQueryRow | undefined> {

@@ -1,22 +1,3 @@
-<script setup lang="ts">
-	import type { InternSummary } from '~/interfaces/interns'
-
-	const { intern } = defineProps<{
-		intern: InternSummary
-	}>()
-
-	const avatarUrl = computed(() => {
-		if (intern.intern_picture) {
-			return `/uploads/avatars/${intern.intern_picture}`
-		}
-		return null
-	})
-
-	const displayCompletedHours = computed(() => {
-		return Math.floor((intern.completed_hours || 0) * 100) / 100
-	})
-</script>
-
 <template>
 	<UCard :ui="{ body: 'p-3 sm:p-3' }">
 		<div class="flex items-center space-x-3">
@@ -34,3 +15,22 @@
 		</div>
 	</UCard>
 </template>
+
+<script setup lang="ts">
+	import type { InternSummary } from '~/types/InternDetails'
+
+	const { intern } = defineProps<{
+		intern: InternSummary
+	}>()
+
+	const avatarUrl = computed(() => {
+		if (intern.intern_picture) {
+			return `/uploads/avatars/${intern.intern_picture}`
+		}
+		return null
+	})
+
+	const displayCompletedHours = computed(() => {
+		return Math.floor((intern.completed_hours || 0) * 100) / 100
+	})
+</script>

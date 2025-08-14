@@ -49,9 +49,9 @@
 </template>
 
 <script setup lang="ts">
-	import type { TimeLogEntry } from '~/interfaces/time-logs'
+	import type { TimeLogEntry } from '~/types/TimeLogs'
 	import { useTimeLogState } from '~/composables/useTimelogStates'
-	import { formattedDate } from '~/utils/formatters'
+	import { formattedDate } from '~/server/utils/formatters'
 
 	const props = defineProps<{ log: TimeLogEntry }>()
 	const emit = defineEmits<{ (e: 'approved'): void }>()

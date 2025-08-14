@@ -1,6 +1,6 @@
 import type { Kysely } from 'kysely'
 import type { DB } from '~/server/db/types'
-import type { RawPendingLogQueryResult, TimeLogEntry } from '~/interfaces/time-logs'
+import type { RawPendingLogQueryResult, TimeLogEntry } from '~/types/TimeLogs'
 
 export async function fetchPendingLogsFromDb(db: Kysely<DB>, startDate: Date, endDate: Date): Promise<RawPendingLogQueryResult[]> {
 	const flatResults = await db
@@ -20,26 +20,26 @@ export async function fetchPendingLogsFromDb(db: Kysely<DB>, startDate: Date, en
 			'tl.time_in',
 			'tl.time_out',
 			'tl.total_hours',
-			'u.name as intern_name',       
-			'i.role as intern_role',      
-			'i.intern_picture',            
+			'u.name as intern_name',
+			'i.role as intern_role',
+			'i.intern_picture',
 		])
 		.orderBy('tl.time_in', 'desc')
-		.execute();
+		.execute()
 
 	return flatResults.map((log) => {
-		const { intern_name, intern_role, intern_picture, ...restOfLog } = log;
+		const { intern_name, intern_role, intern_picture, ...restOfLog } = log
 
 		return {
 			...restOfLog,
 			intern: {
 				id: log.intern_id,
-				name: intern_name ?? 'No Name', 
+				name: intern_name ?? 'No Name',
 				role: intern_role ?? 'No Role',
-				intern_picture: intern_picture ?? '', 
+				intern_picture: intern_picture ?? '',
 			},
-		};
-	});
+		}
+	})
 }
 
 export function formatDbLogsToTimeEntries(logs: RawPendingLogQueryResult[]): TimeLogEntry[] {

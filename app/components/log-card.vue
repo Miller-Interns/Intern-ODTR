@@ -53,9 +53,9 @@
 <script setup lang="ts">
 	import { onClickOutside } from '@vueuse/core'
 	import { useLogApproval } from '~/composables/useApproveLog'
-	import type { DashboardLog, TimeLogEntry } from '~/interfaces/time-logs'
-	import { formatHours, formatTimeOnly } from '~/utils/formatters'
-	import { calculateDisplayHours } from '~/utils/total-hours'
+	import type { DashboardLog, TimeLogEntry } from '~/types/TimeLogs'
+	import { formatHours, formatTimeOnly } from '~/server/utils/formatters'
+	import { calculateDisplayHours } from '~/server/utils/total-hours'
 
 	type Log = DashboardLog | TimeLogEntry
 

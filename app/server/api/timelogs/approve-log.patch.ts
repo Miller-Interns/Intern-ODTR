@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { useApproveSingleLog } from '~/server/use-cases/useApproveSingleLog'
+import { useApproveSingleLog } from '~/server/use-case/approve-single-log.use-case'
 
 const approveLogSchema = z.object({
 	logId: z.string().min(1, 'Log ID cannot be empty.'),
