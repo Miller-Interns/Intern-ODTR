@@ -16,11 +16,11 @@
 
       <!-- Header -->
       <header>
-        <h1 class="text-xl font-semibold">Welcome back, {{ typedUser.name || 'Intern' }}</h1>
-        <p v-if="activeTimeLog" class="text-gray-500 text-sm">Your time log is in progress</p>
-        <p v-else-if="lastCompletedLog" class="text-gray-500 text-sm">Your time log has been submitted for today, Great
+        <h1 class="text-2xl font-bold text-gray-800">Welcome back, {{ typedUser.name || 'Intern' }}</h1>
+        <p v-if="activeTimeLog" class="text-gray-500">Your time log is in progress</p>
+        <p v-else-if="lastCompletedLog" class="text-gray-500">Your time log has been submitted for today, Great
           Job!</p>
-        <p v-else class="text-gray-500 text-sm">You are currently timed out.</p>
+        <p v-else class="text-gray-500">You are currently timed out.</p>
       </header>
 
       <!-- Time Log Summary Card -->
@@ -63,7 +63,7 @@
                 class="w-full" :ui="{ base: 'text-lg placeholder:text-lg w-full' }" />
             </UFormGroup>
           </div>
-          
+
           <UButton @click="handleTimeOut" :disabled="isTimeOutDisabled" :loading="isSubmitting" block class="mt-4"
             size="lg">Time
             Out</UButton>
@@ -124,7 +124,7 @@
         <div class="text-center space-y-1">
           <p class="text-sm font-medium text-gray-500">{{ progressPercentage.toFixed(0) }}%</p>
           <UProgress :value="renderedHours" :max="totalHours" />
-          <p class="font-semibold">{{ renderedHours.toFixed(0) }} / {{ totalHours }} Hours</p>
+          <p class="text-lg font-semibold text-gray-800">{{ renderedHours.toFixed(0) }} / {{ totalHours }} Hours</p>
         </div>
       </UCard>
     </div>
