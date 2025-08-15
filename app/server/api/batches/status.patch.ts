@@ -1,6 +1,6 @@
 
 
-import { updateStatusUseCase } from '~/server/use-case/use-patch-auto-status';
+import { updateStatusUseCase } from '~/server/use-case/batches/patch-auto-status.use-case';
 
 export default defineEventHandler(async (event) => {
   try {

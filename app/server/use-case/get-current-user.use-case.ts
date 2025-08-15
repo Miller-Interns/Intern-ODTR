@@ -1,6 +1,5 @@
 import z from 'zod'
 import { createSchemaValidator } from '../utils/create-schema-validator'
-
 import { checkAuthentication } from '../utils/check-authentication'
 import { userService } from '../service/user.service'
 import type { Selectable } from 'kysely'

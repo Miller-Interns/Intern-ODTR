@@ -4,6 +4,8 @@ export default defineEventHandler((event) => {
 	const token = getCookie(event, 'auth_token')
 	const jwtSecret = process.env.JWT_SECRET
 
+	console.log("Token", token)
+
 	if (token && jwtSecret) {
 		try {
 			const decoded = jwt.verify(token, jwtSecret)

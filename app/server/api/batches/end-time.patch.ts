@@ -1,5 +1,5 @@
 
-import {markBatchAsCompletedUseCase, MarkAsCompletedSchema} from '~/server/use-case/use-end-time';
+import {markBatchAsCompletedUseCase, MarkAsCompletedSchema} from '~/server/use-case/batches/end-time.use-case';
 
 
 export default defineEventHandler(async (event) => {

@@ -1,6 +1,6 @@
 
 
-import { BatchService } from '~/server/services/patch-end-time.service';
+import { BatchService } from '~/server/service/batches/patch-end-time.service';
 import {z} from 'zod'
 export const MarkAsCompletedSchema = z.object({
   id: z.string().min(1, 'Batch ID is required.'),

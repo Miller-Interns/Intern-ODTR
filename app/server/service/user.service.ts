@@ -1,4 +1,4 @@
-import type { RequestContext } from '~/types/RequestContext'
+import type { RequestContext } from '~/server/types/RequestContext'
 import { db } from '../db'
 import type { User } from '../db/types'
 import type { Selectable } from 'kysely'

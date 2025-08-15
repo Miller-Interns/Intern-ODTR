@@ -1,11 +1,11 @@
 import { z } from 'zod'
-
+import {Status} from '@prisma/client'
 export const BatchSchema = z.object({
 	id: z.string(),
 	batch_number: z.string(),
 	start_date: z.date(),
 	end_date: z.date(),
-	status: z.boolean(),
+	status: z.enum([Status.INCOMING, Status.ONGOING, Status.COMPLETED]),
 })
 
 export const InternSchema = z.object({
