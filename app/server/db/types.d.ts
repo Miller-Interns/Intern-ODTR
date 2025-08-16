@@ -24,6 +24,8 @@ export type Intern = {
     required_hours: number;
     status: boolean;
     hours_completed: number;
+    role: string | null;
+    notes: string | null;
 };
 export type TimeLog = {
     id: string;

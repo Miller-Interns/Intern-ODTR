@@ -61,9 +61,15 @@
     <!-- Bottom Navigation -->
     <footer class="fixed bottom-0 left-0 right-0 bg-white shadow-inner border-t">
       <div class="flex justify-around py-2">
-        <UButton to="/dashboard" variant="link" icon="i-heroicons-home" class="flex flex-col items-center text-xs text-gray-600">Dashboard</UButton>
-        <UButton to="/timelogs" variant="link" icon="i-heroicons-clock" class="flex flex-col items-center text-xs text-primary-600 font-bold">Time Logs</UButton>
-        <UButton variant="link" icon="i-heroicons-user-circle" class="flex flex-col items-center text-xs text-gray-600">Profile</UButton>
+        <UButton to="/dashboard" variant="link" icon="i-heroicons-home" class="flex flex-col items-center text-xs text-black-600">
+          Dashboard
+        </UButton>
+        <UButton to="/timelogs" variant="link" icon="i-heroicons-clock" class="flex flex-col items-center text-xs text-black-600">Time
+          Logs
+        </UButton>
+        <UButton to="/profile" variant="link" icon="i-heroicons-user-circle"
+          class="flex flex-col items-center text-xs text-black-600">
+          Profile</UButton>
       </div>
     </footer>
   </div>

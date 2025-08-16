@@ -147,7 +147,7 @@
         <UButton to="/timelogs" variant="link" icon="i-heroicons-clock" class="flex flex-col items-center text-xs text-black-600">Time
           Logs
         </UButton>
-        <UButton variant="link" icon="i-heroicons-user-circle"
+        <UButton to="/profile" variant="link" icon="i-heroicons-user-circle"
           class="flex flex-col items-center text-xs text-black-600">
           Profile</UButton>
       </div>

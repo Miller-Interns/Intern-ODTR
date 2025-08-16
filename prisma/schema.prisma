@@ -61,6 +61,8 @@ model Intern {
   required_hours           Float //changed from Int
   status                   Boolean
   hours_completed          Float // new
+  role                     String? // new
+  notes                    String? // new
 
   TimeLog TimeLog[]
 
