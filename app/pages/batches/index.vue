@@ -92,7 +92,8 @@
               </UCard>
             </div>
           </div>
-          <p v-else class="text-gray-500 dark:text-gray-400 mt-4">No active batches.</p>
+          <p v-else class="text-regular text-gray-500 dark:text-gray-400 items-center mt-4 flex flex-col py-[112px] shadow-[0_5px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)]
+        box-shadow-[ 0px 4px 4px 0px #00000040] ">No active batches.</p>
         </section>
 
         <section class="w-full mt-3 flex flex-col  mb-4 bottom-0 left-1/2 -translate-x-1/2 p-4 z-50 fixed">
@@ -102,7 +103,7 @@
           </NuxtLink>
         </section>
 
-        <section>
+        <section class="py-10 pb-40">
           <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             <UCard v-for="batch in previousBatches" :key="batch.id">
               <template #header>
