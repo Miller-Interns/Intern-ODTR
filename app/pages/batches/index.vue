@@ -126,6 +126,10 @@
                       <p class="font-medium text-gray-500 dark:text-gray-400">Started in</p>
                       <p class="font-medium">{{ formatDate(batch.start_date) }}</p>
                     </div>
+                     <div>
+                      <p class="font-medium text-gray-500 dark:text-gray-400">Ended on</p>
+                      <p class="font-medium">{{ formatDate(batch.end_date) }}</p>
+                    </div>
                     <div>
                       <p class="font-medium text-gray-500 dark:text-gray-400">Intern Supervisor</p>
                       <p class="font-medium">{{ batch.supervisor_name || 'N/A' }}</p>
