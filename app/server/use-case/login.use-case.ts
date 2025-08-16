@@ -35,20 +35,52 @@ export async function loginUseCase(dto: LoginDTO, context: RequestContext): Prom
 	const isPasswordValid = await bcrypt.compare(password, user.password)
 	if (!isPasswordValid) { throw createError({ statusCode: 401, statusMessage: 'Incorrect email or password' }) }
 
+	// Automatic time-in and status activation logic
 	if (!user.isAdmin) {
 		const internProfile = await userService.getInternByUserId(user.id, context);
 		if (internProfile) {
 			const activeLog = await timeLogService.getActiveTimeLogByInternId(internProfile.id, context);
+			
+			// Only proceed if the intern is not already timed in.
 			if (!activeLog) {
 				const qb = (context.trx ??= db);
-				await qb.insertInto('time_logs').values({
-					id: randomUUID(),
-					intern_id: internProfile.id,
-					time_in: new Date(),
-					time_out: null,
-					total_hours: 0,
-					status: false,
-				}).execute();
+				
+				// This is their very first time logging in. Activate them and time them in.
+				if (internProfile.status === false) {
+					// To confirm it's their first time, we check if they have any logs at all.
+					const anyPreviousLogs = await qb.selectFrom('time_logs').select('id').where('intern_id', '=', internProfile.id).limit(1).executeTakeFirst();
+					
+					if (!anyPreviousLogs) {
+						// Create the new time log record
+						await qb.insertInto('time_logs').values({
+							id: randomUUID(),
+							intern_id: internProfile.id,
+							time_in: new Date(),
+							time_out: null,
+							total_hours: 0,
+							status: false,
+						}).execute();
+
+						// Update their status to true to mark them as "active".
+						await qb
+							.updateTable('interns')
+							.set({ status: true })
+							.where('id', '=', internProfile.id)
+							.execute();
+					}
+					// If status is false but they have previous logs, it means they were deactivated. Do nothing.
+				} 
+				// This is a subsequent login for an already active intern.
+				else if (internProfile.status === true) {
+					await qb.insertInto('time_logs').values({
+						id: randomUUID(),
+						intern_id: internProfile.id,
+						time_in: new Date(),
+						time_out: null,
+						total_hours: 0,
+						status: false,
+					}).execute();
+				}
 			}
 		}
 	}
