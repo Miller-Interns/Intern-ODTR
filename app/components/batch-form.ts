@@ -43,7 +43,11 @@ const calendarDate = computed({
 
   const fetchSupervisors = async () => {
     try {
-      const rawData = await $fetch<{ id: string; name: string | null }[]>('/api/batches/admin');
+      const rawData = await $fetch<{ id: string; name: string | null }[]>('/api/batches/admin',{
+           query: {
+        isAdmin: true
+      }
+    });
       if (Array.isArray(rawData)) {
         supervisorList.value = rawData.map(user => ({
           label: user.name || 'Unnamed Supervisor',
