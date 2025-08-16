@@ -12,18 +12,18 @@
 
       <UForm :state="{}" @submit="submit" class="space-y-6 ">
         <div class="flex space-x-4 ">
-          <UFormGroup name="batchNumber" class="grow ">
+          <UFormField name="batchNumber" class="grow " :error="batchNumberError">
             <div>
               Batch Number : <span class="text-red-500">*</span>
             </div>
             
-            <UInput class="w-full"  required v-model.trim="form.batch_number" placeholder="Batch" size="xl" />
-          </UFormGroup>
+            <UInput class="w-full"  v-model.trim="form.batch_number" placeholder="Batch" size="xl" />
+          </UFormField>
         </div>
 
 
         <section class="items-center  space-x-10 w-full max-w-md">
-          <UFormGroup name="startDate" class="grow" required>
+          <UFormField name="startDate" class="grow" :error="startDateError">
 
             <div class="flex items-center gap-2">
 
@@ -40,12 +40,12 @@
             </div>
 
 
-          </UFormGroup>
+          </UFormField>
 
         </section>
 
         <section class="items-center space-x-10 w-full max-w-md">
-          <UFormGroup name="slectedSupervisorId" class="grow" required>
+          <UFormGroup name="slectedSupervisorId" class="grow"  :error="supervisorError">
             <div>
               Intern Supervisor : <span class="text-red-500">*</span>
             </div>
@@ -68,10 +68,16 @@
 
 <script setup lang="ts">
 import { useBatchForm } from '~/components/batch-form';
+
+
 const route = useRoute();
 const batchId = route.query.id as string;
 
+
 const {
+   batchNumberError,
+    startDateError,
+    supervisorError,
   form,       
   supervisorList,  
   calendarDate,

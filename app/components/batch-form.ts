@@ -5,7 +5,7 @@ import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
 
 
 export const useBatchForm = (batchId?: string) => {
-
+  const submitted = ref(false)
   const router = useRouter();
   const toast = useToast();
   const form = reactive({
@@ -19,6 +19,8 @@ export const useBatchForm = (batchId?: string) => {
   const isLoading = ref(true);
   const error = ref<string | null>(null);
   const isEditMode = !!batchId;
+
+
 
 const calendarDate = computed({
   get: () => {
@@ -76,20 +78,38 @@ const calendarDate = computed({
       error.value = "Failed to fetch batch ID"
     }
   };
-
-
-
-  const submit = async () => {
-    if (!form.selectedSupervisorId) {
-      error.value = "Please select a supervisor.";
-      toast.add({ title: 'Validation Error', description: error.value  });
-      return;
+   
+const supervisorError=computed(()=>{
+ if (!form.selectedSupervisorId && submitted.value) {
+      return "Please select a supervisor.";
     }
+    return undefined
+
+})
+
+const batchNumberError= computed(()=>{
+if (!form.batch_number && submitted.value) {
+      return"Please input batch number.";
+    }
+
+
+})
+     
+const startDateError =computed(()=>{
+ if (!form.start_date && submitted.value) {
+      return "Please input start date.";
+
+    }
+  })
+
+       
+  const submit = async () => {
+
 
     isLoading.value = true;
     error.value = null;
+    submitted.value = true
 
- 
     const endpoint = isEditMode ? '/api/batches/edit' : '/api/batches/Post-batch';
     const method = isEditMode ? 'PATCH' : 'POST';
 
@@ -135,6 +155,7 @@ const calendarDate = computed({
 
 
   Promise.all([
+    
     fetchSupervisors(),
     loadBatchForEdit(),
   ]).finally(() => {
@@ -142,6 +163,9 @@ const calendarDate = computed({
   });
 
   return {
+    supervisorError,
+    batchNumberError,
+    startDateError,
     form,
     calendarDate,
     supervisorList,

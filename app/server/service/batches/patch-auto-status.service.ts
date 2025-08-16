@@ -1,8 +1,12 @@
-import { db } from '~/server/db/index';
+import { db } from '~/server/db';
+import { RequestContext } from '~/server/types/RequestContext';
+import { Selectable } from 'kysely';
+import {Status} from '~/enums/status'
+import {type Batch} from '~/types/Types'
 
-
-async function updateIncomingStatus() {
-  const updatedBatches = await db
+async function updateIncomingStatus( ctx: RequestContext):  Promise<Selectable<Batch> | undefined> {
+  const qb = (ctx.trx ??= db)
+  const allBatches = await qb
     .updateTable('batches')
     .set({ status: 'ONGOING' })
     .where((eb) =>
@@ -11,11 +15,11 @@ async function updateIncomingStatus() {
         eb('start_date', '<=', new Date()),
       ])
     )
-    .returningAll()
-    .execute();
-
-  return updatedBatches;
-}
+  .returningAll()
+          .executeTakeFirst();
+           return allBatches as Batch | undefined
+  
+    }
 
 export const BatchService = {
   updateIncomingStatus
