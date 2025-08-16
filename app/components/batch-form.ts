@@ -1,5 +1,5 @@
 
-import type { BatchWithInternCount } from '~/types/Types';
+import type { BatchWithInternCount, Batch } from '~/types/Types';
 import { format, parse, isValid } from 'date-fns'
 import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
 
@@ -65,13 +65,13 @@ const calendarDate = computed({
   const loadBatchForEdit = async () => {
     if (!isEditMode) return;
     try {
-      const data = await $fetch<BatchWithInternCount>('/api/batches/single', {
+      const data = await $fetch<Batch>('/api/batches/single', {
         query: { id: batchId },
       });
     
       form.batch_number = data.batch_number.toString();
       form.start_date = format(new Date(data.start_date),'MM/dd/yyyy');
-      form.selectedSupervisorId = data.supervisorId?.id.toString() ?? ''; 
+      form.selectedSupervisorId = data.supervisorId.toString() ?? ''; 
     } catch (e) {
       error.value = "Failed to fetch batch ID"
     }
