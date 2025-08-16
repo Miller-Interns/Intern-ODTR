@@ -26,9 +26,24 @@ export async function patchBatchUseCase(dto: GetCurrentUserDTO,
   const {id, batch_number, start_date, status, supervisorId}= await validateDTO(dto)
 
 await checkAuthentication(context)
+
+try{
   const batch = await BatchService.editBatchDetails(id, batch_number, start_date, status, supervisorId, context);
   if (!batch) {
     throw new Error('Batch not found.');
   }
   return {batch};
+} catch (error: any) {
+    if (error.message === 'BATCH_CONFLICT') {
+      throw createError({
+        statusCode: 409, 
+        statusMessage: 'This batch number is already taken.',
+      });
+    }
+
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'An unexpected error occurred.',
+    });
+  }
 }

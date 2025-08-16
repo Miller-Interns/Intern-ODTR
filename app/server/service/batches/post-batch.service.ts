@@ -75,7 +75,7 @@ async function createBatch(batch_number: string, start_date: Date,
 
   
   if (existingBatch) {
-    return undefined; 
+  throw new Error('BATCH_CONFLICT');
   }
   const allBatches= await qb.insertInto('batches')
           .values({

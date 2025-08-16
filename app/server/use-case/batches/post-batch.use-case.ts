@@ -20,7 +20,6 @@ import {z} from 'zod'
 import {Status} from '~/enums/status'
 import { RequestContext } from '~/server/types/RequestContext'
 import { Batch } from '~/types/Types'
-import type { H3Event } from 'h3'
 import { BatchService } from '~/server/service/batches/post-batch.service'
 import { Selectable } from 'kysely'
 
@@ -42,7 +41,7 @@ export async function postBatchUseCase(dto: CreateDTO,
 
   const {batch_number, start_date, status, supervisorId}= await validateDTO(dto)
 
-
+try{
   const allBatches = await BatchService.createBatch( batch_number, start_date, status,
      supervisorId, context)
   if (!allBatches) {
@@ -54,4 +53,17 @@ export async function postBatchUseCase(dto: CreateDTO,
   }
 
 return { allBatches}
+} catch (error: any) {
+    if (error.message === 'BATCH_CONFLICT') {
+      throw createError({
+        statusCode: 409, 
+        statusMessage: 'This batch number is already taken.',
+      });
+    }
+
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'An unexpected error occurred.',
+    });
+  }
 }

@@ -16,7 +16,7 @@ async function  editBatchDetails(id: string, batch_number: string, start_date: D
 
   
   if (existingBatch) {
-throw new Error('BATCH_CONFLICT');
+  throw new Error('BATCH_CONFLICT');
   }
 
     

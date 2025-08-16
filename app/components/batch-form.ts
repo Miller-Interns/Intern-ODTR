@@ -134,21 +134,19 @@ const startDateError =computed(()=>{
       await router.push('/batches');
 
     } catch (e: any) {
-     const  errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
-        error.value = errorMessage;
-      if (e.statusCode === 409) {
-        toast.add({
-          title: 'Conflict Error',
-          description: errorMessage ?? 'This batch number is already taken.',
-        
-        });
-      } else {
-        toast.add({
-          title: 'Submission Failed',
-          description: errorMessage ?? 'An unknown error occurred.',
-        });
-      }
-    } finally {
+  const errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
+  error.value = errorMessage;
+
+  if (e.statusCode === 409) {
+    toast.add({
+      description: errorMessage, 
+    });
+  } else {
+    toast.add({
+      description: errorMessage,
+    });
+  }
+} finally {
       isLoading.value = false;
     }
   };
