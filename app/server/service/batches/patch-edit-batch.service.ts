@@ -1,51 +1,41 @@
-import { db } from '~/server/db/index';
-import { prisma } from '~/server/db/db';
-import { Status } from "@prisma/client";
-import {z} from 'zod'
+import { db } from '~/server/db';
+import { RequestContext } from '~/server/types/RequestContext';
+import { Selectable } from 'kysely';
+import {Status} from '~/enums/status'
+import {type Batch} from '~/types/Types'
 
- export const BatchUpdateSchema = z.object({
-  id: z.string(), 
-  batch_number: z.string(),
-  start_date: z.string(), 
-  status: z.enum([Status.INCOMING, Status.ONGOING]),
-  supervisorId: z.string()
-});
-export type BatchUpdateData = z.infer<typeof BatchUpdateSchema>;
+async function  editBatchDetails(id: string, batch_number: string, start_date: Date, 
+  status: Status, supervisorId: string,  ctx: RequestContext):  Promise<Selectable<Batch> | undefined> {
+  const qb = (ctx.trx ??= db)
+    const existingBatch = await qb
+    .selectFrom('batches')
+    .select('id') 
+    .where('batch_number', '=', batch_number)
+     .where('id', '!=', id)
+    .executeTakeFirst();
 
-async function  editBatchDetails(id: string, data: Omit<BatchUpdateData, 'id'>) {
-    const conflictingBatch = await prisma.batch.findFirst({
-      where: {
-        batch_number: data.batch_number,
-        id: {
-          not: id,
-        },
-    }
-    });
- if (conflictingBatch) {
-      throw new Error('BATCH_CONFLICT');
-    }
-     try {
+  
+  if (existingBatch) {
+throw new Error('BATCH_CONFLICT');
+  }
+
     
-   await db
+const allBatches=   await db
       .updateTable('batches')
       .set({ 
-        batch_number: data.batch_number,
-        start_date: data.start_date,
-        status: data.status,
-        supervisorId: data.supervisorId
+        batch_number:batch_number,
+        start_date:start_date,
+        status: status,
+        supervisorId: supervisorId
        })
       .where('batches.id', '=', id)
-      .execute();
+      .returningAll()
+          .executeTakeFirst();
+           return allBatches as Batch | undefined
   
-    } catch (e: any) {
-      console.error('API Error in endTime.patch.ts:', e);
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Failed to update batches in the database.',
-      });
     }
+    
  
-};
 export const BatchService = {
   editBatchDetails
 };
