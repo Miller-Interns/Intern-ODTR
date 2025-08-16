@@ -1,17 +1,23 @@
 import { db } from '~/server/db';
+import { RequestContext } from '~/server/types/RequestContext';
+import { Selectable } from 'kysely';
+import {type Batch} from '~/types/Types'
 
-async function findById(batchId: string) {
-  const batch = await db
+async function findById(id: string, ctx: RequestContext):
+ Promise<Selectable<Batch> | null> {
+  const qb = (ctx.trx ??= db)
+
+  const batch = await qb
     .selectFrom('batches')
     .leftJoin('users', 'users.id', 'batches.supervisorId')
-    .where('batches.id', '=', batchId)
+    .where('batches.id', '=', id)
     .selectAll('batches')
     .select('users.name as supervisor_name')
-    .executeTakeFirst();
+    .executeTakeFirst()
 
-  return batch;
-}
+  return (batch as Batch) ?? null
+ }
 
 export const BatchService = {
   findById,
-};
+}

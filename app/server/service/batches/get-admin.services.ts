@@ -24,10 +24,8 @@
 
 import { db } from '~/server/db/index';
 import { RequestContext } from '~/server/types/RequestContext';
-// IMPORT the specific, lean type you are actually returning
 import type { AdminUserFull } from '~/server/response/batches/get-admin.response';
 
-// FIX: The function must promise the type it actually returns.
 async function findAdmins(isAdmin: boolean, ctx: RequestContext): 
   Promise<AdminUserFull[]> { // <-- FIX
   
@@ -35,7 +33,7 @@ async function findAdmins(isAdmin: boolean, ctx: RequestContext):
   const adminUsers = await qb
     .selectFrom('users')
     .where('isAdmin', '=', isAdmin)
-    .select(['id','name']) // This query returns objects matching AdminUserFull
+    .select(['id','name'])
     .execute();
 
   return adminUsers;
