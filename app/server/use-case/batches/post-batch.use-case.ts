@@ -1,21 +1,4 @@
 
-// import { BatchService, type BatchCreateInput } from "~/server/service/batches/post-batch.service"
-// export async function postBatchUseCase(data: BatchCreateInput){
-//   const newBatch= await BatchService.createBatch(data)
-
-// const responseBatch = {
-//     id: newBatch.id,
-//     batch_number: newBatch.batch_number,
-//     start_date: newBatch.start_date,
-//     status: newBatch.status,
-//     supervisorId: newBatch.intern_supervisor,
-//   };
-
-//   return {
-//     success: true,
-//     batch: responseBatch,
-//   } as const;
-// }
 import {z} from 'zod'
 import {Status} from '~/enums/status'
 import { RequestContext } from '~/server/types/RequestContext'
@@ -45,7 +28,7 @@ try{
   const allBatches = await BatchService.createBatch( batch_number, start_date, status,
      supervisorId, context)
   if (!allBatches) {
-    // By throwing an error, we stop the function here.
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to create the batch.',
