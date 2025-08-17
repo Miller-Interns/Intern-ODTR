@@ -113,13 +113,6 @@
                         <h2 class="font-semibold text-black-800 text-left">{{ data.profile.notes || 'None' }}</h2>
                     </div>
                 </section>
-                    <UModal>
-                        <UButton label="Open" color="neutral" variant="subtle" />
-
-                        <template #content>
-                            <Placeholder class="h-48 m-4" />
-                        </template>
-                    </UModal>
                 <div class="space-y-2 pt-4">
                     <UButton @click="enterEditMode" block size="lg" icon="i-heroicons-pencil-square">Edit Info</UButton>
                     <UModal v-model:open="isLogoutModalOpen" title="Confirmation">
