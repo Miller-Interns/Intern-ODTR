@@ -74,7 +74,7 @@ CREATE TABLE "interns" (
     "emergency_contact_number" TEXT NOT NULL DEFAULT 'N/A',
     "role" TEXT NOT NULL DEFAULT 'Web Developer',
     "intern_picture" TEXT,
-    "hours_completed" INTEGER,
+    "hours_completed" DOUBLE PRECISION,
     "note" TEXT,
 
     CONSTRAINT "interns_pkey" PRIMARY KEY ("id")

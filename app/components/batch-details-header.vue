@@ -1,4 +1,4 @@
-<template #header>
+<template>
   <div class="relative">
     <UButton
       to="/batches/edit-batch" 
@@ -9,17 +9,17 @@
     />
     <div class="space-y-4">
       <div>
-        <h3 class="text-xs font-medium text-black dark:text-white">No. of Interns</h3>
-        <p class="text-sm font-medium text-black dark:text-white"> {{ internsCountText }} </p>
+        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">No. of Interns</h3>
+        <p class="text-sm font-medium text-gray-900 dark:text-white"> {{ internsCountText }} </p>
       </div>    
       <div>
-        <h3 class="text-xs font-medium text-black dark:text-white">Start Date</h3>
-        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ batchData.details.start_date }}</p>
+        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Start Date</h3>
+        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ batchData?.details.startDate }}</p>
       </div>
       
       <div>
-        <h3 class="text-xs font-medium text-black dark:text-white">Intern Supervisor</h3>
-        <p class="text-sm font-medium text-black dark:text-white">{{ batchData.details.supervisor }}</p>
+        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Intern Supervisor</h3>
+        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ batchData?.details.supervisorName }}</p>
       </div>
     </div>
   </div>
@@ -27,13 +27,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { BatchData } from '~/interfaces/interfaces';
+import type { BatchDetailsData } from '~/types/Batch';
 
 const props = defineProps<{
-    batchData: BatchData
+    batchData: BatchDetailsData | null
 }>();
 
 const internsCountText = computed(() => {
+  if (!props.batchData) {
+    return '0 Interns Added';
+  }
+
   const count = props.batchData.details.internCount;
 
   if (count === 1) {

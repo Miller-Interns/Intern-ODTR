@@ -45,7 +45,7 @@
             <NuxtLink v-for="intern in batchData.interns" :key="intern.id" :to="`/interns/${intern.id}`" class="block">
               <div class="overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800/50 h-full">
                 <div class="flex items-center gap-3 p-3">
-                  <UAvatar :src="intern.internPicture || undefined" :alt="intern.fullName" />
+                  <UAvatar :src="intern.internPicture || undefined" :alt="intern.fullName || 'Intern Avatar'" />
                   <p class="font-base text-black dark:text-white">{{ intern.fullName }}</p>
                 </div>
                 <hr class="border-gray-200 dark:border-gray-700" />
@@ -61,7 +61,7 @@
             </NuxtLink>
           </div>
           <template #footer>
-            <UButton v-if="batchData.details.internCount < 5" to="/interns/add-new-intern" block icon="i-heroicons-plus" size="xl" color="primary">
+            <UButton v-if="batchData.details.internCount < 5" :to="`/interns/add-new-intern?batchId=${batchData.details.id}`" block icon="i-lucide-plus" size="xl" color="primary">
               Add Intern
             </UButton>
           </template>
@@ -72,11 +72,12 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import type { BatchData } from '~/interfaces/interfaces';
+  import type { BatchDetailsData } from '~/types/Batch';
 
-// const batchId = route.params.id as string;
-const batchId = '1'; //test
+  const route = useRoute()
+  const batchId = route.params.id as string
 
-const { data: batchData, pending, error } = await useFetch<BatchData>(`/api/batch/${batchId}`);
+  const { data: batchData, pending, error } = await useFetch<BatchDetailsData>(`/api/batches/${batchId}`, {
+    key: `batch-${batchId}`
+  })
 </script>

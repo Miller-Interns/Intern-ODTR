@@ -1,4 +1,4 @@
-import type { RequestContext } from '~/types/RequestContext'
+import type { RequestContext } from '~/server/types/RequestContext'
 
 export const checkAuthentication = async (context: RequestContext): Promise<string> => {
 	if (!context.auth.userId) {

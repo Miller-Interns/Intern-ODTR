@@ -85,10 +85,10 @@
 
 <script setup lang="ts">
 import { UFormField, UInput } from '#components';
-import type { InternDetails } from '~/interfaces/interfaces';
+import type { InternDetails } from '~/types/Intern';
 
 defineProps<{
-  details: InternDetails;
+  details: Partial<InternDetails>;
   isEditing: boolean;
 }>();
 </script>

@@ -8,12 +8,12 @@
         size="xl"
         class="-ml-4"
         aria-label="Back"
-        to="/interns/list-of-interns"
+        :to="batchId ? `/batches/${batchId}` : '/batches'"
       />
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
     </div>
     
-    <UForm :state="state" class="space-y-8" @submit="handleFormSubmit">
+    <UForm :schema="AddInternSchema" :state="state" class="space-y-8" @submit="handleFormSubmit">
       <div class="space-y-6">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Intern details:</h2>
         
@@ -73,16 +73,15 @@
             v-model="state.school"
             create-item="always"
             :items="schoolOptions"
-            :loading="isSchoolsLoading"
             @create="onCreate"
-            placeholder="Select or enter a new school" 
+            placeholder="Select or enter a new school Eq. Negros Oriental State University" 
             size="xl"
             class="w-full"
           />
         </UFormField>
 
         <UFormField label="Course and Year Level:" name="courseYear" required>
-          <UInput v-model="state.courseYear" placeholder="Enter Course and Year Level eg.BSCPE - 3rd Year" size="xl" class="w-full"/>
+          <UInput v-model="state.courseYear" placeholder="Enter Course and Year Level eg.BS in Computer Engineering - 3rd Year" size="xl" class="w-full"/>
         </UFormField>
 
         <UFormField label="Required hours:" name="requiredHours" required>
@@ -111,84 +110,94 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, computed, onMounted, watch } from 'vue'
+import type { FormSubmitEvent } from '#ui/types'
+import { AddInternSchema, type AddInternDTO } from '~/types/Intern'
 
+const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const isPasswordVisible = ref(false)
-const isLoading = ref(false)
 
-const { data: schools, pending: isSchoolsLoading } = useAsyncData('schools', () => {
-  return $fetch<string[]>('/api/school')
-}, {
-  default: () => []
+const isLoading = ref(false)
+const isPasswordVisible = ref(false)
+
+const batchId = computed(() => route.query.batchId as string | undefined)
+
+onMounted(() => {
+  if (!batchId.value){
+    toast.add({ title: 'Error', description: 'No batch was selected. Redirecting.', color: 'error' })
+    navigateTo('/batches')
+  }
 })
 
-const schoolOptions = ref<string[]>([])
+type SchoolResponse = { school: string }
+type SchoolOption = { label: string }
 
-watch(schools, (newSchools) => {
-  if (newSchools) {
-    schoolOptions.value = [...newSchools]
+const { data: schoolsData, pending: isSchoolsLoading } = await useFetch<SchoolResponse[]>('/api/school', { lazy: true })
+const schoolOptions = ref<SchoolOption[]>([])
+watch(schoolsData, (newSchoolsData) => {
+  if (Array.isArray(newSchoolsData)) {
+    schoolOptions.value = newSchoolsData.map(s => ({ label: s.school }))
   }
-}, { immediate: true }) 
-
-function onCreate(newItem: string) {
-  schoolOptions.value.push(newItem)
-}
+}, { immediate: true })
 
 const state = reactive({
+  batchId: batchId.value,
   firstName: '',
-  middleName: '',
   lastName: '',
+  email: '',
+  password: '',
+  school: undefined as SchoolOption | undefined,
+  courseYear: '',
+  requiredHours: undefined as number | undefined,
+  middleName: '',
   contactNumber: '',
   emergencyContactPerson: '',
   emergencyContactNumber: '',
-  email: '',
-  password: '',
-  school: '',
-  courseYear: '',
-  requiredHours: undefined,
   role: '',
   note: '',
 })
 
-const { data, error, execute } = useFetch('/api/add_interns', {
-  method: 'POST',
-  body: state,
-  immediate: false,
-  watch: false,
+watch(batchId, (newBatchId) => {
+  state.batchId = newBatchId
 })
 
-watch(data, (newData) => {
-  if (newData) {
-    toast.add({
-      title: 'Success!',
-      description: `${state.lastName}, ${state.firstName} added successfully.`,
-      color: 'success'
-    })
-    router.push('/interns/list-of-interns')
+
+function onCreate(newSchoolLabel: string) {
+  const newSchoolOption: SchoolOption = { label: newSchoolLabel }
+  if (!schoolOptions.value.some(s => s.label === newSchoolLabel)) {
+    schoolOptions.value.push(newSchoolOption)
   }
-})
+  state.school = newSchoolOption
+}
 
-watch(error, (newError) => {
-  if (newError) {
-    toast.add({
-      title: 'Error Creating Intern',
-      description: newError.data?.statusMessage || 'An unexpected error occurred.',
-      color: 'error'
-    })
-  }
-})
-
-async function handleFormSubmit () {
-  if (isLoading.value) return
-
-  isLoading.value = true
-  data.value = undefined
-  error.value = undefined
+async function handleFormSubmit(event: FormSubmitEvent<AddInternDTO>) {
 
   try {
-    await execute()
+    let schoolName = ''
+    if (typeof event.data.school === 'object' && event.data.school?.label) {
+      schoolName = event.data.school.label
+    } else if (typeof event.data.school === 'string') {
+      schoolName = event.data.school
+    }
+    
+    const submissionPayload = {
+      ...event.data,
+      school: schoolName,
+    }
+
+    await $fetch('/api/interns', {
+      method: 'POST',
+      body: submissionPayload,
+    })
+
+    toast.add({ title: 'Success!', description: 'Intern has been added successfully.', color: 'success' })
+    await router.push(`/batches/${batchId.value}`)
+
+  } catch (error: any) {
+    console.error('Failed to add intern:', error)
+    const errorMessage = error.data?.statusMessage || 'An unexpected error occurred.'
+    toast.add({ title: 'Submission Failed', description: errorMessage, color: 'error' })
   } finally {
     isLoading.value = false
   }

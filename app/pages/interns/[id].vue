@@ -5,7 +5,7 @@
       <p>Loading intern details...</p>
     </div>
     <UAlert v-else-if="error || !form" icon="i-heroicons-exclamation-triangle" color="error" variant="soft" title="Error Loading Data" description="Could not find intern data." />
-    <UForm v-else :state="form" @submit="saveChanges">
+    <UForm v-else-if="form && form.internId" :state="form" @submit="saveChanges">
       <div class="flex items-center justify-between mb-4">
         <UButton
           icon="i-lucide-arrow-left"
@@ -14,7 +14,7 @@
           size="xl"
           class="-ml-4"
           aria-label="Back"
-          to="/interns/list-of-interns"
+          @click="goBack"
         />
       </div>
       <UCard class="mb-6">
@@ -72,11 +72,15 @@ import { useInternProfile } from '~/composable/useInternProfle'
 import InternProfileHeader from '~/components/intern-profile-header.vue'
 import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal } from '#components'
 
-
 const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
 const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
 const route = useRoute()
+const router = useRouter()
 const internId = route.params.id as string
+
+function goBack(){
+  router.back()
+}
 
 const items: TabsItem[] = [
   { slot: 'personalinfo', label: 'Personal Info' },
