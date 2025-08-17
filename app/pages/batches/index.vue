@@ -104,8 +104,12 @@
         </section>
 
         <section class="py-10 pb-40">
-          <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <UCard v-for="batch in previousBatches" :key="batch.id">
+
+          <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 ">
+         
+
+            <UCard v-for="batch in previousBatches" :key="batch.id" class="shadow-[0_0px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)]
+        box-shadow-[ 0px 4px 4px 0px #00000040]">
               <template #header>
                 <div class="flex justify-between  items-center gap-x-3">
                     <h3 class="text-xl  font-semibold text-gray-900 dark:text-white">Batch {{ batch.batch_number }}</h3>

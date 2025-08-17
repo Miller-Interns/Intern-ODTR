@@ -22,26 +22,26 @@
         </div>
 
 
-        <section class="items-center  space-x-10 w-full max-w-md">
+     <section class=" space-x-10 w-full max-w-md">
           <UFormField name="startDate" class="grow" :error="startDateError">
-
-            <div class="flex items-center gap-2">
-
-              <UInput v-model="form.start_date" color="neutral" variant="outline" icon="i-lucide-calendar"
-                class="grow" />
-              <UPopover>
-                <UButton class='bottom-end ' icon="i-lucide-calendar" color="neutral" variant="subtle" />
-
-                <template #content>
-                  <UCalendar class="
-              p-10 text-lg" v-model="calendarDate" />
-                </template>
-              </UPopover>
+            <div>
+              Start Date : <span class="text-red-500">*</span>
             </div>
+            <div class="flex gap-2 ">
 
+              <UInput v-model="form.start_date" color="neutral" variant="outline" class="grow">
+                <template #trailing>
+                  <UPopover>
+                    <UButton trailing-icon="i-lucide-calendar" variant="link" :padded="false" />
 
+                    <template #content>
+                      <UCalendar class="max-w-[326px] max-h-[308px] text-xl p-3 text-base font-semibold" v-model="calendarDate" />
+                    </template>
+                  </UPopover>
+                </template>
+              </UInput>
+            </div>
           </UFormField>
-
         </section>
 
         <section class="items-center space-x-10 w-full max-w-md">
