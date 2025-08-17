@@ -13,17 +13,31 @@
 
         <!-- Main Content -->
         <div v-else-if="data?.profile" class="p-4 space-y-6">
-            <UCard>
-                <div class="flex items-center gap-4">
-                    <UAvatar src="/avatar-placeholder.png" alt="Avatar" size="2xl" />
+            <UCard class="shadow-lg">
+                <div class="flex items-start gap-4">
+                    <div class="relative w-max">
+                        <UAvatar :src="data.profile.intern_picture || undefined" alt="Avatar" class="w-16 h-16" />
+                        <button @click="openFileInput" class="absolute bottom-0 right-0 bg-black bg-opacity-60 hover:bg-opacity-80 
+               rounded-full p-1 flex items-center justify-center transition">
+                            <UIcon v-if="!isUploading" name="i-heroicons-camera" class="text-white text-xs" />
+                            <UIcon v-else name="i-heroicons-arrow-path" class="text-white text-sm animate-spin" />
+                        </button>
+                        <input ref="fileInput" type="file" @change="handleFileChange" accept="image/*" class="hidden" />
+                    </div>
                     <div>
                         <h1 class="font-bold text-lg">{{ data.profile.name || 'Intern Name' }}</h1>
-                        <UBadge v-if="data.profile.status" color="success" variant="soft" class="mt-1">Ongoing</UBadge>
-                        <UBadge v-else color="error" variant="soft" class="mt-1">Inactive</UBadge>
+                        <UBadge v-if="data.profile.status" color="success" variant="soft" class="mt-1">
+                            Ongoing
+                        </UBadge>
+                        <UBadge v-else color="error" variant="soft" class="mt-1">
+                            Inactive
+                        </UBadge>
                         <p class="text-sm text-black-500 mt-1">{{ data.profile.role || 'No Role Assigned' }}</p>
                         <p class="text-sm text-black-500">{{ data.profile.course }} - {{ data.profile.year }}</p>
-                        <p class="text-sm text-black-500">Hours: {{ data.profile.hours_completed }} / {{
-                            data.profile.required_hours }}</p>
+                        <p class="text-sm text-black-500">{{ data.profile.school }}</p>
+                        <p class="text-sm text-black-500">
+                            Hours: {{ data.profile.hours_completed }} / {{ data.profile.required_hours }}
+                        </p>
                     </div>
                 </div>
             </UCard>
@@ -39,8 +53,16 @@
                 <section>
                     <h2 class="font-bold text-xl mb-4 text-black-800">Intern details</h2>
                     <div class="pb-5">
-                        <h1 class="text-black-500 text-sm">Full Name</h1>
-                        <h2 class="font-semibold text-black-800 text-left">{{ data.profile.name || '' }}</h2>
+                        <h1 class="text-black-500 text-sm">First Name</h1>
+                        <h2 class="font-semibold text-black-800 text-left">{{ data.profile.first_name }}</h2>
+                    </div>
+                    <div class="pb-5">
+                        <h1 class="text-black-500 text-sm">Middle Name</h1>
+                        <h2 class="font-semibold text-black-800 text-left">{{ data.profile.middle_name || "N/A" }}</h2>
+                    </div>
+                    <div class="pb-5">
+                        <h1 class="text-black-500 text-sm">Last Name</h1>
+                        <h2 class="font-semibold text-black-800 text-left">{{ data.profile.last_name }}</h2>
                     </div>
                     <div class="pb-5">
                         <h1 class="text-black-500 text-sm">Email</h1>
@@ -75,7 +97,7 @@
                     <div class="pb-5">
                         <h1 class="text-black-500 text-sm">Course and Year Level</h1>
                         <h2 class="font-semibold text-black-800 text-left">{{ data.profile.course
-                            }} - {{ data.profile.year }}</h2>
+                        }} - {{ data.profile.year }}</h2>
                     </div>
                     <div class="pb-5">
                         <h1 class="text-black-500 text-sm">Required Hours</h1>
@@ -91,10 +113,31 @@
                         <h2 class="font-semibold text-black-800 text-left">{{ data.profile.notes || 'None' }}</h2>
                     </div>
                 </section>
+                    <UModal>
+                        <UButton label="Open" color="neutral" variant="subtle" />
+
+                        <template #content>
+                            <Placeholder class="h-48 m-4" />
+                        </template>
+                    </UModal>
                 <div class="space-y-2 pt-4">
                     <UButton @click="enterEditMode" block size="lg" icon="i-heroicons-pencil-square">Edit Info</UButton>
-                    <UButton @click="logout" block size="lg" icon="i-heroicons-arrow-left-on-rectangle" color="primary">
-                        Logout</UButton>
+                    <UModal v-model:open="isLogoutModalOpen" title="Confirmation">
+                        <UButton @click="isLogoutModalOpen = true" block size="lg"
+                            icon="i-heroicons-arrow-left-on-rectangle" color="primary">Logout</UButton>
+                            <template #header>
+                                <h2 class="text-2xl font-bold">Logout?</h2>
+                            </template>
+                            <template #body>
+                            <p class="py-4 text-black">Are you sure you want to log out?</p>
+                            </template>
+                            <template #footer>
+                                <div class="flex justify-end gap-2">
+                                    <UButton @click="isLogoutModalOpen = false" color="primary" variant="outline" label="Cancel" class="text-black text-md"/>
+                                    <UButton @click="performLogout" color="primary" label="Yes, Logout" class="text-white text-md"/>
+                                </div>
+                            </template>
+                    </UModal>
                 </div>
             </div>
 
@@ -105,15 +148,15 @@
                     <section class="space-y-4">
                         <h2 class="font-bold text-xl mb-2">Intern details</h2>
                         <UFormField label="First Name" name="firstName" required class="text-sm">
-                            <UInput v-model="formState.firstName" class="w-full" placeholder="First Name"
+                            <UInput v-model="formState.first_name" class="w-full" placeholder="First Name"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Middle Initial (Optional)" name="middleName">
-                            <UInput v-model="formState.middleName" class="w-full" placeholder="Middle Initial"
+                            <UInput v-model="formState.middle_name" class="w-full" placeholder="Middle Initial"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Last Name" name="lastName" required>
-                            <UInput v-model="formState.lastName" class="w-full" placeholder="Last Name"
+                            <UInput v-model="formState.last_name" class="w-full" placeholder="Last Name"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Email" name="email" required>
@@ -139,11 +182,13 @@
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Emergency Contact Person" name="emergency_contact_person">
-                            <UInput v-model="formState.emergency_contact_person" class="w-full" placeholder="Emergency Contact Person"
+                            <UInput v-model="formState.emergency_contact_person" class="w-full"
+                                placeholder="Emergency Contact Person"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Emergency Contact Number" name="emergency_contact_number">
-                            <UInput v-model="formState.emergency_contact_number" class="w-full" placeholder="Emergency Contact Number"
+                            <UInput v-model="formState.emergency_contact_number" class="w-full"
+                                placeholder="Emergency Contact Number"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                     </section>
@@ -158,16 +203,16 @@
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Required hours" name="required_hours" required>
-                            <UInput v-model.number="formState.required_hours" type="number" class="w-full" placeholder="Required Hours"
-                                :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
+                            <UInput v-model.number="formState.required_hours" type="number" class="w-full"
+                                placeholder="Required Hours" :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Role/Position" name="role">
                             <UInput v-model="formState.role" class="w-full" placeholder="Role/Position"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                         <UFormField label="Note/Remarks (Optional)" name="notes">
-                            <UTextarea v-model="formState.notes" class="w-full" placeholder="Any additional notes or remarks"
-                                :rows="3"
+                            <UTextarea v-model="formState.notes" class="w-full"
+                                placeholder="Any additional notes or remarks" :rows="3"
                                 :ui="{ base: 'text-lg placeholder:text-md w-full' }" />
                         </UFormField>
                     </section>
@@ -178,7 +223,6 @@
                 </UForm>
             </div>
         </div>
-
         <!-- Bottom Navigation -->
         <footer class="fixed bottom-0 left-0 right-0 bg-white shadow-inner border-t">
             <div class="flex justify-around py-2">
@@ -207,13 +251,16 @@ const router = useRouter();
 const toast = useToast();
 const isPasswordVisible = ref(false)
 const passwordError = ref<string | undefined>(undefined)
+const isLogoutModalOpen = ref(false);
 
 const isEditing = ref(false);
 const isSaving = ref(false);
+const isUploading = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
 const formState = ref({
-    firstName: '',
-    middleName: '',
-    lastName: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
     email: '',
     password: '',
     contact_number: '',
@@ -230,19 +277,44 @@ const formState = ref({
 
 const { data, pending, error, refresh } = await useFetch<ProfileDataResponse>('/api/profile/fetch');
 
+function openFileInput() {
+    fileInput.value?.click();
+}
+
+async function handleFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    isUploading.value = true;
+    const formData = new FormData();
+    formData.append('picture', file);
+
+    try {
+        await $fetch('/api/profile/picture', {
+            method: 'POST',
+            body: formData,
+        });
+        toast.add({ title: 'Profile picture updated!', color: 'success' });
+        await refresh(); // Refresh data to show the new picture
+    } catch (err: any) {
+        toast.add({ title: 'Error', description: err.data?.message || 'Could not upload picture.', color: 'error' });
+    } finally {
+        isUploading.value = false;
+        // Reset file input to allow re-uploading the same file if needed
+        if (fileInput.value) fileInput.value.value = '';
+    }
+}
+
 function enterEditMode() {
     if (data.value?.profile) {
         const profile = data.value.profile;
-        const nameParts = profile.name?.trim().split(' ').filter(Boolean) || [];
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
-        const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : '';
-
         formState.value = {
             ...formState.value,
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName || '',
+            first_name: profile.first_name,
+            middle_name: profile.middle_name || '',
+            last_name: profile.last_name,
             email: profile.email,
             contact_number: profile.contact_number,
             emergency_contact_person: profile.emergency_contact_person,
@@ -282,7 +354,7 @@ async function handleSaveChanges() {
     }
 }
 
-async function logout() {
+async function performLogout() {
     await $fetch('/api/auth/logout', { method: 'POST' });
     await clear();
     await router.push('/login');

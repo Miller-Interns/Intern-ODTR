@@ -52,6 +52,9 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
+  first_name               String
+  middle_name              String?
+  last_name                String
   school                   String
   course                   String
   year                     String
@@ -61,6 +64,7 @@ model Intern {
   required_hours           Float //changed from Int
   status                   Boolean
   hours_completed          Float // new
+  intern_picture           String? // new
   role                     String? // new
   notes                    String? // new
 

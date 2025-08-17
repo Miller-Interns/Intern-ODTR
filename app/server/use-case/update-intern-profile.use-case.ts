@@ -5,9 +5,9 @@ import { userService } from '../service/user.service'
 import type { RequestContext } from '../types/RequestContext'
 
 const dtoSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  middleName: z.string().optional(),
-  lastName: z.string().min(1, 'Last name is required'),
+  first_name: z.string().min(1, 'First name is required'),
+  middle_name: z.string().optional(),
+  last_name: z.string().min(1, 'Last name is required'),
   email: z.string().email(),
   password: z.string().min(6).optional().or(z.literal('')),
   contact_number: z.string(),
@@ -25,17 +25,10 @@ type UpdateProfileDTO = z.infer<typeof dtoSchema>
 
 export const updateInternProfileUseCase = async (dto: UpdateProfileDTO, context: RequestContext) => {
   const userId = await checkAuthentication(context)
-  const { firstName, middleName, lastName, ...restOfData } = await validateDTO(dto)
-
-  // Combine the name fields into a single 'name' string
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+  const validatedData = await validateDTO(dto)
   
-  const payload = {
-      ...restOfData,
-      name: fullName
-  };
-  
-  await userService.updateUserProfile(userId, payload);
+  // The use case now passes all the validated data to the service
+  await userService.updateUserProfile(userId, validatedData);
 
   return { status: 'success' }
 }

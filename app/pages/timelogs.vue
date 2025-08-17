@@ -1,9 +1,9 @@
 <template>
   <!-- FIX: Added extra bottom padding (pb-40) to make space for the sticky button and the nav -->
-  <div class="bg-gray-50 min-h-screen flex flex-col pb-40">
+  <div class="bg-black-50 min-h-screen flex flex-col pb-40">
     <!-- Header -->
     <header class="p-4">
-      <h1 class="text-2xl font-bold text-gray-800">Time Logs</h1>
+      <h1 class="text-2xl font-bold text-black-800">Time Logs</h1>
     </header>
 
     <!-- Loading State -->
@@ -19,27 +19,51 @@
     <!-- Main Content: List of Time Logs -->
     <div v-else-if="data?.timeLogs" class="px-4 space-y-4">
       <!-- Empty State -->
-      <div v-if="data.timeLogs.length === 0" class="text-center text-gray-500 pt-10">
-        <p>You have no completed time logs yet.</p>
+      <div v-if="data.timeLogs.length === 0" class="text-center">
+        <UCard class="shadow-lg text-gray-500 p-3 text-md">
+          <p>No time logs recorded yet. Once you log time, it will show up here.</p>
+        </UCard>
       </div>
 
       <!-- Loop through each time log -->
-      <UCard v-for="log in data.timeLogs" :key="log.id">
+      <UCard v-for="log in data.timeLogs" class="shadow-lg" :key="log.id">
         <template #header>
           <div class="flex justify-between items-center">
-            <p class="font-semibold text-gray-700">{{ formattedDate(log.time_in) }}</p>
+            <p class="font-semibold text-black-700">{{ formattedDate(log.time_in) }}</p>
             <UBadge v-if="!log.status" color="warning" variant="soft">Pending Approval</UBadge>
           </div>
         </template>
         <div>
-          <div class="grid grid-cols-3 text-center">
-            <div><p class="text-sm text-gray-500">Time in</p><p class="font-medium">{{ formatTime(log.time_in) }}</p></div>
-            <div><p class="text-sm text-gray-500">Time out</p><p class="font-medium">{{ formatTime(log.time_out) }}</p></div>
-            <div><p class="text-sm text-gray-500">Total Hours</p><p class="font-medium">{{ log.total_hours.toFixed(1) }} Hours</p></div>
+          <div class="grid grid-cols-3">
+            <div class="flex justify-center">
+              <div class="text-left">
+                <p class="text-sm text-black-500">Time in</p>
+                <p class="font-medium">{{ formatTime(log.time_in) }}</p>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <div class="text-left">
+                <p class="text-sm text-black-500">Time out</p>
+                <p class="font-medium">{{ formatTime(log.time_out) }}</p>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <div class="text-left">
+                <p class="text-sm text-black-500">Total Hours</p>
+                <p class="font-medium">{{ log.total_hours.toFixed(1) }} Hours</p>
+              </div>
+            </div>
           </div>
-          <div v-if="log.intern_notes || log.admin_remarks" class="mt-4 pt-4 border-t border-gray-200 space-y-2 text-left">
-            <div v-if="log.intern_notes"><p class="text-sm text-gray-500">Intern Notes:</p><p class="text-sm text-gray-800 p-2 bg-gray-50 rounded-md">{{ log.intern_notes }}</p></div>
-            <div v-if="log.admin_remarks"><p class="text-sm text-gray-500">Admin Remarks:</p><p class="text-sm text-gray-800 p-2 bg-blue-50 rounded-md">{{ log.admin_remarks }}</p></div>
+          <div v-if="log.intern_notes || log.admin_remarks"
+            class="mt-4 pt-4 border-t border-gray-200 space-y-2 text-left">
+            <div v-if="log.intern_notes">
+              <p class="text-sm text-black-500">Intern Notes:</p>
+              <p class="text-sm text-black-800 p-2 bg-black-50 rounded-md">{{ log.intern_notes }}</p>
+            </div>
+            <div v-if="log.admin_remarks">
+              <p class="text-sm text-black-500">Admin Remarks:</p>
+              <p class="text-sm text-black-800 p-2 bg-blue-50 rounded-md">{{ log.admin_remarks }}</p>
+            </div>
           </div>
         </div>
       </UCard>
@@ -47,13 +71,8 @@
 
     <!-- NEW FEATURE: Sticky Export Button -->
     <div class="fixed bottom-20 left-0 right-0 p-4">
-      <UButton
-        block
-        size="lg"
-        icon="i-heroicons-arrow-down-tray"
-        @click="exportDTR"
-        :disabled="!data || data.timeLogs.length === 0"
-      >
+      <UButton block size="lg" icon="i-heroicons-arrow-down-tray" @click="exportDTR"
+        :disabled="!data || data.timeLogs.length === 0">
         Export DTR
       </UButton>
     </div>
@@ -61,10 +80,12 @@
     <!-- Bottom Navigation -->
     <footer class="fixed bottom-0 left-0 right-0 bg-white shadow-inner border-t">
       <div class="flex justify-around py-2">
-        <UButton to="/dashboard" variant="link" icon="i-heroicons-home" class="flex flex-col items-center text-xs text-black-600">
+        <UButton to="/dashboard" variant="link" icon="i-heroicons-home"
+          class="flex flex-col items-center text-xs text-black-600">
           Dashboard
         </UButton>
-        <UButton to="/timelogs" variant="link" icon="i-heroicons-clock" class="flex flex-col items-center text-xs text-black-600">Time
+        <UButton to="/timelogs" variant="link" icon="i-heroicons-clock"
+          class="flex flex-col items-center text-xs text-black-600">Time
           Logs
         </UButton>
         <UButton to="/profile" variant="link" icon="i-heroicons-user-circle"
@@ -141,13 +162,13 @@ function exportDTR() {
   ];
 
   const headers = ['Date', 'Approved By', 'Time in', 'Time out', 'No. of Hours'];
-  
+
   const rows = data.value.timeLogs.map(log => {
     totalHours += log.total_hours;
 
     // FIX: Use the display format but enclose it in double quotes to make it CSV-safe.
     const date = `"${formattedDate(log.time_in)}"`;
-    
+
     const approvedBy = log.adminName ? `${log.adminName}` : 'N/A';
     const timeIn = format24HourTime(log.time_in);
     const timeOut = format24HourTime(log.time_out);
@@ -169,10 +190,10 @@ function exportDTR() {
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
-  
+
   const userNameForFile = internName.replace(/\s+/g, '_');
   link.setAttribute('download', `DTR_${userNameForFile}.csv`);
-  
+
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();

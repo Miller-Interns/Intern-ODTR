@@ -28,7 +28,7 @@
 
       <!-- NEW STATE: Inactive Intern View -->
       <div v-if="!internStatus">
-        <UCard>
+        <UCard class="shadow-lg">
           <div class="text-center">
             <p class="mb-4">Your account is currently inactive. You cannot time in until an administrator reactivates
               your account.</p>
@@ -39,7 +39,7 @@
       <!-- In-Progress View -->
       <div v-else-if="activeTimeLog">
         <h2 class="font-semibold text-xl pb-4">Time Log Summary</h2>
-        <UCard class="mb-6">
+        <UCard class="mb-6 shadow-lg">
           <template #header>
             <p class="text-l text-black">{{ formattedDate(activeTimeLog.time_in) }}</p>
           </template>
@@ -82,7 +82,7 @@
       <!-- Submitted View -->
       <div v-else-if="lastCompletedLog">
         <h2 class="font-semibold text-xl pb-4">Time Log Summary</h2>
-        <UCard>
+        <UCard class="shadow-lg">
           <template #header>
             <div class="flex justify-between items-center">
               <div>
@@ -117,7 +117,7 @@
 
       <!-- Fully Timed Out View (for active interns) -->
       <div v-else>
-        <UCard>
+        <UCard class="shadow-lg">
           <div class="text-center">
             <p class="mb-4">You do not have an active time log. Please log out and log in again to start a new time
               sheet.</p>
@@ -128,7 +128,7 @@
       <!-- Hours Rendered Card (always visible) -->
       <div>
         <h2 class="font-semibold text-xl pb-4">Hours Rendered</h2>
-        <UCard>
+        <UCard class="shadow-lg">
           <div class="text-center space-y-1">
             <p class="text-sm font-medium text-black-500">{{ progressPercentage.toFixed(0) }}%</p>
             <UProgress v-model="renderedHours" :max="totalHours" color="success" />

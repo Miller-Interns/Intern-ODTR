@@ -15,6 +15,9 @@ export type Intern = {
     id: string;
     user_id: string;
     batch_id: string;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
     school: string;
     course: string;
     year: string;
@@ -24,6 +27,7 @@ export type Intern = {
     required_hours: number;
     status: boolean;
     hours_completed: number;
+    intern_picture: string | null;
     role: string | null;
     notes: string | null;
 };
