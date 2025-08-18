@@ -89,8 +89,8 @@ model TimeLog {
   admin_remarks String?
   intern_notes  String?
   status        Boolean  @default(false)
-  user          User     @relation(fields: [admin_id], references: [id])
-  admin_id      String
+  user          User?    @relation(fields: [admin_id], references: [id])
+  admin_id      String?
 
   @@map("time_logs")
 }

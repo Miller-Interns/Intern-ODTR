@@ -13,13 +13,12 @@ async function main() {
 	await prisma.user.deleteMany()
 	console.log('-> Existing data deleted.')
 	console.log('-> Preparing user data...')
-	const supervisorId = '015084bc-bec3-4373-aec3-729fba0a825a'
 	const internUser1Id = 'ada24d94-f49e-4af1-91f0-64056ad149ec'
 	const internUser2Id = 'a7c4a8a0-2b1d-4f1e-9d6c-2e9b9c0a3b1d'
 
 	const usersToCreate = [
 		{
-			id: supervisorId,
+			id: '015084bc-bec3-4373-aec3-729fba0a825a',
 			email: 'alyssa.palencia@mllrdev.com',
 			name: 'Alyssa Palencia',
 			password: 'mllrdev321',

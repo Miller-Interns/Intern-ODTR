@@ -1,27 +1,41 @@
-import { approveBulkLogsUseCase, bulkApproveSchema } from '~/server/use-case/time-logs/approve-all.use-case'
+import { approveBulkLogsUseCase } from '~/server/use-case/time-logs/approve-all.use-case'
+import { defineEventHandler, readBody } from 'h3'
+import { ZodError } from 'zod'
+import type { RequestContext } from '~/server/types/RequestContext' // <-- Import your RequestContext type
 
 export default defineEventHandler(async (event) => {
-	// Proper authentication should be implemented here
-	if (!event.context.auth?.id) {
-		throw createError({
-			statusCode: 401,
-			statusMessage: 'Authentication is required.',
-		})
-	}
-	const adminId = event.context.auth.id
+	try {
+		// 1. Get the request body.
+		const body = await readBody(event)
 
-	const body = await readBody(event)
-	const validatedBody = bulkApproveSchema.parse(body) // Use Zod to parse and validate
+		// 2. Call the use case with the DTO and the full request context.
+		// We use a type assertion (`as RequestContext`) to bridge the gap between
+		// H3's generic context and our application's specific context type.
+		const result = await approveBulkLogsUseCase(body, event.context as RequestContext)
 
-	await approveBulkLogsUseCase(validatedBody, adminId)
+		// 3. Format the successful response.
+		return {
+			success: true,
+			message: `Successfully approved ${result.approvedCount} logs.`,
+			data: {
+				approvedCount: result.approvedCount,
+			},
+		}
+	} catch (error) {
+		// Handle Zod validation errors to return a 400 Bad Request
+		if (error instanceof ZodError) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: 'Bad Request: Invalid input.',
+				// FIX: The correct property on a ZodError instance is `.issues`
+				data: error.issues,
+			})
+		}
 
-	return {
-		success: true,
-		message: `Successfully approved ${validatedBody.logs.length} logs.`,
+		// Re-throw other pre-formatted errors (e.g., from checkAuthentication)
+		throw error
 	}
 })
-
-
 
 // import { z } from 'zod'
 // import type { Transaction } from 'kysely'

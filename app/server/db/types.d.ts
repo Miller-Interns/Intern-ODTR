@@ -44,7 +44,7 @@ export type TimeLog = {
     admin_remarks: string | null;
     intern_notes: string | null;
     status: Generated<boolean>;
-    admin_id: string;
+    admin_id: string | null;
 };
 export type User = {
     id: string;

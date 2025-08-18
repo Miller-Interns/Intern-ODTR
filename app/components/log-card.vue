@@ -8,14 +8,17 @@
 			<div class="grid grid-cols-3 text-center">
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Time In:</span>
+					<!-- No change needed here, the function name is the same -->
 					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_in) }}</p>
 				</div>
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Time Out:</span>
+					<!-- No change needed here, the function name is the same -->
 					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_out) }}</p>
 				</div>
 				<div>
 					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Hours:</span>
+					<!-- This now relies on the cleaner computed property -->
 					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ totalHoursForDisplay }}</p>
 				</div>
 			</div>
@@ -54,8 +57,8 @@
 	import { onClickOutside } from '@vueuse/core'
 	import { useLogApproval } from '~/composables/useApproveLog'
 	import type { DashboardLog, InternLog } from '~/types/TimeLog'
+	// REFACTOR 1: Update import path and remove unused calculator
 	import { formatDuration, formatTimeOnly } from '~/server/utils/formatters'
-	import { calculateDisplayHours } from '~/server/utils/total-hours'
 
 	type Log = DashboardLog | InternLog
 
@@ -91,20 +94,37 @@
 		}
 	}
 
-	const totalHoursForDisplay = computed(() => {
+	// REFACTOR 2: Create a computed property for raw hour *calculation*.
+	// This mirrors the server-side logic for consistency.
+	const calculatedHours = computed<number | null>(() => {
+		// If the log is approved, use the definitive `total_hours` from the database.
 		if (props.log.status === true) {
-			return formatDuration(props.log.total_hours)
+			return props.log.total_hours
 		}
+
+		// For pending logs, calculate the potential hours for display purposes.
+		if (!props.log.time_in || !props.log.time_out) {
+			return null
+		}
+
 		const timeIn = new Date(props.log.time_in)
 		const timeOut = new Date(props.log.time_out)
+
+		// Check for invalid dates
 		if (isNaN(timeIn.getTime()) || isNaN(timeOut.getTime())) {
-			return formatDuration(null)
+			return null
 		}
 
-		const durationMs = timeOut.getTime() - timeIn.getTime()
-		const durationHours = durationMs / (1000 * 60 * 60)
+		const BREAK_HOURS = 1
+		const grossDurationHours = (timeOut.getTime() - timeIn.getTime()) / (1000 * 60 * 60)
 
-		return formatDuration(durationHours)
+		return Math.max(0, grossDurationHours - BREAK_HOURS)
+	})
+
+	// REFACTOR 3: The display computed is now extremely simple.
+	// Its only job is to *format* the result from the calculation.
+	const totalHoursForDisplay = computed(() => {
+		return formatDuration(calculatedHours.value)
 	})
 
 	defineExpose({
