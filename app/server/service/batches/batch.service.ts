@@ -3,7 +3,7 @@ import { sql } from 'kysely'
 import type { Batch, Intern } from '~/server/db/types'
 import type { BatchListItem as ServiceBatchListItem } from '~/types/Batch'
 
-type KyselyBatchListItem = Omit<ServiceBatchListItem, 'batchNumber' | 'supervisor' | 'status'> & {
+export type KyselyBatchListItem = Omit<ServiceBatchListItem, 'batchNumber' | 'supervisor' | 'status'> & {
   batch_number: string;
   supervisorName: string | null;
   status: 'INCOMING' | 'ONGOING' | 'COMPLETED';
@@ -26,8 +26,8 @@ async function getAllBatchesWithDetails(): Promise<KyselyBatchListItem[]> {
   return result as unknown as KyselyBatchListItem[];
 }
 
-type BatchAndSupervisor = Batch & { supervisorName: string | null };
-type InternWithUser = Intern & { fullName: string | null };
+export type BatchAndSupervisor = Batch & { supervisorName: string | null };
+export type InternWithUser = Intern & { fullName: string | null };
 
 async function getBatchAndSupervisor(id: string): Promise<BatchAndSupervisor | undefined> {
   const result = await db

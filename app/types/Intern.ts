@@ -5,7 +5,7 @@ export const AddInternSchema = z.object({
   firstName: z.string().min(2, 'First name is required'),
   lastName: z.string().min(2, 'Last name is required'),
   email: z.string().email('Must be a valid email address'),
-  password: z.string().min(3, 'Password must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   school: z.union([
     z.object({ label: z.string().min(1, 'School is required') }),
     z.string().min(1, 'School is required')
@@ -52,3 +52,22 @@ export type InternDetails = {
   fullName: string;
   courseYear: string;
 };
+
+export const UpdateInternSchema = z.object({
+  userId: z.string().uuid(),
+  internId: z.string().min(1),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  middleName: z.string().optional(),
+  email: z.string().email(),
+  contactNumber: z.string().optional(),
+  emergencyContactPerson: z.string().optional(),
+  emergencyContactNumber: z.string().optional(),
+  school: z.string().min(1),
+  courseYear: z.string().min(3),
+  requiredHours: z.number().positive(),
+  role: z.string().optional(),
+  note: z.string().optional(),
+});
+
+export type UpdateInternDTO = z.infer<typeof UpdateInternSchema>;

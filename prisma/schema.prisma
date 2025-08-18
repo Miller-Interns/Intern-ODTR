@@ -60,20 +60,21 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
-
+  //first_name               String
+  //middle_name              String?
+  //last_name                String
   school                   String
+  course                   String?
+  year                     String?
+  contact_number           String?
+  emergency_contact_person String?
+  emergency_contact_number String?
   required_hours           Int
   status                   Status @default(INCOMING)
-
-  course                   String @default("BSCOE")
-  year                     String @default("3rd Year")
-  contact_number           String @default("N/A")
-  emergency_contact_person String @default("N/A")
-  emergency_contact_number String @default("N/A")
-  role                     String @default("Web Developer")
-  intern_picture           String?
   hours_completed          Float?
-  note                     String?
+  intern_picture           String?
+  role                     String?
+  notes                    String?
 
 
   TimeLog TimeLog[]

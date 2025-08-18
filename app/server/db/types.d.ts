@@ -23,17 +23,17 @@ export type Intern = {
     user_id: string;
     batch_id: string;
     school: string;
+    course: string | null;
+    year: string | null;
+    contact_number: string | null;
+    emergency_contact_person: string | null;
+    emergency_contact_number: string | null;
     required_hours: number;
     status: Generated<Status>;
-    course: Generated<string>;
-    year: Generated<string>;
-    contact_number: Generated<string>;
-    emergency_contact_person: Generated<string>;
-    emergency_contact_number: Generated<string>;
-    role: Generated<string>;
-    intern_picture: string | null;
     hours_completed: number | null;
-    note: string | null;
+    intern_picture: string | null;
+    role: string | null;
+    notes: string | null;
 };
 export type TimeLog = {
     id: string;
