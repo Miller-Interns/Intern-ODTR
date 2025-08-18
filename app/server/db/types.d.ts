@@ -4,6 +4,12 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export const Status = {
+    INCOMING: "INCOMING",
+    ONGOING: "ONGOING",
+    COMPLETED: "COMPLETED"
+} as const;
+export type Status = (typeof Status)[keyof typeof Status];
 export type Batch = {
     id: string;
     batch_number: string;
@@ -25,7 +31,7 @@ export type Intern = {
     emergency_contact_person: string;
     emergency_contact_number: string;
     required_hours: number;
-    status: boolean;
+    status: Generated<Status>;
     hours_completed: number;
     intern_picture: string | null;
     role: string | null;

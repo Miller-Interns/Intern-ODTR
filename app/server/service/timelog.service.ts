@@ -7,33 +7,49 @@ import type { Selectable } from 'kysely'
  * Finds the single most recent time log for an intern that has not yet been timed out.
  */
 async function getActiveTimeLogByInternId(internId: string, ctx: RequestContext): Promise<Selectable<TimeLog> | null> {
-  const qb = (ctx.trx ??= db)
-  const result = await qb
-    .selectFrom('time_logs')
-    .selectAll()
-    .where('intern_id', '=', internId)
-    .where('time_out', 'is', null)
-    .orderBy('time_in', 'desc')
-    .limit(1)
-    .executeTakeFirst()
-  return result ?? null;
+	const qb = (ctx.trx ??= db)
+	const result = await qb
+		.selectFrom('time_logs')
+		.selectAll()
+		.where('intern_id', '=', internId)
+		.where('time_out', 'is', null)
+		.orderBy('time_in', 'desc')
+		.limit(1)
+		.executeTakeFirst()
+	return result ?? null
+}
+
+async function getLastCompletedLogTodayByInternId(internId: string, ctx: RequestContext) {
+	const qb = (ctx.trx ??= db)
+	const today = new Date()
+	today.setHours(0, 0, 0, 0) // Set to the beginning of the current day
+
+	return await qb
+		.selectFrom('time_logs')
+		.selectAll()
+		.where('intern_id', '=', internId)
+		.where('time_out', '>=', today)
+		.where('time_out', 'is not', null)
+		.orderBy('time_out', 'desc')
+		.limit(1)
+		.executeTakeFirst()
 }
 
 /**
  * Updates an existing time log record to mark it as complete.
  */
 async function timeOut(logId: string, details: { intern_notes?: string; total_hours: number }, ctx: RequestContext) {
-  const qb = (ctx.trx ??= db)
-  return await qb
-    .updateTable('time_logs')
-    .set({
-      time_out: new Date(),
-      intern_notes: details.intern_notes,
-      total_hours: details.total_hours,
-    })
-    .where('id', '=', logId)
-    .returningAll()
-    .executeTakeFirst()
+	const qb = (ctx.trx ??= db)
+	return await qb
+		.updateTable('time_logs')
+		.set({
+			time_out: new Date(),
+			intern_notes: details.intern_notes,
+			total_hours: details.total_hours,
+		})
+		.where('id', '=', logId)
+		.returningAll()
+		.executeTakeFirst()
 }
 
 /**
@@ -42,20 +58,33 @@ async function timeOut(logId: string, details: { intern_notes?: string; total_ho
  * to get the name of the approving admin.
  */
 async function getCompletedTimeLogsByInternId(internId: string, ctx: RequestContext) {
-  const qb = (ctx.trx ??= db);
-  return await qb
-    .selectFrom('time_logs')
-    .leftJoin('users', 'users.id', 'time_logs.admin_id') // Join users table
-    .selectAll('time_logs') // Select all columns from the time_logs table
-    .select('users.name as adminName') // And select the admin's name, aliasing it
-    .where('intern_id', '=', internId)
-    .where('time_out', 'is not', null)
-    .orderBy('time_in', 'desc')
-    .execute();
+	const qb = (ctx.trx ??= db)
+	return await qb
+		.selectFrom('time_logs')
+		.leftJoin('users', 'users.id', 'time_logs.admin_id') // Join users table
+		.selectAll('time_logs') // Select all columns from the time_logs table
+		.select('users.name as adminName') // And select the admin's name, aliasing it
+		.where('intern_id', '=', internId)
+		.where('time_out', 'is not', null)
+		.orderBy('time_in', 'desc')
+		.execute()
+}
+
+async function findActiveLogByIdAndInternId(logId: string, internId: string, ctx: RequestContext) {
+	const qb = (ctx.trx ??= db)
+	return await qb
+		.selectFrom('time_logs')
+		.selectAll()
+		.where('id', '=', logId)
+		.where('intern_id', '=', internId)
+		.where('time_out', 'is', null) // Ensure we're only finding an active log
+		.executeTakeFirst()
 }
 
 export const timeLogService = {
-    getActiveTimeLogByInternId,
-    timeOut,
-    getCompletedTimeLogsByInternId,
-};
+	getActiveTimeLogByInternId,
+	timeOut,
+	getCompletedTimeLogsByInternId,
+	getLastCompletedLogTodayByInternId,
+	findActiveLogByIdAndInternId, // Export the new function
+}

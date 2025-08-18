@@ -9,10 +9,11 @@ import type { User } from '../db/types'
 import type { Selectable } from 'kysely'
 import { db } from '../db'
 import { randomUUID } from 'node:crypto'
+import { Status } from '../../enum/enums'
 
 const dtoSchema = z.object({
-	email: z.string(),
-	password: z.string().min(1).max(100),
+	email: z.string().email(),
+	password: z.string().min(6).max(100),
 })
 const validateDTO = createSchemaValidator(dtoSchema)
 type LoginDTO = z.infer<typeof dtoSchema>
@@ -27,55 +28,59 @@ export async function loginUseCase(dto: LoginDTO, context: RequestContext): Prom
 	const config = useRuntimeConfig()
 	const jwtSecret = config.JWT_SECRET
 
-	if (!jwtSecret) { throw createError({ statusCode: 500, statusMessage: 'Server misconfiguration' }) }
+	if (!jwtSecret) {
+		throw createError({ statusCode: 500, statusMessage: 'Server misconfiguration' })
+	}
 
 	const user = await userService.getUserByEmail(email, context)
-	if (!user || !user.password) { throw createError({ statusCode: 401, statusMessage: 'User does not exist' }) }
+	if (!user || !user.password) {
+		throw createError({ statusCode: 401, statusMessage: 'User does not exist' })
+	}
 
 	const isPasswordValid = await bcrypt.compare(password, user.password)
-	if (!isPasswordValid) { throw createError({ statusCode: 401, statusMessage: 'Incorrect email or password' }) }
+	if (!isPasswordValid) {
+		throw createError({ statusCode: 401, statusMessage: 'Incorrect email or password' })
+	}
 
-	// Automatic time-in and status activation logic
 	if (!user.isAdmin) {
-		const internProfile = await userService.getInternByUserId(user.id, context);
+		const internProfile = await userService.getInternByUserId(user.id, context)
 		if (internProfile) {
-			const activeLog = await timeLogService.getActiveTimeLogByInternId(internProfile.id, context);
-			
+			const activeLog = await timeLogService.getActiveTimeLogByInternId(internProfile.id, context)
+
 			if (!activeLog) {
-                // FIX: All database writes are now wrapped in a single, safe transaction.
-                await db.transaction().execute(async (trx) => {
-                    let shouldTimeIn = false;
+				await db.transaction().execute(async (trx) => {
+					let shouldTimeIn = false
 
-                    // Case 1: First-ever login. Activate the intern.
-                    if (internProfile.status === false) {
-                        const anyPreviousLogs = await trx.selectFrom('time_logs').select('id').where('intern_id', '=', internProfile.id).limit(1).executeTakeFirst();
-                        if (!anyPreviousLogs) {
-                            await trx
-                                .updateTable('interns')
-                                .set({ status: true })
-                                .where('id', '=', internProfile.id)
-                                .execute();
-                            shouldTimeIn = true;
-                        }
-                        // If status is false but they have logs, they were deactivated. Do not time in.
-                    } 
-                    // Case 2: Subsequent login for an active intern.
-                    else if (internProfile.status === true) {
-                        shouldTimeIn = true;
-                    }
+					// Case 1: First-ever login. Activate the intern.
+					// FIX: Check for the INCOMING status.
+					if (internProfile.status === Status.INCOMING) {
+						await trx
+							.updateTable('interns')
+							.set({ status: Status.ONGOING }) // FIX: Update status to ONGOING
+							.where('id', '=', internProfile.id)
+							.execute()
+						shouldTimeIn = true
+					}
+					// Case 2: Subsequent login for an already active intern.
+					else if (internProfile.status === Status.ONGOING) {
+						shouldTimeIn = true
+					}
+					// If status is COMPLETED or anything else, they are not timed in.
 
-                    // If either valid case was met, create the time log.
-                    if (shouldTimeIn) {
-                        await trx.insertInto('time_logs').values({
-                            id: randomUUID(),
-                            intern_id: internProfile.id,
-                            time_in: new Date(),
-                            time_out: null,
-                            total_hours: 0,
-                            status: false,
-                        }).execute();
-                    }
-                });
+					if (shouldTimeIn) {
+						await trx
+							.insertInto('time_logs')
+							.values({
+								id: randomUUID(),
+								intern_id: internProfile.id,
+								time_in: new Date(),
+								time_out: null,
+								total_hours: 0,
+								status: false,
+							})
+							.execute()
+					}
+				})
 			}
 		}
 	}

@@ -94,8 +94,6 @@
 	import { UForm, UFormField, UInput, UCard, UButton } from '#components'
 	import Logo from '../assets/images/logo-cadet-blue.svg'
 
-	import { RouterNames } from '~/types/RouterNames'
-
 	// const { fetchUser } = useAuth()
 
 	const isLoading = ref(false)
@@ -132,7 +130,7 @@
 
 			if (response) {
 				await fetch()
-				navigateTo({ name: RouterNames.DASHBOARD }, { replace: true })
+				navigateTo({ path: '/intern/dashboard' }, { replace: true })
 			}
 		} catch (error: any) {
 			emailError.value = true

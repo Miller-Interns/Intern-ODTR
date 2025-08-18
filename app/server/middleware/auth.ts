@@ -4,7 +4,7 @@ import type { JwtPayload } from 'jsonwebtoken'
 export default defineEventHandler((event) => {
 	// Always initialize the auth context for every request.
 	event.context.auth = {
-		userId: undefined
+		userId: undefined,
 	}
 	event.context.user = null
 

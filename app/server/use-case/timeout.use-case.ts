@@ -3,59 +3,50 @@ import { checkAuthentication } from '../utils/check-authentication'
 import { createSchemaValidator } from '../utils/create-schema-validator'
 import { timeLogService } from '../service/timelog.service'
 import { userService } from '../service/user.service'
+import { createTimeoutResponse } from '../response/timeout.response' // Import the new formatter
 import type { RequestContext } from '../types/RequestContext'
-import { db } from '../db'
 
-// The DTO now expects 'intern_notes', which is optional.
 const dtoSchema = z.object({
-  timeLogId: z.string().uuid(),
-  intern_notes: z.string().optional(),
+	timeLogId: z.string().uuid(),
+	intern_notes: z.string().optional(),
 })
 const validateDTO = createSchemaValidator(dtoSchema)
 export type TimeoutDTO = z.infer<typeof dtoSchema>
 
+/**
+ * This use case orchestrates the process of timing out an active log.
+ */
 export const timeOutUseCase = async (dto: TimeoutDTO, context: RequestContext) => {
+	// 1. Authenticate and validate input
 	const userId = await checkAuthentication(context)
-	// Use the new field name from the DTO
 	const { timeLogId, intern_notes } = await validateDTO(dto)
 
+	// 2. Fetch the necessary data from services
 	const intern = await userService.getInternByUserId(userId, context)
 	if (!intern) {
 		throw createError({ status: 404, message: 'Intern profile not found.' })
 	}
 
-	const qb = (context.trx ??= db)
-	const timeLog = await qb
-		.selectFrom('time_logs')
-		.selectAll()
-		.where('id', '=', timeLogId)
-		.where('intern_id', '=', intern.id) // Security check: user can only time out their own log
-		.executeTakeFirst()
+	const timeLogToUpdate = await timeLogService.findActiveLogByIdAndInternId(timeLogId, intern.id, context)
 
-	if (!timeLog) {
-		throw createError({ status: 404, message: 'Active time log not found or access denied.' })
+	// 3. Apply business logic and validation
+	if (!timeLogToUpdate) {
+		throw createError({ status: 404, message: 'Active time log not found or it has already been timed out.' })
 	}
 
-	// Check if the log is already completed. This is the correct logic for a nullable field.
-	if (timeLog.time_out !== null) {
-		throw createError({ status: 400, message: 'This log has already been timed out.' })
-	}
-
-	// Calculate the duration between the original time_in and now.
-	const timeIn = new Date(String(timeLog.time_in))
+	// 4. Perform calculations (business logic)
+	const timeIn = new Date(String(timeLogToUpdate.time_in))
 	const timeOut = new Date()
 	const totalMilliseconds = timeOut.getTime() - timeIn.getTime()
 	const totalHours = totalMilliseconds / (1000 * 60 * 60)
 
-	// Call the service to perform the database update with the correct field name.
-	const updatedLog = await timeLogService.timeOut(
-		timeLogId,
-		{ intern_notes, total_hours: totalHours },
-		context,
-	)
+	// 5. Call the service to perform the update
+	const updatedLog = await timeLogService.timeOut(timeLogId, { intern_notes, total_hours: totalHours }, context)
 
-	// Note: We no longer update the intern's 'hours_completed' here.
-	// That value is now calculated dynamically when the dashboard loads.
+	if (!updatedLog) {
+		throw createError({ status: 500, message: 'Failed to update the time log.' })
+	}
 
-	return { updatedLog }
+	// 6. Pass the result to the response formatter
+	return createTimeoutResponse(updatedLog)
 }

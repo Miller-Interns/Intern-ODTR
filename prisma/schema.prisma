@@ -1,9 +1,15 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+enum Status {
+  INCOMING
+  ONGOING
+  COMPLETED
+}
+
 generator client {
   provider = "prisma-client-js"
-  output = "../app/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 generator kysely {
@@ -62,7 +68,7 @@ model Intern {
   emergency_contact_person String
   emergency_contact_number String
   required_hours           Float //changed from Int
-  status                   Boolean
+  status                   Status  @default(INCOMING) //changed from String
   hours_completed          Float // new
   intern_picture           String? // new
   role                     String? // new
@@ -74,17 +80,17 @@ model Intern {
 }
 
 model TimeLog {
-  id              String   @id @default(uuid())
-  intern          Intern   @relation(fields: [intern_id], references: [id])
-  intern_id       String
-  time_in         DateTime
-  time_out        DateTime? //made optional
-  total_hours     Float   //changed to float
-  admin_remarks   String?
-  intern_notes    String? //renamed from remarks
-  status          Boolean  @default(false)
-  user            User?     @relation(fields: [admin_id], references: [id])
-  admin_id        String? //changed to optional
+  id            String    @id @default(uuid())
+  intern        Intern    @relation(fields: [intern_id], references: [id])
+  intern_id     String
+  time_in       DateTime
+  time_out      DateTime? //made optional
+  total_hours   Float //changed to float
+  admin_remarks String?
+  intern_notes  String? //renamed from remarks
+  status        Boolean   @default(false)
+  user          User?     @relation(fields: [admin_id], references: [id])
+  admin_id      String? //changed to optional
 
   @@map("time_logs")
 }
