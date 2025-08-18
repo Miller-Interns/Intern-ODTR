@@ -1,11 +1,24 @@
 import type { Selectable } from 'kysely'
-import type { Intern, User, Batch, Status, TimeLog } from '../server/db/types.js'
+import type { User } from '~/types/User'
+import type { Batch, Status } from '~/types/Batch'
 
-export type InternQueryRow = Selectable<Intern> & {
-	name: User['name']
-	email: User['email']
-	batch_number: Batch['batch_number']
-}
+export type Intern = {
+	id: string;
+	user_id: string;
+	batch_id: string;
+	school: string;
+	required_hours: number;
+	status: Status;
+	course: string;
+	year: string;
+	contact_number: string;
+	emergency_contact_person: string;
+	emergency_contact_number: string;
+	role: string;
+	intern_picture: string | null;
+	hours_completed: number | null;
+	note: string | null;
+};
 
 export type InternWithDetails = Omit<Selectable<Intern>, 'hours_completed'> & {
 	user: Pick<User, 'name' | 'email'>

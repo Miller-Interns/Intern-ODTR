@@ -1,13 +1,44 @@
-export function formatHours(hours: number | null | undefined): string {
-    if (typeof hours !== 'number') return "0.0";
-    return (hours).toFixed(1);
+/**
+ * A consistent placeholder for invalid or missing data.
+ */
+const NOT_AVAILABLE = 'N/A';
+
+/**
+ * Formats a duration from a decimal number of hours into a more readable "Xh Ym" format.
+ * Example: 8.5 becomes "8h 30m".
+ *
+ * @param hours - The total hours as a number.
+ * @returns A formatted string or 'N/A' if the input is invalid.
+ */
+export function formatDuration(hours: number | null | undefined): string {
+    // Return 'N/A' for null, undefined, or non-finite numbers (NaN, Infinity)
+    if (hours == null || !Number.isFinite(hours)) {
+        return NOT_AVAILABLE;
+    }
+
+    // Ensure hours are not negative for duration display
+    const positiveHours = Math.max(0, hours);
+
+    const totalMinutes = Math.floor(positiveHours * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+
+    return `${h}h ${m}m`;
 }
 
-export function formatTimeOnly(dateString: string | null): string {
-    if (!dateString) return 'N/A';
+/**
+ * Formats a date string or Date object into a localized time-only string.
+ * Example: "2025-08-17T14:30:00.000Z" becomes "2:30 PM".
+ *
+ * @param dateSource - The date string (ISO format recommended) or Date object.
+ * @returns A formatted time string or 'N/A' if the input is invalid.
+ */
+export function formatTimeOnly(dateSource: string | Date | null | undefined): string {
+    if (!dateSource) return NOT_AVAILABLE;
+
     try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Invalid Time';
+        const date = new Date(dateSource);
+        if (isNaN(date.getTime())) return NOT_AVAILABLE; // Invalid date check
 
         return date.toLocaleTimeString('en-US', {
             hour: 'numeric',
@@ -15,23 +46,24 @@ export function formatTimeOnly(dateString: string | null): string {
             hour12: true,
         });
     } catch (e) {
-        return 'Invalid Time';
+        // This catch block is a safeguard, though isNaN should handle most cases.
+        return NOT_AVAILABLE;
     }
 }
 
-export function formatDuration(hours: number | null | undefined): string {
-    if (hours === null || hours === undefined) return '0 Hours';
-    const formattedHours = new Intl.NumberFormat('en-US', {
-        maximumFractionDigits: 2,
-    }).format(hours);
-    return `${formattedHours} Hours`;
-}
+/**
+ * Formats a date string or Date object into a full, localized date string.
+ * Example: "2025-08-17T14:30:00.000Z" becomes "Sun, August 17, 2025".
+ *
+ * @param dateSource - The date string (ISO format recommended) or Date object.
+ * @returns A formatted date string or 'N/A' if the input is invalid.
+ */
+export function formattedDate(dateSource: string | Date | null | undefined): string {
+    if (!dateSource) return NOT_AVAILABLE;
 
-export function formattedDate(dateString: string | null | Date): string {
-    if (!dateString) return 'No Date';
     try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Invalid Date';
+        const date = new Date(dateSource);
+        if (isNaN(date.getTime())) return NOT_AVAILABLE; // Invalid date check
 
         return date.toLocaleDateString('en-US', {
             weekday: 'short',
@@ -40,6 +72,6 @@ export function formattedDate(dateString: string | null | Date): string {
             day: 'numeric',
         });
     } catch (e) {
-        return 'Invalid Date';
+        return NOT_AVAILABLE;
     }
 }

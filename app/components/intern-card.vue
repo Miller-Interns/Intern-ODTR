@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-	import type { InternSummary } from '~/types/InternDetails'
+	import type { InternSummary } from '~/types/Intern'
 
 	const { intern } = defineProps<{
 		intern: InternSummary

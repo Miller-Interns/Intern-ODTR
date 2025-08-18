@@ -63,11 +63,11 @@
 				<template #timelog>
 					<div class="space-y-4">
 						<div
-							v-if="data?.timeLogs && data.timeLogs.length > 0"
+							v-if="timeLogs.length > 0"
 							class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
 						>
 							<InternLogs
-								v-for="log in data.timeLogs"
+								v-for="log in timeLogs"
 								:key="log.id"
 								:log="log"
 								@approved="refresh"
@@ -98,15 +98,24 @@
 
 <script setup lang="ts">
 	import type { InternDetailsResponse } from '~/types/Api'
+	import type { InternLog } from '~/types/TimeLog'
 
 	const route = useRoute()
-
 	const internId = computed(() => route.params.id as string)
 	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/${internId.value}`)
+	
+	// watchEffect(() => {
+	// 	console.log({
+	// 		isPending: pending.value,
+	// 		fetchData: data.value,
+	// 		fetchError: error.value,
+	// 	})
+	// })
+	const form = computed(() => data.value?.intern)
+	const timeLogs = computed<InternLog[]>(() => data.value?.timeLogs ?? [])
 
 	const isEditing = ref(false)
 	const avatarPreviewUrl = ref<string | null>(null)
-	const form = computed(() => data.value?.intern)
 
 	const tabItems = [
 		{ slot: 'personalinfo', label: 'Personal Info' },

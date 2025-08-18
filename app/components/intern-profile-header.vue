@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-	import type { InternWithDetails } from '~/types/InternDetails'
+	import type { InternWithDetails } from '~/types/Intern'
 
 	const { intern } = defineProps<{
 		intern: InternWithDetails

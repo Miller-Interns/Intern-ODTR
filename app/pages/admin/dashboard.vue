@@ -12,7 +12,7 @@
 							size="sm"
 							class="flex h-6 w-6 items-center justify-center rounded-full"
 						>
-							{{ pendingLogs?.length || 0 }}
+							{{ dashboardLogs?.length || 0 }}
 						</UBadge>
 					</div>
 				</div>
@@ -24,7 +24,7 @@
 					label="Approve All"
 					color="primary"
 					variant="solid"
-					:disabled="!pendingLogs || pendingLogs.length === 0 || isApproving"
+					:disabled="!dashboardLogs || dashboardLogs.length === 0 || isApproving"
 					:loading="isApproving"
 					@click="handleApproveAllClick"
 				/>
@@ -53,11 +53,11 @@
 			/>
 
 			<div
-				v-else-if="pendingLogs && pendingLogs.length > 0"
+				v-else-if="dashboardLogs && dashboardLogs.length > 0"
 				class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
 			>
 				<DashboardLogs
-					v-for="log in formattedLogs"
+					v-for="log in dashboardLogs"
 					:key="log.id"
 					:log="log"
 					@approved="refresh"
@@ -80,37 +80,24 @@
 </template>
 
 <script setup lang="ts">
-	import type { ApproveLogPayload, RawPendingLogQueryResult } from '~/types/TimeLogs'
-	import type { DashboardLog } from '~/types/TimeLogs'
+	import type { ApproveLogPayload, DashboardLog } from '~/types/TimeLog'
 	import { useBulkApproval } from '~/composables/useBulkApprove'
 
 	const toast = useToast()
 	const { approveAll, isApproving } = useBulkApproval()
-	const { data: pendingLogs, pending, error, refresh } = useFetch<RawPendingLogQueryResult[]>('/api/timelogs/today')
+	const { data: apiResponse, pending, error, refresh } = useFetch<{ logs: DashboardLog[] }>('/api/timelogs/today')
+	const isLoading = ref(isApproving.value)
 
-	const formattedLogs = computed((): DashboardLog[] => {
-		if (!pendingLogs.value) {
-			return []
-		}
-		return pendingLogs.value.map((rawLog) => ({
-			id: rawLog.id,
-			status: rawLog.status,
-			time_in: new Date(rawLog.time_in).toISOString(),
-			time_out: rawLog.time_out ? new Date(rawLog.time_out).toISOString() : null,
-			total_hours: rawLog.total_hours,
-			intern_notes: rawLog.intern_notes,
-			admin_remarks: rawLog.admin_remarks,
-			intern_name: rawLog.intern.name || 'Unnamed Intern',
-			intern_picture: rawLog.intern.intern_picture,
-		}))
+	const dashboardLogs = computed((): DashboardLog[] => {
+		return apiResponse.value?.logs ?? []
 	})
 
 	async function handleApproveAllClick() {
-		if (!pendingLogs.value || pendingLogs.value.length === 0) {
+		if (dashboardLogs.value.length === 0) {
 			return
 		}
 
-		const logsPayload: ApproveLogPayload[] = pendingLogs.value
+		const logsPayload: ApproveLogPayload[] = dashboardLogs.value
 			.filter((log) => log.time_out)
 			.map((log) => ({
 				logId: log.id,
@@ -126,11 +113,22 @@
 			return
 		}
 
-		if (isApproving.value) return
+		if (isLoading.value) return
 
-		const success = await approveAll(logsPayload)
-		if (success) {
-			await refresh()
+		isLoading.value = true
+		try {
+			const success = await approveAll(logsPayload)
+			if (success) {
+				await refresh()
+			}
+		} catch (e) {
+			toast.add({
+				title: 'Error',
+				description: 'An error occurred while approving logs.',
+				color: 'error',
+			})
+		} finally {
+			isLoading.value = false
 		}
 	}
 

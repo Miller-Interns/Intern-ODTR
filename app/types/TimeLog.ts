@@ -1,13 +1,25 @@
+export type TimeLog = {
+	id: string;
+	intern_id: string;
+	time_in: Date;
+	time_out: Date;
+	total_hours: number;
+	admin_remarks: string | null;
+	intern_notes: string | null;
+	status: boolean;
+	admin_id: string;
+}
+
 export type RawPendingLogQueryResult = {
 	id: string
 	intern_id: string
-	admin_id: string | null
-	status: boolean
-	admin_remarks: string | null
-	intern_notes: string | null
 	time_in: Date
 	time_out: Date | null
 	total_hours: number
+	admin_remarks: string | null
+	intern_notes: string | null
+	status: boolean
+	admin_id: string | null
 	intern: {
 		id: string
 		name: string
@@ -18,26 +30,28 @@ export type RawPendingLogQueryResult = {
 
 export type DashboardLog = {
 	id: string
-	status: boolean
+	intern_id: string
 	time_in: string
 	time_out: string | null
 	total_hours: number
-	intern_notes: string | null
 	admin_remarks: string | null
+	intern_notes: string | null
+	status: boolean
+	admin_id: string
 	intern_name: string
 	intern_picture: string | null
 }
 
-export type TimeLogEntry = {
+export type InternLog = {
 	id: string
 	intern_id: string
-	admin_id: string
-	status: boolean
-	admin_remarks: string | null
-	intern_notes: string | null
 	time_in: string
 	time_out: string | null
 	total_hours: number
+	admin_remarks: string | null
+	intern_notes: string | null
+	status: boolean
+	admin_id: string
 	intern: {
 		id: string
 		name: string

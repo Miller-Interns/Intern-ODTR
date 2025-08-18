@@ -1,22 +1,42 @@
-import { sql, type Kysely } from 'kysely'
-import type { DB, Batch } from '../db/types'
-import type { InternQueryRow, ActiveInternRow } from '../../types/InternDetails'
-import type { Selectable } from 'kysely'
+import { db } from '../db';
+import type { RequestContext } from '../types/RequestContext';
+import type { InternQueryRow } from '~/server/types/InternQueryRow';
 
-export async function getActiveBatch(db: Kysely<DB>): Promise<Selectable<Batch> | undefined> {
-	return await db.selectFrom('batches').selectAll().where('status', '=', 'ONGOING').executeTakeFirst()
-}
+async function getInternDetailsById(
+	id: string,
+	ctx: RequestContext,
+): Promise<InternQueryRow | null> {
+	const qb = ctx.trx ?? db
 
-export async function getInternsByBatchId(db: Kysely<DB>, batchId: string): Promise<ActiveInternRow[]> {
-	return await db
+	const intern = await qb
 		.selectFrom('interns as i')
 		.innerJoin('users as u', 'u.id', 'i.user_id')
 		.innerJoin('batches as b', 'b.id', 'i.batch_id')
-		.leftJoin('time_logs as tl', (join) => join.onRef('tl.intern_id', '=', 'i.id').on('tl.status', '=', true))
-		.where('i.batch_id', '=', batchId)
-		.select(['i.id', 'i.user_id', 'i.batch_id', 'i.required_hours', 'i.intern_picture', 'i.status', 'u.name', 'u.email', 'b.batch_number'])
-		.select(sql<number>`COALESCE(SUM(tl.total_hours), 0)`.as('completed_hours'))
-		.groupBy(['i.id', 'u.id', 'b.id'])
-		.orderBy('u.name', 'asc')
-		.execute()
+		.where('i.id', '=', id)
+		.selectAll('i')
+		.select(['u.name', 'u.email', 'b.batch_number'])
+		// .select((eb) => [
+		// 	eb
+		// 		.selectFrom('time_logs as tl')
+		// 		.select(sql<number>`COALESCE(SUM(tl.total_hours), 0)`.as('total'))
+		// 		.where('tl.intern_id', '=', id)
+		// 		.where('tl.status', '=', true)
+		// 		.as('completed_hours'),
+		// ])
+		.executeTakeFirst()
+	return intern ?? null
+}
+
+async function updateCompletedHours(id: string, newCompletedHours: number, ctx: RequestContext) {
+	const qb = (ctx.trx ??= db)
+	return qb
+		.updateTable('interns')
+		.set({ hours_completed: newCompletedHours })
+		.where('id', '=', id)
+		.executeTakeFirst()
+}
+
+export const internService = {
+	getInternDetailsById,
+	updateCompletedHours
 }

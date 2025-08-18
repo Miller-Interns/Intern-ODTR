@@ -1,5 +1,5 @@
 import { bulkApproveLogsApi } from '~/server/utils/api/time-log'
-import type { ApproveLogPayload, BulkApprovePayload } from '~/types/TimeLogs'
+import type { ApproveLogPayload, BulkApprovePayload } from '~/types/TimeLog'
 
 export function useBulkApproval() {
 	const isApproving = ref(false)

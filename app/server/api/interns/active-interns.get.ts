@@ -1,9 +1,9 @@
-import { useGetActiveInterns } from '~/server/use-case/get-active-interns.use-case'
+import { getActiveInterns } from '~/server/use-case/interns/get-active-interns.use-case'
 import type { ActiveInternsApiResponse } from '~/types/Api'
 
 export default defineEventHandler(async (event): Promise<ActiveInternsApiResponse> => {
 	try {
-		const activeInternsData = await useGetActiveInterns(event.context.db)
+		const activeInternsData = await getActiveInterns(event.context.db)
 		return activeInternsData
 	} catch (error: any) {
 		if (error.message === 'No active batch found.') {

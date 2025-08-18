@@ -1,5 +1,5 @@
 import type { BulkApprovalApiResponse } from '~/types/Api'
-import type { ApproveLogPayload, BulkApprovePayload } from '~/types/TimeLogs'
+import type { ApproveLogPayload, BulkApprovePayload } from '~/types/TimeLog'
 
 export function approveLogApi(payload: ApproveLogPayload) {
 	return $fetch('/api/timelogs/approve-log', {

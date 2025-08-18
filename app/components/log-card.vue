@@ -53,11 +53,11 @@
 <script setup lang="ts">
 	import { onClickOutside } from '@vueuse/core'
 	import { useLogApproval } from '~/composables/useApproveLog'
-	import type { DashboardLog, TimeLogEntry } from '~/types/TimeLogs'
-	import { formatHours, formatTimeOnly } from '~/server/utils/formatters'
+	import type { DashboardLog, InternLog } from '~/types/TimeLog'
+	import { formatDuration, formatTimeOnly } from '~/server/utils/formatters'
 	import { calculateDisplayHours } from '~/server/utils/total-hours'
 
-	type Log = DashboardLog | TimeLogEntry
+	type Log = DashboardLog | InternLog
 
 	const props = defineProps<{
 		log: Log
@@ -93,10 +93,18 @@
 
 	const totalHoursForDisplay = computed(() => {
 		if (props.log.status === true) {
-			return formatHours(props.log.total_hours)
+			return formatDuration(props.log.total_hours)
 		}
-		const { displayHours } = calculateDisplayHours(props.log.time_in, props.log.time_out)
-		return formatHours(displayHours)
+		const timeIn = new Date(props.log.time_in)
+		const timeOut = new Date(props.log.time_out)
+		if (isNaN(timeIn.getTime()) || isNaN(timeOut.getTime())) {
+			return formatDuration(null)
+		}
+
+		const durationMs = timeOut.getTime() - timeIn.getTime()
+		const durationHours = durationMs / (1000 * 60 * 60)
+
+		return formatDuration(durationHours)
 	})
 
 	defineExpose({

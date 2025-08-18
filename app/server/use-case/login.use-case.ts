@@ -6,8 +6,8 @@ import z from 'zod'
 import { createSchemaValidator } from '../utils/create-schema-validator'
 import { userService } from '../service/user.service'
 import type { RequestContext } from '../types/RequestContext'
-import { User } from '../db/types'
-import { Selectable } from 'kysely'
+import type { User } from '../db/types'
+import type { Selectable } from 'kysely'
 
 const dtoSchema = z.object({
 	email: z.string(),

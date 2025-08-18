@@ -1,11 +1,22 @@
 import { z } from 'zod'
+import type { Status } from '~/server/db/types.d.ts'
+
+export const StatusSchema = z.enum([
+	"INCOMING",
+	"ONGOING",
+	"COMPLETED"
+]);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _statusCheck: Status = "" as z.infer<typeof StatusSchema>;
 
 export const BatchSchema = z.object({
 	id: z.string(),
 	batch_number: z.string(),
 	start_date: z.date(),
-	end_date: z.date(),
-	status: z.boolean(),
+	end_date: z.date().nullable(),
+	status: StatusSchema,
+	supervisorId: z.string(),
 })
 
 export const InternSchema = z.object({
@@ -13,13 +24,17 @@ export const InternSchema = z.object({
 	user_id: z.string(),
 	batch_id: z.string(),
 	school: z.string(),
+	required_hours: z.number(),
+	status: StatusSchema,
 	course: z.string(),
 	year: z.string(),
 	contact_number: z.string(),
 	emergency_contact_person: z.string(),
 	emergency_contact_number: z.string(),
-	required_hours: z.number(),
-	status: z.boolean(),
+	role: z.string(),
+	intern_picture: z.string().nullable(),
+	hours_completed: z.number().nullable(),
+	note: z.string().nullable(),
 })
 
 export const TimeLogSchema = z.object({
@@ -27,9 +42,9 @@ export const TimeLogSchema = z.object({
 	intern_id: z.string(),
 	time_in: z.date(),
 	time_out: z.date(),
-	overtime: z.number().nullable(),
 	total_hours: z.number(),
-	remarks: z.string().nullable(),
+	admin_remarks: z.string().nullable(),
+	intern_notes: z.string().nullable(),
 	status: z.boolean(),
 	admin_id: z.string(),
 })

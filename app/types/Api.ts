@@ -1,7 +1,7 @@
 import type { Selectable } from 'kysely'
 import type { Batch } from '../../app/server/db/types.d.ts'
-import type { InternWithDetails, InternSummary } from './InternDetails'
-import type { TimeLogEntry } from './TimeLogs'
+import type { InternWithDetails, InternSummary } from './Intern.js'
+import type { InternLog } from './TimeLog.js'
 
 export type ActiveInternsApiResponse = {
 	batch: Selectable<Batch>
@@ -15,7 +15,7 @@ export type ActiveInternsResponse = {
 
 export type InternDetailsResponse = {
 	intern: InternWithDetails
-	timeLogs: TimeLogEntry[]
+	timeLogs: InternLog[]
 }
 
 export type BulkApprovalApiResponse = {

@@ -49,11 +49,11 @@
 </template>
 
 <script setup lang="ts">
-	import type { TimeLogEntry } from '~/types/TimeLogs'
+	import type { InternLog } from '~/types/TimeLog'
 	import { useTimeLogState } from '~/composables/useTimelogStates'
 	import { formattedDate } from '~/server/utils/formatters'
 
-	const props = defineProps<{ log: TimeLogEntry }>()
+	const props = defineProps<{ log: InternLog }>()
 	const emit = defineEmits<{ (e: 'approved'): void }>()
 	const logCardRef = ref()
 	const { isPending } = useTimeLogState(props.log)

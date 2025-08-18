@@ -1,7 +1,7 @@
 import { computed } from 'vue'
-import type { TimeLogEntry } from '~/types/TimeLogs'
+import type { InternLog } from '~/types/TimeLog'
 
-export function useTimeLogState(log: TimeLogEntry) {
+export function useTimeLogState(log: InternLog) {
 	const isPending = computed(() => !log.status)
 
 	const derivedStatus = computed<'pending' | 'approved'>(() => {
