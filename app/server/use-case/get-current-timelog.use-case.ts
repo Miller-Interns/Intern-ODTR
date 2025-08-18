@@ -15,7 +15,6 @@ export const getCurrentTimeLogUseCase = async (context: RequestContext) => {
 	let activeTimeLog = null
 	let lastCompletedLog = null
 
-	// FIX: Only search for logs if the intern is ONGOING.
 	if (intern.status === Status.ONGOING) {
 		activeTimeLog = await timeLogService.getActiveTimeLogByInternId(intern.id, context)
 		if (!activeTimeLog) {

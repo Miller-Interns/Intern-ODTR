@@ -3,19 +3,14 @@ import type { Ref } from 'vue'
 import type { Selectable } from 'kysely'
 import type { Intern, User } from '~/server/db/types'
 
-// Type definition for the data fetched from the API
 type ProfileDataResponse = {
 	profile: Selectable<Intern> & { email: string; name: string | null }
 }
 
-// This is our new composable function.
-// It accepts the fileInput ref from the component, as that is tied to the template.
 export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	const { clear } = useUserSession()
 	const router = useRouter()
 	const toast = useToast()
-
-	// --- All reactive state is managed here ---
 	const isPasswordVisible = ref(false)
 	const passwordError = ref<string | undefined>(undefined)
 	const isLogoutModalOpen = ref(false)
@@ -40,10 +35,8 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		notes: '',
 	})
 
-	// --- Data Fetching ---
 	const { data, pending, error, refresh } = useFetch<ProfileDataResponse>('/api/profile/fetch')
 
-	// --- Methods ---
 	function openFileInput() {
 		fileInput.value?.click()
 	}
@@ -117,7 +110,6 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		await router.push('/login')
 	}
 
-	// --- Return everything the component's template needs ---
 	return {
 		data,
 		pending,

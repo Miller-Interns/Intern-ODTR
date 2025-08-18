@@ -2,7 +2,7 @@ import z from 'zod'
 import { checkAuthentication } from '../utils/check-authentication'
 import { createSchemaValidator } from '../utils/create-schema-validator'
 import { userService } from '../service/user.service'
-import { createUpdateProfileResponse } from '../response/update-profile.response' // Import the new response formatter
+import { createUpdateProfileResponse } from '../response/update-profile.response'
 import type { RequestContext } from '../types/RequestContext'
 
 const dtoSchema = z.object({
@@ -24,19 +24,9 @@ const dtoSchema = z.object({
 const validateDTO = createSchemaValidator(dtoSchema)
 type UpdateProfileDTO = z.infer<typeof dtoSchema>
 
-/**
- * This use case orchestrates the process of updating an intern's profile information.
- */
 export const updateInternProfileUseCase = async (dto: UpdateProfileDTO, context: RequestContext) => {
-	// 1. Authenticate the user
 	const userId = await checkAuthentication(context)
-
-	// 2. Validate the incoming data
 	const validatedData = await validateDTO(dto)
-
-	// 3. Call the service to perform the database update
 	await userService.updateUserProfile(userId, validatedData)
-
-	// 4. Pass control to the response formatter to build the final API response
 	return createUpdateProfileResponse()
 }

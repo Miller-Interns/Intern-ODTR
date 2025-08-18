@@ -2,7 +2,6 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import type { Selectable } from 'kysely'
 import type { TimeLog } from '~/server/db/types'
 
-// Define the shape of the API response
 type DashboardDataResponse = {
 	activeTimeLog: Selectable<TimeLog> | null
 	lastCompletedLog: Selectable<TimeLog> | null
@@ -11,13 +10,10 @@ type DashboardDataResponse = {
 	renderedHours: number
 }
 
-// This is our new composable function
 export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>) {
 	const { session } = useUserSession()
 	const toast = useToast()
 	const typedUser = computed(() => session.value?.user as { name?: string | null } | undefined)
-
-	// --- Reactive State ---
 	const intern_notes = ref('')
 	const elapsedTime = ref(0)
 	const activeTimeLog = ref<Selectable<TimeLog> | null>(null)
@@ -26,8 +22,6 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 	const showRemarksInput = ref(false)
 	const internStatus = ref<boolean>(true)
 	let timerInterval: NodeJS.Timeout | null = null
-
-	// --- Data Fetching ---
 	const {
 		data: dashboardData,
 		pending,
@@ -35,7 +29,6 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		refresh,
 	} = useFetch<DashboardDataResponse>('/api/timelog/current', { watch: [typedUser], immediate: !!typedUser.value })
 
-	// --- Methods ---
 	function updateElapsedTime() {
 		if (!activeTimeLog.value?.time_in) return
 		const timeInDate = new Date(String(activeTimeLog.value.time_in))
@@ -65,7 +58,6 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		}
 	}
 
-	// --- Computed Properties ---
 	const isTimeOutDisabled = computed(() => {
 		if (isSubmitting.value) {
 			return true
@@ -75,7 +67,7 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		}
 		return intern_notes.value.trim() === ''
 	})
-	// --- Watchers and Lifecycle Hooks ---
+
 	watch(
 		dashboardData,
 		(newData) => {
@@ -113,8 +105,6 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		if (timerInterval) clearInterval(timerInterval)
 	})
 
-	// --- Return Values ---
-	// We explicitly return all the state and methods that the component will need.
 	return {
 		pending,
 		error,

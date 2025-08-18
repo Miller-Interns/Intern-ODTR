@@ -1,24 +1,14 @@
 <template>
-	<!-- FIX: Added extra bottom padding (pb-40) to make space for the sticky button and the nav -->
 	<div class="bg-black-50 flex min-h-screen flex-col pb-40">
-		<!-- Header -->
 		<header class="p-4">
 			<h1 class="text-black-800 text-2xl font-bold">Time Logs</h1>
 		</header>
 
-		<!-- Loading State -->
-		<div
-			v-if="pending"
-			class="flex flex-1 items-center justify-center"
-		>
+		<div v-if="pending" class="flex flex-1 items-center justify-center">
 			<p>Loading Time Logs...</p>
 		</div>
 
-		<!-- Error State -->
-		<div
-			v-else-if="error"
-			class="flex flex-1 items-center justify-center text-center text-red-500"
-		>
+		<div v-else-if="error" class="flex flex-1 items-center justify-center text-center text-red-500">
 			<p>
 				Could not load time logs.
 				<br />
@@ -26,35 +16,18 @@
 			</p>
 		</div>
 
-		<!-- Main Content: List of Time Logs -->
-		<div
-			v-else-if="data?.timeLogs"
-			class="space-y-4 px-4"
-		>
-			<!-- Empty State -->
-			<div
-				v-if="data.timeLogs.length === 0"
-				class="text-center"
-			>
+		<div v-else-if="data?.timeLogs" class="space-y-4 px-4">
+			<div v-if="data.timeLogs.length === 0" class="text-center">
 				<UCard class="text-md p-3 text-gray-500 shadow-lg">
 					<p>No time logs recorded yet. Once you log time, it will show up here.</p>
 				</UCard>
 			</div>
 
-			<!-- Loop through each time log -->
-			<UCard
-				v-for="log in data.timeLogs"
-				class="shadow-lg"
-				:key="log.id"
-			>
+			<UCard v-for="log in data.timeLogs" class="shadow-lg" :key="log.id">
 				<template #header>
 					<div class="flex items-center justify-between">
 						<p class="text-black-700 font-semibold">{{ formattedDate(log.time_in) }}</p>
-						<UBadge
-							v-if="!log.status"
-							color="warning"
-							variant="soft"
-						>
+						<UBadge v-if="!log.status" color="warning" variant="soft">
 							Pending Approval
 						</UBadge>
 					</div>
@@ -80,10 +53,8 @@
 							</div>
 						</div>
 					</div>
-					<div
-						v-if="log.intern_notes || log.admin_remarks"
-						class="mt-4 space-y-2 border-t border-gray-200 pt-4 text-left"
-					>
+					<div v-if="log.intern_notes || log.admin_remarks"
+						class="mt-4 space-y-2 border-t border-gray-200 pt-4 text-left">
 						<div v-if="log.intern_notes">
 							<p class="text-black-500 text-sm">Intern Notes:</p>
 							<p class="text-black-800 bg-black-50 rounded-md p-2 text-sm">{{ log.intern_notes }}</p>
@@ -97,25 +68,22 @@
 			</UCard>
 		</div>
 
-		<!-- NEW FEATURE: Sticky Export Button -->
 		<div class="fixed right-0 bottom-20 left-0 p-4">
-			<UButton
-				block
-				size="lg"
-				icon="i-heroicons-arrow-down-tray"
-				@click="exportDTR"
-				:disabled="!data || data.timeLogs.length === 0"
-			>
+			<UButton block size="lg" icon="i-heroicons-arrow-down-tray" @click="exportDTR"
+				:disabled="!data || data.timeLogs.length === 0">
 				Export DTR
 			</UButton>
 		</div>
-
-		<!-- Bottom Navigation -->
 		<LayoutBottomNav />
 	</div>
 </template>
 
 <script setup lang="ts">
-	// All the complex logic is now neatly contained within our new composable.
-	const { pending, error, data, formattedDate, formatTime, exportDTR } = useTimeLogs()
+const { pending,
+	error,
+	data,
+	formattedDate,
+	formatTime,
+	exportDTR
+} = useTimeLogs()
 </script>

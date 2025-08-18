@@ -67,12 +67,12 @@ model Intern {
   contact_number           String
   emergency_contact_person String
   emergency_contact_number String
-  required_hours           Float //changed from Int
-  status                   Status  @default(INCOMING) //changed from String
-  hours_completed          Float // new
-  intern_picture           String? // new
-  role                     String? // new
-  notes                    String? // new
+  required_hours           Float
+  status                   Status  @default(INCOMING)
+  hours_completed          Float
+  intern_picture           String?
+  role                     String?
+  notes                    String?
 
   TimeLog TimeLog[]
 
@@ -84,13 +84,13 @@ model TimeLog {
   intern        Intern    @relation(fields: [intern_id], references: [id])
   intern_id     String
   time_in       DateTime
-  time_out      DateTime? //made optional
-  total_hours   Float //changed to float
+  time_out      DateTime?
+  total_hours   Float
   admin_remarks String?
-  intern_notes  String? //renamed from remarks
+  intern_notes  String?
   status        Boolean   @default(false)
   user          User?     @relation(fields: [admin_id], references: [id])
-  admin_id      String? //changed to optional
+  admin_id      String?
 
   @@map("time_logs")
 }

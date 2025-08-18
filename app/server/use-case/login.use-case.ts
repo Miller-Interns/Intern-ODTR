@@ -51,21 +51,18 @@ export async function loginUseCase(dto: LoginDTO, context: RequestContext): Prom
 				await db.transaction().execute(async (trx) => {
 					let shouldTimeIn = false
 
-					// Case 1: First-ever login. Activate the intern.
-					// FIX: Check for the INCOMING status.
 					if (internProfile.status === Status.INCOMING) {
 						await trx
 							.updateTable('interns')
-							.set({ status: Status.ONGOING }) // FIX: Update status to ONGOING
+							.set({ status: Status.ONGOING })
 							.where('id', '=', internProfile.id)
 							.execute()
 						shouldTimeIn = true
 					}
-					// Case 2: Subsequent login for an already active intern.
+
 					else if (internProfile.status === Status.ONGOING) {
 						shouldTimeIn = true
 					}
-					// If status is COMPLETED or anything else, they are not timed in.
 
 					if (shouldTimeIn) {
 						await trx

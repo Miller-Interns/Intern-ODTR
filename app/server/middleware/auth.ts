@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 import type { JwtPayload } from 'jsonwebtoken'
 
 export default defineEventHandler((event) => {
-	// Always initialize the auth context for every request.
 	event.context.auth = {
 		userId: undefined,
 	}
@@ -15,11 +14,9 @@ export default defineEventHandler((event) => {
 		try {
 			const decoded = jwt.verify(token, jwtSecret)
 
-			// FIX: Change the check from looking for '.id' to looking for '.userId'
 			if (typeof decoded === 'object' && (decoded as JwtPayload).userId) {
 				const payload = decoded as JwtPayload
 				event.context.user = payload
-				// FIX: Assign the value from the correct field, 'payload.userId'
 				event.context.auth.userId = payload.userId
 			}
 		} catch (err) {

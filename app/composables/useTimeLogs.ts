@@ -2,7 +2,6 @@ import { ref, computed } from 'vue'
 import type { Selectable } from 'kysely'
 import type { TimeLog } from '~/server/db/types'
 
-// --- Type Definitions ---
 interface SessionUser {
 	id: string
 	email: string
@@ -18,27 +17,19 @@ type TimeLogsResponse = {
 	timeLogs: TimeLogWithAdmin[]
 }
 
-// This is our new composable function
 export function useTimeLogs() {
 	const { session } = useUserSession()
 	const toast = useToast()
 	const typedUser = computed(() => session.value?.user as SessionUser | undefined)
-
-	// --- Data Fetching ---
 	const { data, pending, error } = useFetch<TimeLogsResponse>('/api/timelog/list')
-
-	// --- Helper Functions for Formatting ---
 	const formattedDate = (dateString: string | Date) => {
 		if (!dateString) return ''
 		return new Date(String(dateString)).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })
 	}
-
 	const formatTime = (dateString: string | Date | null) => {
 		if (!dateString) return ''
 		return new Date(String(dateString)).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
 	}
-
-	// Helper for CSV-specific time format
 	const format24HourTime = (dateString: string | Date | null): string => {
 		if (!dateString) return ''
 		const date = new Date(String(dateString))
@@ -47,7 +38,6 @@ export function useTimeLogs() {
 		return `${hours}:${minutes}`
 	}
 
-	// --- CSV Export Logic ---
 	function exportDTR() {
 		if (!data.value || !data.value.timeLogs || data.value.timeLogs.length === 0) {
 			toast.add({ id: 'export_error', title: 'No time logs to export.', color: 'error' })
@@ -90,8 +80,6 @@ export function useTimeLogs() {
 		toast.add({ id: 'export_success', title: 'DTR exported successfully!', color: 'success' })
 	}
 
-	// --- Return Values ---
-	// We explicitly return all the state and methods that the component will need.
 	return {
 		pending,
 		error,
