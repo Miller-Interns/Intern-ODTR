@@ -131,9 +131,14 @@
 			})
 
 			if (response) {
-				await fetch()
-				navigateTo({ name: RouterNames.DASHBOARD }, { replace: true })
-			}
+            await fetch()
+
+            if (user.value?.isAdmin) {
+                navigateTo({ name: 'admin-dashboard' }, { replace: true }) 
+            } else {
+                navigateTo({ name: 'intern-dashboard' }, { replace: true })
+            }
+        }
 		} catch (error: any) {
 			emailError.value = true
 			passwordError.value = error.data?.statusMessage || 'Incorrect Password'

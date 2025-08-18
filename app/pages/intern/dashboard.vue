@@ -5,7 +5,7 @@
 	>
 		<h1>Dashboard</h1>
 		<p>Welcome, hello!</p>
-		<p>This page is for admin.</p>
+		<p>This page is for intern</p>
 		<button
 			@click="handleLogout"
 			class="submit-button"
