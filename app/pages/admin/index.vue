@@ -56,7 +56,7 @@
                       <p class="font-medium">{{ batch.supervisor_name || 'N/A' }}</p>
                     </div>
                   </div>
-                  <NuxtLink :to="`batches/edit-batch?id=${batch.id}`">
+                  <NuxtLink :to="`admin/edit-batch?id=${batch.id}`">
                     <UButton icon="i-lucide-pen" color=primary variant="ghost" class="min-w-[20px] min-h-[20px]"
                       aria-label="Edit Batch" />
                   </NuxtLink>
@@ -97,7 +97,7 @@
         </section>
 
         <section class="w-full mt-3 flex flex-col  mb-4 bottom-0 left-1/2 -translate-x-1/2 p-4 z-50 fixed">
-          <NuxtLink to="/batches/create-batch">
+          <NuxtLink to="/admin/create-batch">
             <UButton  icon="i-lucide-plus" label="Create Batch" variant=solid color=primary block
               size=xl />
           </NuxtLink>

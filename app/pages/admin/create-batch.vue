@@ -3,7 +3,7 @@
     <div class="max-w-md mx-auto p-6 w-full">
 
       <div class="flex items-center space-x-4">
-        <NuxtLink to="/batches">
+        <NuxtLink to="/admin">
           <UButton icon="i-lucide-arrow-left" color=secondary variant="ghost" aria-label="Go back" />
         </NuxtLink>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
