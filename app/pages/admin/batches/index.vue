@@ -30,7 +30,7 @@
       <NuxtLink
         v-for="batch in batches"
         :key="batch.id"
-        :to="`/batches/${batch.id}`"
+        :to="`/admin/batches/${batch.id}`"
         class="block group"
       >
         <UCard class="h-full group-hover:ring-2 group-hover:ring-primary-500 dark:group-hover:ring-primary-400 transition-all">

@@ -1,8 +1,8 @@
 <template>
-  <div class="flex items-center gap-4 sm:gap-6">
+  <div class="flex items-start gap-4 sm:gap-6  ">
     <template v-if="intern">
       <div class="relative flex-shrink-0">
-        <UAvatar :src="previewSrc || intern.internPicture || undefined" :alt="intern.fullName || 'Intern Avatar'" size="3xl" />
+        <UAvatar :src="previewSrc || intern.internPicture || undefined" :alt="intern.fullName || 'Intern Avatar'" class="h-[56px] w-[56px]"  />
         <div v-if="isEditing" class="absolute bottom-0 -right-1">
           <UButton
             icon="i-heroicons-camera-solid"

@@ -8,7 +8,7 @@
         size="xl"
         class="-ml-4"
         aria-label="Back"
-        :to="batchId ? `/batches/${batchId}` : '/batches'"
+        :to="batchId ? `admin/batches/${batchId}` : '/batches'"
       />
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
     </div>
@@ -192,7 +192,7 @@ async function handleFormSubmit(event: FormSubmitEvent<AddInternDTO>) {
     })
 
     toast.add({ title: 'Success!', description: 'Intern has been added successfully.', color: 'success' })
-    await router.push(`/batches/${batchId.value}`)
+    await router.push(`/admin/batches/${batchId.value}`)
 
   } catch (error: any) {
     console.error('Failed to add intern:', error)

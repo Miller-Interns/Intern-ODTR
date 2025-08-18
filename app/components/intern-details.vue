@@ -4,87 +4,105 @@
       <h2 class="text-base font-semibold leading-7 text-black dark:text-white">
         Intern details:
       </h2>
-      <div class="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <UFormField>
-          <template #label>
-            First Name <span v-if="!details.firstName" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.firstName" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField label="Middle Name (Optional):">
-          <UInput v-model="details.middleName" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Last Name <span v-if="!details.lastName" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.lastName" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Email <span v-if="!details.email" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.email" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-          <UFormField>
-          <template #label>
-            Contact Number <span v-if="!details.contactNumber" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.contactNumber" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Emergency Contact Person <span v-if="!details.emergencyContactPerson" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.emergencyContactPerson" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Emergency Contact Number <span v-if="!details.emergencyContactNumber" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.emergencyContactNumber" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
+      <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3">
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-700 dark:text-gray-200">First Name</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.firstName" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.firstName || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Middle Name (Optional)</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.middleName" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.middleName || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Last Name</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.lastName" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.lastName || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Email</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.email" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.email || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Contact Number</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.contactNumber" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.contactNumber || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Emergency Contact Person</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.emergencyContactPerson" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.emergencyContactPerson || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Emergency Contact Number</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.emergencyContactNumber" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.emergencyContactNumber || '-' }}</p>
+          </div>
+        </div>
       </div>
     </div>
     <div>
       <h2 class="text-base font-semibold leading-7 text-black dark:text-white">
         Internship information:
       </h2>
-      <div class="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <UFormField>
-          <template #label>
-            School <span v-if="!details.school" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.school" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Course and Year Level <span v-if="!details.courseYear" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.courseYear" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Required hours <span v-if="!details.requiredHours && details.requiredHours !== 0" class="text-red-500">*</span>
-          </template>
-          <UInput v-model.number="details.requiredHours" type="number" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField>
-          <template #label>
-            Role/Position <span v-if="!details.role" class="text-red-500">*</span>
-          </template>
-          <UInput v-model="details.role" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
-        <UFormField label="Note/Remarks (Optional):" class="lg:col-span-3">
-          <UTextarea v-model="details.note" :disabled="!isEditing" size="xl" class="w-full" />
-        </UFormField>
+      <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3">
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">School</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.school" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.school || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Course and Year Level</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.courseYear" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.courseYear || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Required Hours</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model.number="details.requiredHours" type="number" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.requiredHours ? `${details.requiredHours} hours` : '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Role/Position</label>
+          <div class="mt-2">
+            <UInput v-if="isEditing" v-model="details.role" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white">{{ details.role || '-' }}</p>
+          </div>
+        </div>
+        <div class="form-field-container lg:col-span-3">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Note/Remarks (Optional)</label>
+          <div class="mt-2">
+            <UTextarea v-if="isEditing" v-model="details.note" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white whitespace-pre-wrap">{{ details.note || 'None' }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { UFormField, UInput } from '#components';
+import { UFormField, UInput, UTextarea } from '#components';
 import type { InternDetails } from '~/types/Intern';
 
 defineProps<{
