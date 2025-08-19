@@ -22,24 +22,32 @@ export const updateInternDetailsUseCase = async (dto: UpdateInternDTO) => {
     emergencyContactNumber,
     school,
     role,
-    note
+    notes
   } = validatedData
   
-  const displayName = [lastName, firstName, middleName].filter(Boolean).join(',');
+  const middleInitial = middleName ? `${middleName.charAt(0).toUpperCase()}.` : '';
+  const displayName = [firstName, middleInitial, lastName].filter(Boolean).join(' ');
+
   const [course, year] = courseYear.split('-').map((part: string) => part.trim())
 
   const updatedInternWithUser = await internService.updateInternAndUser({
     userId,
     internId,
-    userData: { name: displayName, email },
+    userData: { 
+      name: displayName, 
+      email 
+    },
     internData: { 
+      first_name: firstName,
+      middle_name: middleName,
+      last_name: lastName,
       required_hours: requiredHours,
       contact_number: contactNumber,
       emergency_contact_person: emergencyContactPerson,
       emergency_contact_number: emergencyContactNumber,
       school: school,
       role: role,
-      notes: note,
+      notes: notes,
       course, 
       year 
     },

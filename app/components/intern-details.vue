@@ -92,8 +92,8 @@
         <div class="form-field-container lg:col-span-3">
           <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Note/Remarks (Optional)</label>
           <div class="mt-2">
-            <UTextarea v-if="isEditing" v-model="details.note" size="xl" class="w-full"/>
-            <p v-else class="text-base text-black dark:text-white whitespace-pre-wrap">{{ details.note || 'None' }}</p>
+            <UTextarea v-if="isEditing" v-model="details.notes" size="xl" class="w-full"/>
+            <p v-else class="text-base text-black dark:text-white whitespace-pre-wrap">{{ details.notes || 'None' }}</p>
           </div>
         </div>
       </div>

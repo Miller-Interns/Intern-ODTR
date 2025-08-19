@@ -8,7 +8,7 @@
         size="xl"
         class="-ml-4"
         aria-label="Back"
-        :to="batchId ? `admin/batches/${batchId}` : '/batches'"
+        :to="batchId ? `/admin/batches/${batchId}` : '/batches'"
       />
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Intern</h1>
     </div>

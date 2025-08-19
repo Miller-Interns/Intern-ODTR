@@ -24,7 +24,7 @@ export const AddInternSchema = z.object({
   emergencyContactPerson: z.string().optional(),
   emergencyContactNumber: z.string().optional(),
   role: z.string().optional(),
-  note: z.string().optional(),
+  notes: z.string().optional(),
 })
 
 export type AddInternDTO = z.infer<typeof AddInternSchema>
@@ -45,7 +45,7 @@ export type InternDetails = {
   year: string;
   requiredHours: number;
   role: string;
-  note: string | null;
+  notes: string | null;
   status: 'INCOMING' | 'ONGOING' | 'COMPLETED';
   internPicture: string | null;
   hoursCompleted: number | null;
@@ -67,7 +67,7 @@ export const UpdateInternSchema = z.object({
   courseYear: z.string().min(3),
   requiredHours: z.number().positive(),
   role: z.string().optional(),
-  note: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export type UpdateInternDTO = z.infer<typeof UpdateInternSchema>;

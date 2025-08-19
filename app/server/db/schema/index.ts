@@ -12,6 +12,9 @@ export const InternSchema = z.object({
   id: z.string(),
   user_id: z.string(),
   batch_id: z.string(),
+  first_name: z.string(),
+  middle_name: z.string(),
+  last_name: z.string(),
   school: z.string(),
   course: z.string(),
   year: z.string(),
@@ -23,7 +26,7 @@ export const InternSchema = z.object({
   role: z.string(),
   intern_picture: z.string(),
   hours_completed: z.number(),
-  note: z.string(),
+  notes: z.string(),
 })
 
 export const TimeLogSchema = z.object({

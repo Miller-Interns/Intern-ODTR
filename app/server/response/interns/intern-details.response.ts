@@ -16,7 +16,7 @@ export const InternDetailsResponseSchema = z.object({
   year: z.string(),
   requiredHours: z.number(),
   role: z.string(),
-  note: z.string().nullable(),
+  notes: z.string().nullable(),
   status: z.enum(['INCOMING', 'ONGOING', 'COMPLETED']),
   internPicture: z.string().nullable(),
   hoursCompleted: z.number().nullable(),

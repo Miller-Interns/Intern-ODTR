@@ -1,44 +1,22 @@
-import type { Intern } from '@prisma/client'
+import type { Intern } from '~/server/db/types.d' 
 import { AddInternResponseSchema, type AddInternResponse } from '~/server/response/add_intern/add-intern.response'
-import type { InternWithUser } from '~/server/service/interns/intern.service'
 import { InternDetailsResponseSchema, type InternDetailsResponse } from '~/server/response/interns/intern-details.response'
+import type { InternWithUser } from '~/server/service/interns/intern.service'
 
 function toAddInternResponse(intern: Intern): AddInternResponse {
   return AddInternResponseSchema.parse(intern);
 }
 
 function toInternDetailsResponse(internWithUser: InternWithUser): InternDetailsResponse {
-  let firstName = '';
-  let middleName = '';
-  let lastName = '';
-  const nameFromDb = (internWithUser.name as string) || '';
   
-  if (nameFromDb.includes(',')) {
-    const nameParts = nameFromDb.split(',');
-    lastName = nameParts[0]?.trim() || '';
-    firstName = nameParts[1]?.trim() || '';
-    middleName = nameParts[2]?.trim() || '';
-  } else {
-    const nameParts = nameFromDb.split(' ').filter(Boolean);
-    if (nameParts.length > 0) {
-      firstName = nameParts.shift() || ''; 
-      if (nameParts.length > 0) {
-        lastName = nameParts.pop() || ''; 
-      }
-      middleName = nameParts.join(' '); 
-    }
-  }
-
-  const middleInitial = middleName ? `${middleName.charAt(0).toUpperCase()}.` : '';
-  const finalFullName = [firstName, middleInitial, lastName].filter(Boolean).join(' ');
-
   const viewModel = {
     userId: internWithUser.user_id,
-    firstName,
-    middleName,
-    lastName,
+    firstName: internWithUser.first_name,
+    middleName: internWithUser.middle_name || '',
+    lastName: internWithUser.last_name,
     email: internWithUser.email,
     internId: internWithUser.id,
+    fullName: internWithUser.name || '',
     batchId: internWithUser.batch_id,
     contactNumber: internWithUser.contact_number,
     emergencyContactPerson: internWithUser.emergency_contact_person,
@@ -48,11 +26,10 @@ function toInternDetailsResponse(internWithUser: InternWithUser): InternDetailsR
     year: internWithUser.year,
     requiredHours: internWithUser.required_hours,
     role: internWithUser.role,
-    note: internWithUser.note,
+    notes: internWithUser.notes,
     status: internWithUser.status,
     internPicture: internWithUser.intern_picture,
     hoursCompleted: internWithUser.hours_completed,
-    fullName: finalFullName,
     courseYear: `${internWithUser.course} - ${internWithUser.year}`,
   };
 

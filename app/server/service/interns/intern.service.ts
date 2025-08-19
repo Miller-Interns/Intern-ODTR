@@ -4,19 +4,33 @@ import type { Updateable, Insertable, Transaction } from 'kysely'
 import type { DB } from '~/server/db/types'
 
 export type InternWithUser = Intern & User & { user_id_from_users?: string };
-type CreateInternAndUserPayload = { userData: Insertable<User>; internData: Omit<Insertable<Intern>, 'user_id'> }
+
+type CreateInternAndUserPayload = {
+  userData: Insertable<User>,
+  internData: Omit<Insertable<Intern>, 'user_id'>
+}
 
 async function createInternAndUser(payload: CreateInternAndUserPayload): Promise<Intern> {
   const { userData, internData } = payload;
   
   const result = await db.transaction().execute(async (trx) => {
-    const newUser = await trx.insertInto('users').values(userData).returning('id').executeTakeFirstOrThrow();
-    const newIntern = await trx.insertInto('interns').values({ ...internData, user_id: newUser.id }).returningAll().executeTakeFirstOrThrow();
+    await trx
+      .insertInto('users')
+      .values(userData)
+      .execute();
+
+    const newIntern = await trx
+      .insertInto('interns')
+      .values({
+        ...internData,
+        user_id: userData.id as string,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+      
     return newIntern;
   });
 
-  // --- THE FIX ---
-  // We use a double cast (`as unknown as ...`) to force the type conversion.
   return result as unknown as Intern;
 }
 
