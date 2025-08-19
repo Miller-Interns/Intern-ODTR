@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { jwtDecode } from 'jwt-decode'
 import { db } from '~/server/db'
 import type { DB } from '~/server/db/types'
 import type { Transaction } from 'kysely'
@@ -8,6 +9,13 @@ import { internService } from '~/server/service/intern.service'
 import { createSchemaValidator } from '~/server/utils/create-schema-validator'
 import { checkAuthentication } from '~/server/utils/check-authentication'
 import type { RequestContext } from '~/server/types/RequestContext'
+
+interface JwtPayload {
+	userId: string;
+	email: string;
+	iat: number;
+	exp: number;
+}
 
 const dtoSchema = z.object({
 	logId: z.string().min(1, 'Log ID cannot be empty.'),
@@ -79,12 +87,19 @@ export async function approveLogLogic(
 }
 
 export const approveSingleLog = async (dto: ApproveSingleLogDTO, context: RequestContext): Promise<ApproveSingleLogResult> => {
-	const adminId = await checkAuthentication(context)
-	const { logId, admin_remarks } = await validateDTO(dto)
+	const authPayload = await checkAuthentication(context);
+	let adminId: string;
+	if (typeof authPayload === 'object' && authPayload !== null) {
+		adminId = (authPayload as any).userId;
+	} else {
+		adminId = authPayload as string;
+	}
+
+	const { logId, admin_remarks } = await validateDTO(dto);
 
 	const { updatedCompletedHours } = await db.transaction().execute(async (trx) => {
-		return approveLogLogic(trx, context, logId, adminId, admin_remarks || null)
-	})
+		return approveLogLogic(trx, context, logId, adminId, admin_remarks || null);
+	});
 
-	return { success: true, logId, updatedCompletedHours }
+	return { success: true, logId, updatedCompletedHours };
 }

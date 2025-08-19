@@ -32,23 +32,35 @@ type BulkApproveResult = {
  * Handles authentication, input validation, and transaction management.
  */
 export async function approveBulkLogsUseCase(dto: BulkApproveDTO, context: RequestContext): Promise<BulkApproveResult> {
-	// 1. Authentication and Validation
-	const adminId = await checkAuthentication(context)
-	const { logs } = await validateDTO(dto)
+	// 1. Get the payload from authentication. This could be a string OR an object.
+	const authPayload = await checkAuthentication(context);
 
-	// 2. Start a transaction to ensure atomicity
+	let adminId: string;
+
+	// 2. Perform a RUNTIME check to see what was actually returned.
+	if (typeof authPayload === 'object' && authPayload !== null) {
+		// If it's an object, we extract the 'userId' property.
+		adminId = (authPayload as any).userId;
+	} else {
+		// If it's not an object, we trust it's the string we need.
+		adminId = authPayload as string;
+	}
+
+	// 3. From this point on, 'adminId' is guaranteed to be the correct string ID.
+	const { logs } = await validateDTO(dto);
+
+	// 4. Start a transaction to ensure atomicity
 	await db.transaction().execute(async (trx: Transaction<DB>) => {
 		// Sequentially process each log to avoid race conditions on intern hours
 		for (const log of logs) {
-			// Pass the full context into the core logic function
-			await approveLogLogic(trx, context, log.logId, adminId, log.admin_remarks || null)
+			// Now, the correct adminId string is passed into the core logic.
+			await approveLogLogic(trx, context, log.logId, adminId, log.admin_remarks || null);
 		}
-	})
+	});
 
-	// 3. Return a successful result
-	return { success: true, approvedCount: logs.length }
+	// 5. Return a successful result
+	return { success: true, approvedCount: logs.length };
 }
-
 // export async function approveAllLogs(db: Kysely<DB>, logIds: string[], remarks: string | null, adminId: string) {
 // 	try {
 // 		await db.transaction().execute(async (trx) => {
