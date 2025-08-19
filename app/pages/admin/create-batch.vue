@@ -69,6 +69,9 @@
               v-model="form.selectedSupervisorId" :items="supervisorList" placeholder="Intern Supervisor" icon="icon"
               value-key="value" />
           </UFormField>
+        <p v-if="error.message" class="text-red-500 mt-2 text-sm">
+  {{ error.message }}
+</p>
         </section>
         <UButton type="submit" text=regular label="Save Batch" :loading="isLoading" color=primary block size="lg"
           class="mt-8" />
