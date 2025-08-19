@@ -56,7 +56,7 @@
                       <p class="font-medium">{{ batch.supervisor_name || 'N/A' }}</p>
                     </div>
                   </div>
-                  <NuxtLink :to="`admin/edit-batch?id=${batch.id}`">
+                  <NuxtLink :to="`batches/edit-batch?id=${batch.id}`">
                     <UButton icon="i-lucide-pen" color=primary variant="ghost" class="min-w-[20px] min-h-[20px]"
                       aria-label="Edit Batch" />
                   </NuxtLink>
@@ -97,7 +97,7 @@
         </section>
 
         <section class="w-full mt-3 flex flex-col  mb-4 bottom-0 left-1/2 -translate-x-1/2 p-4 z-50 fixed">
-          <NuxtLink to="/admin/create-batch">
+          <NuxtLink to="/admin/batches/create-batch">
             <UButton  icon="i-lucide-plus" label="Create Batch" variant=solid color=primary block
               size=xl />
           </NuxtLink>
@@ -157,7 +157,8 @@
 import { capitalize } from '~/server/db/utils/format'
 import { type BatchWithInternCount } from '~/types/Types';
 import { formatDate } from '~/server/db/utils/format'
-import { getTodayDateString } from '~/composables/today-date';
+import type { number } from 'zod';
+
 
 definePageMeta({
   layout: 'batch'
@@ -191,11 +192,7 @@ const triggerServerStatusUpdate = async () => {
 
   } catch (error: any) {
     console.error('Failed to update batch end time:', error);
-    toast.add({
-      title: 'Update Failed',
-      description: error.data?.message || 'Could not complete the batch. Please try again.',
-
-    });
+     throw new Error('Could not complete the batch. Please try again.');
   }
 };
 watchEffect((onInvalidate) => {
@@ -218,10 +215,7 @@ watchEffect((onInvalidate) => {
 const endTime = async () => {
   if (!selectedBatchId.value) {
     console.error("No batch selected to end.");
-    toast.add({
-      title: 'Error',
-      description: 'Please select a batch first.',
-    });
+     throw new Error('Could not complete the batch. Please try again.');
     return;
   }
 
@@ -232,32 +226,27 @@ const endTime = async () => {
       method: 'PATCH',
       body: {
         id: selectedBatchId.value,
-        end_date: today.toISOString(), // Send as ISO string for consistency
+        end_date: today.toISOString(),
       }
     });
 
-
-    if (response) {
+ const completedBatch = allBatches.value.find(b => b.id === selectedBatchId.value);
+    if (response && completedBatch) {
 
       openModal.value = false;
       toast.add({
-        title: 'Batch Completed Successfully',
-        description: 'The batch has been marked as completed.',
+          description: `Batch ${completedBatch.batch_number}  marked as complete`,
 
       });
       const updatedBatches = await $fetch<BatchWithInternCount[]>('/api/batches/batch');
       allBatches.value = updatedBatches;
     } else {
-      throw new Error('API indicated a failure without throwing an error.');
+
     }
 
   } catch (error: any) {
     console.error('Failed to update batch end time:', error);
-    toast.add({
-      title: 'Update Failed',
-      description: error.data?.message || 'Could not complete the batch. Please try again.',
-
-    });
+      throw new Error('Could not complete the batch. Please try again.');
   }
 };
 const currentBatches = computed(() => {
@@ -273,4 +262,5 @@ const previousBatches = computed(() => {
 defineShortcuts({
   o: () => openModal.value = !openModal.value
 })
+
 </script>

@@ -151,7 +151,7 @@ const startDateError =computed(()=>{
         description: `Batch ${form.batch_number} ${isEditMode ? 'updated' : 'added'} successfully`,
       });
       
-      await router.push('/admin');
+      await router.push('/admin/batches');
 
     } catch (e: any) {
   const errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
