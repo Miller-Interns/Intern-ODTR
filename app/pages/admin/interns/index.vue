@@ -18,7 +18,6 @@
 		</header>
 
 		<main class="p-4">
-			<!-- Loading State: Using USkeleton for a better UX -->
 			<div v-if="pending">
 				<UCard>
 					<div class="flex items-center justify-between">
@@ -35,7 +34,6 @@
 				</UCard>
 			</div>
 
-			<!-- Error State: Using UAlert for a clear error message -->
 			<div v-else-if="error">
 				<UAlert
 					icon="i-lucide-alert-triangle"
@@ -46,7 +44,6 @@
 				/>
 			</div>
 
-			<!-- Data Loaded State: Using UCard and other Nuxt UI components -->
 			<div v-else-if="data">
 				<UCard>
 					<template #header>
@@ -64,7 +61,6 @@
 						</div>
 					</template>
 
-					<!-- Main Body for Interns List -->
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						<NuxtLink
 							v-for="intern in data.interns"
@@ -76,7 +72,6 @@
 						</NuxtLink>
 					</div>
 
-					<!-- Custom Footer Slot for the Add Intern button -->
 					<template #footer>
 						<UButton
 							icon="i-lucide-plus"

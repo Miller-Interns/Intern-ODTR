@@ -103,14 +103,6 @@
 	const route = useRoute()
 	const internId = computed(() => route.params.id as string)
 	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/${internId.value}`)
-	
-	// watchEffect(() => {
-	// 	console.log({
-	// 		isPending: pending.value,
-	// 		fetchData: data.value,
-	// 		fetchError: error.value,
-	// 	})
-	// })
 	const form = computed(() => data.value?.intern)
 	const timeLogs = computed<InternLog[]>(() => data.value?.timeLogs ?? [])
 

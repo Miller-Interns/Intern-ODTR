@@ -1,13 +1,13 @@
 export type TimeLog = {
-	id: string;
-	intern_id: string;
-	time_in: Date;
-	time_out: Date;
-	total_hours: number;
-	admin_remarks: string | null;
-	intern_notes: string | null;
-	status: boolean;
-	admin_id: string;
+	id: string
+	intern_id: string
+	time_in: Date
+	time_out: Date
+	total_hours: number
+	admin_remarks: string | null
+	intern_notes: string | null
+	status: boolean
+	admin_id: string
 }
 
 export type RawPendingLogQueryResult = {

@@ -2,6 +2,7 @@
 	<LogCard
 		ref="logCardRef"
 		:log="log"
+		v-model:admin_remarks="admin_remarks"
 		@approved="bus.emit()"
 	>
 		<template #header>
@@ -50,6 +51,7 @@
 	const props = defineProps<{ log: DashboardLog }>()
 	const bus = useEventBus<void>('log:approved')
 	const logCardRef = ref()
+	const admin_remarks = defineModel<string | null>('admin_remarks')
 
 	const avatarUrl = computed(() => {
 		if (props.log.intern_picture) {
@@ -59,6 +61,6 @@
 	})
 
 	const remarksButtonLabel = computed(() => {
-		return props.log.admin_remarks ? 'Edit Remarks' : 'Add Remarks'
+		return admin_remarks.value ? 'Edit Remarks' : 'Add Remarks'
 	})
 </script>

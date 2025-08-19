@@ -94,10 +94,6 @@
 	import { UForm, UFormField, UInput, UCard, UButton } from '#components'
 	import Logo from '../assets/images/logo-cadet-blue.svg'
 
-	import { RouterNames } from '~/types/RouterNames'
-
-	// const { fetchUser } = useAuth()
-
 	const isLoading = ref(false)
 	const isPasswordVisible = ref(false)
 	const emailError = ref(false)
@@ -132,7 +128,11 @@
 
 			if (response) {
 				await fetch()
-				navigateTo({ name: RouterNames.DASHBOARD }, { replace: true })
+				if (user.value?.isAdmin) {
+					navigateTo({ name: 'admin-dashboard' }, { replace: true })
+				} else {
+					navigateTo({ name: 'intern-dashboard' }, { replace: true })
+				}
 			}
 		} catch (error: any) {
 			emailError.value = true

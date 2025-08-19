@@ -39,6 +39,10 @@
 			console.error('Logout failed:', error)
 		}
 	}
+
+	definePageMeta({
+		layout: 'admin',
+	})
 </script>
 
 <style scoped>

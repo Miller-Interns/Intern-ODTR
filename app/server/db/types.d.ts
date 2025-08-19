@@ -22,9 +22,12 @@ export type Intern = {
     id: string;
     user_id: string;
     batch_id: string;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
     school: string;
     required_hours: number;
-    status: Status;
+    status: Generated<Status>;
     course: string;
     year: string;
     contact_number: string;

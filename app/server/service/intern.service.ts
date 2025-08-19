@@ -1,11 +1,8 @@
-import { db } from '../db';
-import type { RequestContext } from '../types/RequestContext';
-import type { InternQueryRow } from '~/server/types/InternQueryRow';
+import { db } from '../db'
+import type { RequestContext } from '../types/RequestContext'
+import type { InternQueryRow } from '~/server/types/InternQueryRow'
 
-async function getInternDetailsById(
-	id: string,
-	ctx: RequestContext,
-): Promise<InternQueryRow | null> {
+async function getInternDetailsById(id: string, ctx: RequestContext): Promise<InternQueryRow | null> {
 	const qb = ctx.trx ?? db
 
 	const intern = await qb
@@ -15,28 +12,16 @@ async function getInternDetailsById(
 		.where('i.id', '=', id)
 		.selectAll('i')
 		.select(['u.name', 'u.email', 'b.batch_number'])
-		// .select((eb) => [
-		// 	eb
-		// 		.selectFrom('time_logs as tl')
-		// 		.select(sql<number>`COALESCE(SUM(tl.total_hours), 0)`.as('total'))
-		// 		.where('tl.intern_id', '=', id)
-		// 		.where('tl.status', '=', true)
-		// 		.as('completed_hours'),
-		// ])
 		.executeTakeFirst()
 	return intern ?? null
 }
 
 async function updateCompletedHours(id: string, newCompletedHours: number, ctx: RequestContext) {
 	const qb = (ctx.trx ??= db)
-	return qb
-		.updateTable('interns')
-		.set({ hours_completed: newCompletedHours })
-		.where('id', '=', id)
-		.executeTakeFirst()
+	return qb.updateTable('interns').set({ hours_completed: newCompletedHours }).where('id', '=', id).executeTakeFirst()
 }
 
 export const internService = {
 	getInternDetailsById,
-	updateCompletedHours
+	updateCompletedHours,
 }

@@ -1,4 +1,3 @@
-import { computed } from 'vue'
 import type { InternLog } from '~/types/TimeLog'
 
 export function useTimeLogState(log: InternLog) {

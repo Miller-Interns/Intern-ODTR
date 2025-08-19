@@ -33,33 +33,34 @@ type BulkApproveResult = {
  */
 export async function approveBulkLogsUseCase(dto: BulkApproveDTO, context: RequestContext): Promise<BulkApproveResult> {
 	// 1. Get the payload from authentication. This could be a string OR an object.
-	const authPayload = await checkAuthentication(context);
+	const authPayload = await checkAuthentication(context)
 
-	let adminId: string;
+	let adminId: string
 
 	// 2. Perform a RUNTIME check to see what was actually returned.
 	if (typeof authPayload === 'object' && authPayload !== null) {
 		// If it's an object, we extract the 'userId' property.
-		adminId = (authPayload as any).userId;
+		adminId = (authPayload as any).userId
 	} else {
 		// If it's not an object, we trust it's the string we need.
-		adminId = authPayload as string;
+		adminId = authPayload as string
 	}
 
 	// 3. From this point on, 'adminId' is guaranteed to be the correct string ID.
-	const { logs } = await validateDTO(dto);
+	const { logs } = await validateDTO(dto)
+	console.log('USE CASE DATA for processing:', JSON.stringify(logs, null, 2))
 
 	// 4. Start a transaction to ensure atomicity
 	await db.transaction().execute(async (trx: Transaction<DB>) => {
 		// Sequentially process each log to avoid race conditions on intern hours
 		for (const log of logs) {
 			// Now, the correct adminId string is passed into the core logic.
-			await approveLogLogic(trx, context, log.logId, adminId, log.admin_remarks || null);
+			await approveLogLogic(trx, context, log.logId, adminId, log.admin_remarks || null)
 		}
-	});
+	})
 
 	// 5. Return a successful result
-	return { success: true, approvedCount: logs.length };
+	return { success: true, approvedCount: logs.length }
 }
 // export async function approveAllLogs(db: Kysely<DB>, logIds: string[], remarks: string | null, adminId: string) {
 // 	try {

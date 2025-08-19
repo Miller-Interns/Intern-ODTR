@@ -60,6 +60,7 @@
 					v-for="log in dashboardLogs"
 					:key="log.id"
 					:log="log"
+					v-model:admin_remarks="remarksState[log.id]"
 					@approved="refresh"
 				/>
 			</div>
@@ -88,21 +89,18 @@
 	const { data: apiResponse, pending, error, refresh } = useFetch<{ logs: DashboardLog[] }>('/api/timelogs/today')
 	const isLoading = ref(isApproving.value)
 
-	const dashboardLogs = computed((): DashboardLog[] => {
-		return apiResponse.value?.logs ?? []
-	})
+	const remarksState = reactive<Record<string, string>>({})
+	const dashboardLogs = computed((): DashboardLog[] => apiResponse.value?.logs ?? [])
 
 	async function handleApproveAllClick() {
-		if (dashboardLogs.value.length === 0) {
-			return
-		}
-
 		const logsPayload: ApproveLogPayload[] = dashboardLogs.value
 			.filter((log) => log.time_out)
 			.map((log) => ({
 				logId: log.id,
-				admin_remarks: 'Bulk Approved',
+				admin_remarks: remarksState[log.id] ?? null,
 			}))
+
+		console.log('CLIENT PAYLOAD being sent:', JSON.stringify(logsPayload, null, 2))
 
 		if (logsPayload.length === 0) {
 			toast.add({
@@ -113,9 +111,7 @@
 			return
 		}
 
-		if (isLoading.value) return
-
-		isLoading.value = true
+		if (isApproving.value) return
 		try {
 			const success = await approveAll(logsPayload)
 			if (success) {
@@ -127,8 +123,6 @@
 				description: 'An error occurred while approving logs.',
 				color: 'error',
 			})
-		} finally {
-			isLoading.value = false
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from '../app/generated/prisma/index.js'
+import { PrismaClient, Status } from '../app/generated/prisma/index.js'
 import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
@@ -12,14 +12,16 @@ async function main() {
 	await prisma.batch.deleteMany()
 	await prisma.user.deleteMany()
 	console.log('-> Existing data deleted.')
+
 	console.log('-> Preparing user data...')
-	const internUser1Id = 'ada24d94-f49e-4af1-91f0-64056ad149ec'
+	// Corrected the internUser1Id to match the user list
+	const internUser1Id = 'ada24d94-f49e-4af1-91f0-64056ad149eb'
 	const internUser2Id = 'a7c4a8a0-2b1d-4f1e-9d6c-2e9b9c0a3b1d'
 	const supervisorId = '015084bc-bec3-4373-aec3-729fba0a825a'
 
 	const usersToCreate = [
 		{
-			id: '015084bc-bec3-4373-aec3-729fba0a825a',
+			id: supervisorId,
 			email: 'alyssa.palencia@mllrdev.com',
 			name: 'Alyssa Palencia',
 			password: 'mllrdev321',
@@ -40,14 +42,14 @@ async function main() {
 			isAdmin: true,
 		},
 		{
-			id: 'ada24d94-f49e-4af1-91f0-64056ad149eb',
+			id: 'ada24d94-f49e-4af1-91f0-64056ad149ec', // This user is an admin
 			email: 'sheen.balatero@mllrdev.com',
 			name: 'Sheen Balatero',
 			password: 'mllrdev321',
 			isAdmin: true,
 		},
 		{
-			id: internUser1Id,
+			id: internUser1Id, // This ID matches the intern's user_id
 			email: 'paculba.herielkaye@gmail.com',
 			name: 'Heriel Kaye Paculba',
 			password: 'test321',
@@ -71,10 +73,10 @@ async function main() {
 	)
 
 	console.log('-> Creating users...')
-	const createdUsers = await prisma.user.createMany({
+	await prisma.user.createMany({
 		data: usersWithHashedPasswords,
 	})
-	console.log(`-> Created ${createdUsers.count} users.`)
+	console.log(`-> Created ${usersToCreate.length} users.`)
 
 	console.log('-> Creating a batch...')
 	const batch = await prisma.batch.create({
@@ -82,7 +84,7 @@ async function main() {
 			batch_number: 'B2025-01',
 			start_date: new Date('2025-01-15T00:00:00Z'),
 			supervisorId: supervisorId,
-			status: 'ONGOING',
+			status: Status.ONGOING,
 		},
 	})
 	console.log(`-> Created batch "${batch.batch_number}".`)
@@ -92,9 +94,11 @@ async function main() {
 		data: {
 			user_id: internUser1Id,
 			batch_id: batch.id,
+			first_name: 'Heriel Kaye',
+			last_name: 'Paculba',
 			school: 'Negros Oriental State University',
 			required_hours: 300,
-			status: 'ONGOING',
+			status: Status.ONGOING,
 			course: 'BS Computer Engineering',
 			year: '4th',
 			contact_number: '111-222-3333',
@@ -108,9 +112,11 @@ async function main() {
 		data: {
 			user_id: internUser2Id,
 			batch_id: batch.id,
+			first_name: 'John',
+			last_name: 'Doe',
 			school: 'City College',
 			required_hours: 300,
-			status: 'ONGOING',
+			status: Status.ONGOING,
 			course: 'BS Computer Engineering',
 			year: '4th',
 			contact_number: '444-555-6666',
@@ -120,31 +126,43 @@ async function main() {
 			intern_picture: 'cheerful-boy-with-cute-avatar-over-white-vector.jpg',
 		},
 	})
-	console.log(`-> Created interns.`)
+	console.log(`-> Created interns: "${intern1.first_name}" and "${intern2.first_name}".`)
 
 	console.log('-> Creating pending time logs...')
 	const logsData = []
 	const internsToLog = [intern1.id, intern2.id]
+	const BREAK_HOURS = 1
 
 	for (const internId of internsToLog) {
 		for (let i = 1; i <= 3; i++) {
 			const logDate = new Date()
-			logDate.setDate(logDate.getDate() - i * 2)
+			logDate.setDate(logDate.getDate() - i * 2) // Create logs for previous days
+
+			const timeIn = new Date(logDate)
+			timeIn.setHours(9, 0, 0, 0) // 9:00 AM
+
+			const timeOut = new Date(logDate)
+			timeOut.setHours(18, 0, 0, 0) // 6:00 PM
+
+			const durationMs = timeOut.getTime() - timeIn.getTime()
+			const grossHours = durationMs / (1000 * 60 * 60)
+			const netHours = Math.max(0, grossHours - BREAK_HOURS)
+
 			logsData.push({
 				intern_id: internId,
-				time_in: new Date(logDate.setHours(9, 0, 0, 0)),
-				time_out: new Date(logDate.setHours(19, 0, 0, 0)),
-				total_hours: 0,
+				time_in: timeIn,
+				time_out: timeOut,
+				total_hours: null,
 				status: false,
 				admin_id: null,
 			})
 		}
 	}
 
-	const timeLogs = await prisma.timeLog.createMany({
+	await prisma.timeLog.createMany({
 		data: logsData,
 	})
-	console.log(`-> Created ${timeLogs.count} pending time logs.`)
+	console.log(`-> Created ${logsData.length} pending time logs.`)
 
 	console.log(`\nSeeding finished.`)
 }

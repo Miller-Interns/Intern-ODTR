@@ -61,9 +61,12 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
+  first_name               String
+  middle_name              String?
+  last_name                String
   school                   String
   required_hours           Int
-  status                   Status
+  status                   Status  @default(INCOMING)
   course                   String
   year                     String
   contact_number           String

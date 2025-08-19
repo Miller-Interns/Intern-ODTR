@@ -58,6 +58,7 @@
 	const logCardRef = ref()
 	const { isPending } = useTimeLogState(props.log)
 	const dateDisplay = computed(() => formattedDate(props.log.time_in))
+
 	const remarksButtonLabel = computed(() => {
 		return props.log.admin_remarks ? 'Edit Remarks' : 'Add Remarks (Optional)'
 	})
