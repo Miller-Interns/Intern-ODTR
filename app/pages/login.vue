@@ -15,8 +15,8 @@
 				<UFormField name="email" label="Email:" required>
 					<UInput v-model="state.email" placeholder="username@gmail.com"
 						class="w-full rounded-md border text-sm italic placeholder-gray-400" :class="emailError
-								? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-								: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
 							" />
 				</UFormField>
 				<p v-if="emailError" class="mt-1 text-sm text-red-500">
@@ -26,8 +26,8 @@
 					<UInput v-model="state.password" :type="isPasswordVisible ? 'text' : 'password'" revealable="false"
 						placeholder="Password" class="w-full rounded-md border text-sm italic placeholder-gray-400"
 						:class="passwordError
-								? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-								: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
+							? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+							: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
 							">
 						<template #trailing>
 							<UButton :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
@@ -86,7 +86,8 @@ const handleLogin = async (event: FormSubmitEvent<any>) => {
 
 		if (response) {
 			await fetch()
-			navigateTo({ path: '/intern/dashboard' }, { replace: true })
+			if (user.value?.isAdmin) { navigateTo({ name: 'admin-dashboard' }, { replace: true }) } 
+			else { navigateTo({ name: 'intern-dashboard' }, { replace: true }) }
 		}
 	} catch (error: any) {
 		emailError.value = true
