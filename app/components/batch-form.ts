@@ -17,7 +17,10 @@ export const useBatchForm = (batchId?: string) => {
 
   const supervisorList = ref<{ label: string; value: string; icon: string}[]>([]);
   const isLoading = ref(true);
-  const error = ref<string | null>(null);
+  const error = ref({
+    message: null as string | null
+  });
+
   const isEditMode = !!batchId;
 
 
@@ -59,7 +62,7 @@ const calendarDate = computed({
         }));
       }
     } catch (e) {
-      error.value = 'Failed to load supervisors.';
+           error.value.message = 'Failed to load supervisors.';
     }
   };
 
@@ -75,10 +78,27 @@ const calendarDate = computed({
       form.start_date = format(new Date(data.start_date),'MM/dd/yyyy');
       form.selectedSupervisorId = data.supervisorId.toString() ?? ''; 
     } catch (e) {
-      error.value = "Failed to fetch batch ID"
+    error.value.message = "Failed to fetch batch ID";
     }
   };
    
+
+// const errors=computed(()=>{
+
+//  if (!form.selectedSupervisorId && submitted.value) {
+//       return "Required";
+//     }
+//     if (!form.batch_number && submitted.value) {
+//       return "Required";
+//     }
+//      if (!form.start_date && submitted.value) {
+//        return "Required";
+
+//     }
+//     return undefined
+
+
+// })
 const supervisorError=computed(()=>{
  if (!form.selectedSupervisorId && submitted.value) {
       return "Please select a supervisor.";
@@ -107,7 +127,7 @@ const startDateError =computed(()=>{
 
 
     isLoading.value = true;
-    error.value = null;
+       error.value.message = null; 
     submitted.value = true
 
     const endpoint = isEditMode ? '/api/batches/edit' : '/api/batches/Post-batch';
@@ -135,16 +155,11 @@ const startDateError =computed(()=>{
 
     } catch (e: any) {
   const errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
-  error.value = errorMessage;
-
+   error.value.message = errorMessage;
   if (e.statusCode === 409) {
-    toast.add({
-      description: errorMessage, 
-    });
+    error.value.message = errorMessage;
   } else {
-    toast.add({
-      description: errorMessage,
-    });
+    error.value.message = errorMessage;
   }
 } finally {
       isLoading.value = false;
@@ -161,6 +176,7 @@ const startDateError =computed(()=>{
   });
 
   return {
+
     supervisorError,
     batchNumberError,
     startDateError,
