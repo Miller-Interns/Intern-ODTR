@@ -141,7 +141,7 @@
 
 			<!-- EDIT MODE -->
 			<div v-else class="space-y-6">
-				<UForm :state="formState" @submit="handleSaveChanges">
+				<UForm :state="formState" :validate="validate" @submit="handleSaveChanges">
 					<section class="space-y-4">
 						<h2 class="mb-2 text-xl font-bold">Intern details</h2>
 						<UFormField label="First Name" name="firstName" required class="text-sm">
@@ -164,8 +164,8 @@
 							<UInput v-model="formState.password" :type="isPasswordVisible ? 'text' : 'password'"
 								revealable="false" placeholder="Password" class="w-full"
 								:ui="{ base: 'text-lg placeholder:text-md w-full' }" :class="passwordError
-										? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-										: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
+									? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+									: 'focus:border-primary-500 focus:ring-primary-500 border-gray-300'
 									">
 								<template #trailing>
 									<UButton :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
@@ -174,6 +174,9 @@
 								</template>
 							</UInput>
 						</UFormField>
+						<p v-if="passwordError" class="mt-1 text-sm text-red-500">
+							{{ passwordError }}
+						</p>
 						<UFormField label="Contact Number" name="contact_number">
 							<UInput v-model="formState.contact_number" class="w-full" placeholder="Contact Number"
 								:ui="{ base: 'text-lg placeholder:text-md w-full' }" />
@@ -221,7 +224,7 @@
 						<UButton type="submit" :loading="isSaving" block size="lg">
 							Save Changes
 						</UButton>
-						<UButton @click="isEditing = false" block size="lg" color="primary">
+						<UButton @click="cancelEdit" block size="lg" color="primary">
 							Cancel
 						</UButton>
 					</div>
@@ -249,6 +252,8 @@ const {
 	isPasswordVisible,
 	passwordError,
 	isLogoutModalOpen,
+	cancelEdit,
+	validate,
 	openFileInput,
 	handleFileChange,
 	enterEditMode,

@@ -4,7 +4,6 @@
 	>
 		<slot />
 	</main>
-
 	<footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
 		<nav class="px-safe mx-auto flex max-w-4xl justify-around">
 			<NuxtLink
@@ -57,7 +56,7 @@
 		{
 			label: 'Logout',
 			icon: 'i-lucide-circle-user',
-			to: '/admin/logoout',
+			to: '/admin/logout',
 		},
 	]
 </script>

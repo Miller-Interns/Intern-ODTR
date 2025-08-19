@@ -7,6 +7,11 @@ type ProfileDataResponse = {
 	profile: Selectable<Intern> & { email: string; name: string | null }
 }
 
+type FormError = {
+	path: string
+	message: string
+}
+
 export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	const { clear } = useUserSession()
 	const router = useRouter()
@@ -36,6 +41,16 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	})
 
 	const { data, pending, error, refresh } = useFetch<ProfileDataResponse>('/api/profile/fetch')
+
+	const validate = (state: any): FormError[] => {
+		const errors = []
+		if (state.password && state.password.length > 0 && state.password.length < 6) {
+			const message = 'Password must be at least 6 characters';
+			errors.push({ path: 'password', message: message });
+			passwordError.value = message;
+		}
+		return errors
+	}
 
 	function openFileInput() {
 		fileInput.value?.click()
@@ -74,6 +89,7 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 				middle_name: profile.middle_name || '',
 				last_name: profile.last_name,
 				email: profile.email,
+				password: '',
 				contact_number: profile.contact_number,
 				emergency_contact_person: profile.emergency_contact_person,
 				emergency_contact_number: profile.emergency_contact_number,
@@ -88,7 +104,13 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		}
 	}
 
+	function cancelEdit() {
+		isEditing.value = false;
+		passwordError.value = undefined;
+	}
+
 	async function handleSaveChanges() {
+		passwordError.value = undefined;
 		isSaving.value = true
 		try {
 			const payload = { ...formState.value }
@@ -121,6 +143,8 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		isPasswordVisible,
 		passwordError,
 		isLogoutModalOpen,
+		cancelEdit,
+		validate,
 		openFileInput,
 		handleFileChange,
 		enterEditMode,
