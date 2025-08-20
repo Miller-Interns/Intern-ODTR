@@ -1,23 +1,31 @@
+export default defineNuxtRouteMiddleware((to) => {
+	const { user } = useUserSession()
 
-export default defineNuxtRouteMiddleware((to, _from) => {
-  const { user } = useUserSession()
- 
-  const isLoggedIn = !!user.value
-  const isAdmin = user.value?.isAdmin === true
-  const isAuthRoute = to.name === 'login'
-  const isAdminRoute = to.path.startsWith('/admin')
- 
-  if (isLoggedIn && isAuthRoute) {
-    return navigateTo(isAdmin ? '/admin/dashboard' : '/dashboard', { replace: true })
-  }
- 
-  if (!isLoggedIn && !isAuthRoute) {
-    return navigateTo('/login', { replace: true })
-  }
- 
-  if (isAdminRoute && !isAdmin) {
-    return navigateTo('/dashboard', { replace: true })
-  }
- 
-  return
+	const isLoggedIn = !!user.value
+	const isAdmin = user.value?.isAdmin === true
+	const adminDashboardPath = '/admin/dashboard'
+	const internDashboardPath = '/intern/dashboard'
+	const loginPath = '/login'
+
+	if (to.path === loginPath) {
+		if (isLoggedIn) {
+			return navigateTo(isAdmin ? adminDashboardPath : internDashboardPath, { replace: true })
+		}
+		return
+	}
+
+	if (!isLoggedIn) {
+		return navigateTo(loginPath, { replace: true })
+	}
+
+	const isAdminRoute = to.path.startsWith('/admin')
+	const isInternRoute = !isAdminRoute
+
+	if (isAdmin && isInternRoute) {
+		return navigateTo(adminDashboardPath, { replace: true })
+	}
+	if (!isAdmin && isAdminRoute) {
+		return navigateTo(internDashboardPath, { replace: true })
+	}
+	return
 })
