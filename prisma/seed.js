@@ -152,7 +152,7 @@ async function main() {
 				intern_id: internId,
 				time_in: timeIn,
 				time_out: timeOut,
-				total_hours: null,
+				total_hours: 0,
 				status: false,
 				admin_id: null,
 			})

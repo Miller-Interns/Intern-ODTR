@@ -19,15 +19,47 @@
 			</div>
 			<div class="flex items-center justify-between">
 				<p class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">{{ today }}</p>
-				<UButton
-					icon="i-lucide-check-check"
-					label="Approve All"
-					color="primary"
-					variant="solid"
-					:disabled="!dashboardLogs || dashboardLogs.length === 0 || isApproving"
-					:loading="isApproving"
-					@click="handleApproveAllClick"
-				/>
+
+				<UModal
+					v-model:open="isApproveModalOpen"
+					title="Confirmation"
+				>
+					<UButton
+						label="Approve All"
+						icon="i-lucide-check-check"
+						color="primary"
+						variant="solid"
+					/>
+					<template #header>
+						<h2 class="text-2xl font-bold dark:text-gray-400">Approve Time Log</h2>
+					</template>
+					<template #body>
+						<p class="py-4 text-black dark:text-gray-400">
+							Are you sure you want to approve {{ props.log.intern_name }}'s pending time log?
+						</p>
+					</template>
+					<template #footer>
+						<div class="flex w-full items-center justify-center gap-8">
+							<UButton
+								@click="isApproveModalOpen = false"
+								color="primary"
+								variant="outline"
+								label="Cancel"
+								class="text-md text-black"
+								block
+							/>
+							<UButton
+								color="primary"
+								label="Confirm"
+								class="text-md text-white"
+								:disabled="!dashboardLogs || dashboardLogs.length === 0 || isApproving"
+								:loading="isApproving"
+								@click="handleApproveAllClick"
+								block
+							/>
+						</div>
+					</template>
+				</UModal>
 			</div>
 		</header>
 
@@ -87,10 +119,10 @@
 	const toast = useToast()
 	const { approveAll, isApproving } = useBulkApproval()
 	const { data: apiResponse, pending, error, refresh } = useFetch<{ logs: DashboardLog[] }>('/api/timelogs/today')
-	const isLoading = ref(isApproving.value)
-
+	const isApproveModalOpen = ref(false)
 	const remarksState = reactive<Record<string, string>>({})
 	const dashboardLogs = computed((): DashboardLog[] => apiResponse.value?.logs ?? [])
+	const props = defineProps<{ log: DashboardLog }>()
 
 	async function handleApproveAllClick() {
 		const logsPayload: ApproveLogPayload[] = dashboardLogs.value
@@ -99,8 +131,6 @@
 				logId: log.id,
 				admin_remarks: remarksState[log.id] ?? null,
 			}))
-
-		console.log('CLIENT PAYLOAD being sent:', JSON.stringify(logsPayload, null, 2))
 
 		if (logsPayload.length === 0) {
 			toast.add({
