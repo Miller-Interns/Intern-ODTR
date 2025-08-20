@@ -1,5 +1,5 @@
 import { db } from '../db'
-import type { Selectable } from 'kysely'
+import { sql, type Selectable } from 'kysely'
 import type { TimeLog } from '../db/types'
 import type { RequestContext } from '~/server/types/RequestContext'
 import type { RawPendingLogQueryResult } from '~/server/types/RawPendingLogQueryResult'
@@ -64,9 +64,24 @@ async function getTimeLogsByInternId(internId: string, ctx: RequestContext): Pro
 	return logs
 }
 
+async function getFormattedLogsByInternId(internId: string, ctx: RequestContext) {
+	const qb = ctx.trx ?? db
+
+	const logs = await qb
+		.selectFrom('time_logs as tl')
+		.leftJoin('users as u', 'u.id', 'tl.admin_id')
+		.where('tl.intern_id', '=', internId)
+		.select(['tl.time_in', 'tl.time_out', 'tl.total_hours', sql<string>`COALESCE(u.name, 'N/A')`.as('approved_by')])
+		.orderBy('tl.time_in', 'asc')
+		.execute()
+
+	return logs
+}
+
 export const timeLogService = {
 	fetchPendingWithInternDetails,
 	approveLog,
 	getTimeLogsByInternId,
 	getLogById,
+	getFormattedLogsByInternId,
 }

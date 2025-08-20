@@ -17,6 +17,7 @@
 		"@prisma/nuxt": "^0.3.0",
 		"@vueuse/nuxt": "^13.6.0",
 		"bcrypt": "^6.0.0",
+		"date-fns": "^4.1.0",
 		"fast-csv": "^5.0.5",
 		"jsonwebtoken": "^9.0.2",
 		"kysely": "^0.28.3",
