@@ -26,7 +26,7 @@ export const InternSchema = z.object({
   role: z.string(),
   intern_picture: z.string(),
   hours_completed: z.number(),
-  notes: z.string(),
+  notes: z.string().nullable(),
 })
 
 export const TimeLogSchema = z.object({
