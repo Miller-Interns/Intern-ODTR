@@ -7,17 +7,49 @@
 		<template #header>
 			<div class="flex items-center justify-between">
 				<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ dateDisplay }}</p>
-				<UBadge
-					v-if="isPending && logCardRef"
-					class="font-base rounded-full"
-					color="warning"
-					variant="soft"
-					as="button"
-					@click="logCardRef.handleApprove()"
-					:loading="logCardRef.isApproving"
+				<UModal
+					v-model:open="isApproveModalOpen"
+					title="Confirmation"
 				>
-					Pending Approval
-				</UBadge>
+					<UButton variant="ghost">
+						<UBadge
+							v-if="isPending && logCardRef"
+							class="font-base rounded-full"
+							color="warning"
+							variant="soft"
+							as="button"
+						>
+							Pending Approval
+						</UBadge>
+					</UButton>
+
+					<template #header>
+						<h2 class="text-2xl font-bold dark:text-gray-400">Approve Time Log</h2>
+					</template>
+					<template #body>
+						<p class="py-4 text-black dark:text-gray-400">
+							Are you sure you want to approve {{ props.log.intern.name }}'s pending time log?
+						</p>
+					</template>
+					<template #footer>
+						<div class="flex w-full items-center justify-center gap-8">
+							<UButton
+								@click="isApproveModalOpen = false"
+								color="primary"
+								variant="outline"
+								label="Cancel"
+								class="text-md text-black"
+							/>
+							<UButton
+								color="primary"
+								label="Confirm"
+								class="text-md text-white"
+								@click="logCardRef.handleApprove()"
+								:loading="logCardRef.isApproving"
+							/>
+						</div>
+					</template>
+				</UModal>
 			</div>
 		</template>
 
@@ -58,6 +90,7 @@
 	const logCardRef = ref()
 	const { isPending } = useTimeLogState(props.log)
 	const dateDisplay = computed(() => formattedDate(props.log.time_in))
+	const isApproveModalOpen = ref(false)
 
 	const remarksButtonLabel = computed(() => {
 		return props.log.admin_remarks ? 'Edit Remarks' : 'Add Remarks (Optional)'

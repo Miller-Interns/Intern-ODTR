@@ -81,15 +81,45 @@
 							No time logs found.
 						</div>
 					</div>
+					<UModal
+						v-model:open="isExporting"
+						fullscreen
+						:ui="{
+							overlay: 'bg-black/60 bg-transparent',
+						}"
+					>
+						<UButton
+							label="Export DTR"
+							color="primary"
+							variant="solid"
+							icon="i-heroicons-arrow-down-tray"
+							block
+							class="mt-6"
+							@click="handleExport"
+						/>
 
-					<UButton
-						label="Export DTR"
-						color="primary"
-						variant="solid"
-						icon="i-heroicons-arrow-down-tray"
-						block
-						class="mt-6"
-					/>
+						<!-- <template #body>
+							<div class="flex h-full items-center justify-center bg-black/50">
+								<UIcon
+									name="i-lucide-loader-circle"
+									class="h-12 w-12 animate-spin text-white"
+								/>
+							</div>
+						</template> -->
+
+						<template #body>
+							<div class="flex h-full items-center justify-center bg-black/60">
+								<div class="flex flex-col items-center">
+									<UIcon
+										name="i-lucide-loader-circle"
+										class="h-12 w-12 animate-spin text-white"
+									/>
+
+									<p class="mt-4 text-lg font-semibold text-white">Exporting DTR</p>
+								</div>
+							</div>
+						</template>
+					</UModal>
 				</template>
 			</UTabs>
 		</UForm>
@@ -102,12 +132,13 @@
 
 	const route = useRoute()
 	const internId = computed(() => route.params.id as string)
-	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/${internId.value}`)
+	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/[id]/${internId.value}`)
 	const form = computed(() => data.value?.intern)
 	const timeLogs = computed<InternLog[]>(() => data.value?.timeLogs ?? [])
-
 	const isEditing = ref(false)
 	const avatarPreviewUrl = ref<string | null>(null)
+	const isExporting = ref(false)
+	const exportError = ref<string | null>(null)
 
 	const tabItems = [
 		{ slot: 'personalinfo', label: 'Personal Info' },
@@ -135,6 +166,46 @@
 			URL.revokeObjectURL(avatarPreviewUrl.value)
 		}
 	})
+
+	const handleExport = async () => {
+		isExporting.value = true
+		exportError.value = null
+
+		try {
+			const response = await $fetch.raw(`/api/interns/${internId}/export`)
+			const blob = response._data
+
+			if (!(blob instanceof Blob)) {
+				throw new Error('The server response was not a file.')
+			}
+
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			const disposition = response.headers.get('content-disposition')
+			let filename = 'timelogs.csv'
+
+			if (disposition && disposition.includes('filename=')) {
+				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+				const matches = filenameRegex.exec(disposition)
+				if (matches != null && matches[1]) {
+					filename = matches[1].replace(/['"]/g, '')
+				}
+			}
+
+			link.setAttribute('download', filename)
+			document.body.appendChild(link)
+
+			link.click()
+			document.body.removeChild(link)
+			URL.revokeObjectURL(url)
+		} catch (error: any) {
+			console.error('Export failed:', error)
+			exportError.value = 'Failed to export time logs. Please try again.'
+		} finally {
+			isExporting.value = false
+		}
+	}
 
 	definePageMeta({
 		layout: 'admin',

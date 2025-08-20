@@ -54,16 +54,13 @@ async function approveLog(
 
 async function getLogById(id: string, ctx: RequestContext): Promise<Selectable<TimeLog> | null> {
 	const qb = (ctx.trx ??= db)
-
 	const log = await qb.selectFrom('time_logs').where('id', '=', id).selectAll().executeTakeFirst()
 	return log ?? null
 }
 
 async function getTimeLogsByInternId(internId: string, ctx: RequestContext): Promise<Selectable<TimeLog>[]> {
 	const qb = ctx.trx ?? db
-
 	const logs = await qb.selectFrom('time_logs').where('intern_id', '=', internId).selectAll().execute()
-
 	return logs
 }
 

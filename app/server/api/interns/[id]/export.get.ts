@@ -1,4 +1,3 @@
-import { defineEventHandler, setResponseHeaders } from 'h3'
 import { exportInternTimeLogs } from '~/server/use-case/time-logs/export.use-case'
 
 export default defineEventHandler(async (event) => {
