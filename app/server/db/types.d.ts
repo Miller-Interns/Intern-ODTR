@@ -15,7 +15,8 @@ export type Batch = {
     batch_number: string;
     start_date: Generated<Timestamp>;
     end_date: Timestamp | null;
-    status: Generated<boolean>;
+    status: Generated<Status>;
+    supervisorId: string;
 };
 export type Intern = {
     id: string;
@@ -25,14 +26,14 @@ export type Intern = {
     middle_name: string | null;
     last_name: string;
     school: string;
-    course: string;
-    year: string;
-    contact_number: string;
-    emergency_contact_person: string;
-    emergency_contact_number: string;
+    course: string | null;
+    year: string | null;
+    contact_number: string | null;
+    emergency_contact_person: string | null;
+    emergency_contact_number: string | null;
     required_hours: number;
     status: Generated<Status>;
-    hours_completed: number;
+    hours_completed: number | null;
     intern_picture: string | null;
     role: string | null;
     notes: string | null;

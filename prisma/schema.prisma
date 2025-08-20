@@ -5,7 +5,7 @@ enum Status {
   INCOMING
   ONGOING
   COMPLETED
-}
+}   
 
 generator client {
   provider = "prisma-client-js"
@@ -36,6 +36,7 @@ model User {
 
   Intern  Intern[]
   TimeLog TimeLog[]
+  supervised_batches Batch[] @relation("SupervisorToBatch")
 
   @@map("users")
 }
@@ -45,12 +46,15 @@ model Batch {
   batch_number String
   start_date   DateTime  @default(now())
   end_date     DateTime?
-  status       Boolean   @default(true)
+  status       Status   @default(INCOMING)
+  supervisorId String
+  intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
 
   Intern Intern[]
 
   @@map("batches")
 }
+
 
 model Intern {
   id                       String  @id @default(uuid())
@@ -62,17 +66,18 @@ model Intern {
   middle_name              String?
   last_name                String
   school                   String
-  course                   String
-  year                     String
-  contact_number           String
-  emergency_contact_person String
-  emergency_contact_number String
-  required_hours           Float
-  status                   Status  @default(INCOMING)
-  hours_completed          Float
+  course                   String?
+  year                     String?
+  contact_number           String?
+  emergency_contact_person String?
+  emergency_contact_number String?
+  required_hours           Int
+  status                   Status @default(INCOMING)
+  hours_completed          Float?
   intern_picture           String?
   role                     String?
   notes                    String?
+
 
   TimeLog TimeLog[]
 

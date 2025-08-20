@@ -1,5 +1,5 @@
 <template>
-	<div class="flex min-h-screen flex-col bg-gray-50 pb-20">
+	<div class="flex min-h-screen flex-col">
 		<div v-if="pending" class="flex flex-1 items-center justify-center">
 			<p>Loading Dashboard...</p>
 		</div>
@@ -44,15 +44,15 @@
 				<h2 class="pb-4 text-xl font-semibold">Time Log Summary</h2>
 				<UCard class="mb-6 shadow-lg">
 					<template #header>
-						<p class="text-l text-black">{{ formattedDate(activeTimeLog.time_in) }}</p>
+						<p class="text-l">{{ formattedDate(activeTimeLog.time_in) }}</p>
 					</template>
 					<div class="mb-6 space-y-4">
 						<div>
 							<p class="text-black-500 text-sm">Time in:</p>
 							<p class="text-lg font-semibold">{{ formatTime(activeTimeLog.time_in) }}</p>
 						</div>
-						<div class="rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-4 text-center">
-							<p class="text-black-500 text-sm">Elapsed Time:</p>
+						<div class="rounded-lg border-2 border-dashed border-gray-300 light:bg-gray-100 p-4 text-center">
+							<p class="text-sm">Elapsed Time:</p>
 							<p class="text-xl font-bold">{{ elapsedTime.toFixed(1) }} hrs</p>
 						</div>
 					</div>
@@ -114,9 +114,9 @@
 						</div>
 						<div v-if="lastCompletedLog.intern_notes">
 							<p class="text-black-500 text-sm">Intern Notes</p>
-							<p class="rounded bg-gray-50 p-2 text-sm">{{ lastCompletedLog.intern_notes }}</p>
+							<p class="rounded light:bg-gray-50 p-2 text-sm">{{ lastCompletedLog.intern_notes }}</p>
 						</div>
-						<div class="rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-4 text-center">
+						<div class="rounded-lg border-2 border-dashed border-gray-300 light:bg-gray-100 p-4 text-center">
 							<p class="text-black-500 text-sm">Total Hours:</p>
 							<p class="text-xl font-bold">{{ lastCompletedLog.total_hours.toFixed(1) }} hrs</p>
 						</div>

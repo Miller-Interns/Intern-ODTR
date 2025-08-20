@@ -22,12 +22,12 @@
 			<h2 class="text-2xl font-bold">Logout?</h2>
 		</template>
 		<template #body>
-			<p class="py-4 text-black">Are you sure you want to log out?</p>
+			<p class="py-4 light:text-black">Are you sure you want to log out?</p>
 		</template>
 		<template #footer>
 			<div class="flex justify-end gap-2">
 				<UButton @click="isLogoutModalOpen = false" color="primary" variant="outline" label="Cancel"
-					class="text-md text-black" />
+					class="text-md light:text-black" />
 				<UButton @click="performLogout" color="primary" label="Yes, Logout" class="text-md text-white" />
 			</div>
 		</template>

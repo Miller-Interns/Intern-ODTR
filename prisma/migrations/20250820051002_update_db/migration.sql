@@ -53,7 +53,8 @@ CREATE TABLE "batches" (
     "batch_number" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "end_date" TIMESTAMP(3),
-    "status" BOOLEAN NOT NULL DEFAULT true,
+    "status" "Status" NOT NULL DEFAULT 'INCOMING',
+    "supervisorId" TEXT NOT NULL,
 
     CONSTRAINT "batches_pkey" PRIMARY KEY ("id")
 );
@@ -67,14 +68,14 @@ CREATE TABLE "interns" (
     "middle_name" TEXT,
     "last_name" TEXT NOT NULL,
     "school" TEXT NOT NULL,
-    "course" TEXT NOT NULL,
-    "year" TEXT NOT NULL,
-    "contact_number" TEXT NOT NULL,
-    "emergency_contact_person" TEXT NOT NULL,
-    "emergency_contact_number" TEXT NOT NULL,
-    "required_hours" DOUBLE PRECISION NOT NULL,
+    "course" TEXT,
+    "year" TEXT,
+    "contact_number" TEXT,
+    "emergency_contact_person" TEXT,
+    "emergency_contact_number" TEXT,
+    "required_hours" INTEGER NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'INCOMING',
-    "hours_completed" DOUBLE PRECISION NOT NULL,
+    "hours_completed" DOUBLE PRECISION,
     "intern_picture" TEXT,
     "role" TEXT,
     "notes" TEXT,
@@ -102,6 +103,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "interns_user_id_key" ON "interns"("user_id");
+
+-- AddForeignKey
+ALTER TABLE "batches" ADD CONSTRAINT "batches_supervisorId_fkey" FOREIGN KEY ("supervisorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "interns" ADD CONSTRAINT "interns_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

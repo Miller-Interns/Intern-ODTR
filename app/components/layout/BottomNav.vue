@@ -1,5 +1,5 @@
 <template>
-	<footer class="fixed right-0 bottom-0 left-0 border-t bg-white shadow-inner">
+<footer class="fixed right-0 bottom-0 left-0 border-t light:bg-white dark:bg-black shadow-inner">
 		<div class="flex justify-around py-2">
 			<UButton v-for="link in navLinks" :key="link.to" :to="link.to" variant="link" :icon="link.icon"
 				:class="getLinkClass(link.to)" class="flex flex-col items-center text-md">

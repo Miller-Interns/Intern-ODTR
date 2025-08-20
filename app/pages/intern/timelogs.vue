@@ -61,7 +61,7 @@
 						</div>
 						<div v-if="log.admin_remarks">
 							<p class="text-black-500 text-sm">Admin Remarks:</p>
-							<p class="text-black-800 rounded-md bg-blue-50 p-2 text-sm">{{ log.admin_remarks }}</p>
+							<p class="text-black-800 rounded-md light:bg-blue-50 p-2 text-sm">{{ log.admin_remarks }}</p>
 						</div>
 					</div>
 				</div>
