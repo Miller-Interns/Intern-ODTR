@@ -132,7 +132,7 @@
 
 	const route = useRoute()
 	const internId = computed(() => route.params.id as string)
-	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/[id]/${internId.value}`)
+	const { data, pending, error, refresh } = useFetch<InternDetailsResponse>(() => `/api/interns/${internId.value}`)
 	const form = computed(() => data.value?.intern)
 	const timeLogs = computed<InternLog[]>(() => data.value?.timeLogs ?? [])
 	const isEditing = ref(false)
@@ -172,7 +172,7 @@
 		exportError.value = null
 
 		try {
-			const response = await $fetch.raw(`/api/interns/${internId}/export`)
+			const response = await $fetch.raw(`/api/interns/export`)
 			const blob = response._data
 
 			if (!(blob instanceof Blob)) {
