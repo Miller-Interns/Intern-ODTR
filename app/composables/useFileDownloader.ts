@@ -44,7 +44,6 @@ export function useFileDownloader() {
 				color: 'success',
 			})
 		} catch (err: any) {
-			console.error('Download failed:', err)
 			const errorMessage = err.message || 'An unknown error occurred during download.'
 			exportError.value = err.message
 			toast.add({

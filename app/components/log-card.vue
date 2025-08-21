@@ -76,10 +76,6 @@
 	const admin_remarks = defineModel<string | null>('admin_remarks')
 	const remarksContainer = ref<HTMLDivElement | null>(null)
 
-	watch(admin_remarks, (newValue) => {
-		console.log(`Remarks for log ${props.log.id} changed to:`, newValue)
-	})
-
 	onClickOutside(remarksContainer, () => {
 		if (!admin_remarks.value || admin_remarks.value.trim() === '') {
 			isEditingRemarks.value = false

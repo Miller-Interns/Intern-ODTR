@@ -20,7 +20,6 @@ export function useBulkApproval() {
 			toast.add({ title: 'Success', description: response.message, color: 'success' })
 			return true
 		} catch (error: any) {
-			console.error('Failed to approve all logs:', error)
 			const errorMessage = error.data?.statusMessage || 'Could not approve all logs.'
 			toast.add({ title: 'Approval Failed', description: errorMessage, color: 'error' })
 			return false

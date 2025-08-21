@@ -16,8 +16,6 @@ export type ExportInternTimeLogsDTO = z.infer<typeof dtoSchema>
 export const exportInternTimelogs = async (dto: ExportInternTimeLogsDTO, context: RequestContext): Promise<ExportTimeLogsResponse> => {
 	await checkAuthentication(context)
 	const { internId } = await validateDTO(dto)
-
-	// Fetch intern details and formatted logs concurrently
 	const [intern, timelogs] = await Promise.all([
 		internService.getInternDetailsById(internId, context),
 		timeLogService.getLogsByInternIdWithAdmin(internId, context),

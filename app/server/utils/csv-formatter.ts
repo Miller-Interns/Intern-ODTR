@@ -25,7 +25,6 @@ export function formatTimelogsToCsv(data: ExportTimeLogsResponse): string {
     csvLines.push(tableHeaders.join(','));
     let totalHours = 0;
 
-    // Map your data to match the header order if necessary
     timelogs.forEach((log: FormattedTimeLog) => {
         const row = [
             escapeCsvField(log.date),

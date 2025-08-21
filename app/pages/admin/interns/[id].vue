@@ -118,13 +118,10 @@
 	]
 
 	async function saveChanges() {
-		console.log('Saving changes to:', form.value)
 		isEditing.value = false
 	}
 
-	async function handleStatusUpdate(newStatus: string) {
-		console.log('Updating status to:', newStatus)
-	}
+	async function handleStatusUpdate(newStatus: string) {}
 
 	function handlePictureUpload(file: File) {
 		if (avatarPreviewUrl.value) {

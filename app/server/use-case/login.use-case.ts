@@ -1,7 +1,5 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { loginSchema } from './useAuth.schema'
-import type { H3Event } from 'h3'
 import z from 'zod'
 import { createSchemaValidator } from '../utils/create-schema-validator'
 import { userService } from '../service/user.service'
@@ -21,7 +19,7 @@ type LoginResult = {
 	user: Selectable<User>
 }
 
-export async function loginUseCase(dto: LoginDTO, context: RequestContext, event: H3Event): Promise<LoginResult> {
+export async function loginUseCase(dto: LoginDTO, context: RequestContext): Promise<LoginResult> {
 	const { email, password } = await validateDTO(dto)
 	const config = useRuntimeConfig()
 

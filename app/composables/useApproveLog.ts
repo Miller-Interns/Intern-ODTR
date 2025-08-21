@@ -11,7 +11,6 @@ export function useLogApproval() {
 			toast.add({ title: 'Log Approved', color: 'success' })
 			return true
 		} catch (error: any) {
-			console.error('Failed to approve log:', error)
 			const errorMessage = error.data?.statusMessage || 'Approval failed.'
 			toast.add({ title: 'Error', description: errorMessage, color: 'error' })
 			return false

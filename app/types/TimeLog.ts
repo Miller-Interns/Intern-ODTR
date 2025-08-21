@@ -68,3 +68,5 @@ export type ApproveLogPayload = {
 export type BulkApprovePayload = {
 	logs: ApproveLogPayload[]
 }
+
+
