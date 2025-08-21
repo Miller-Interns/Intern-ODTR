@@ -1,5 +1,5 @@
 import { ref, reactive, watch } from 'vue'
-import type { InternDetails } from '~/types/Intern' // Corrected import path casing
+import type { InternDetails } from '~/types/Intern' 
 import { useToast } from '#imports'
 
 export function useInternProfile(internId: string) {
@@ -8,39 +8,25 @@ export function useInternProfile(internId: string) {
   const avatarFile = ref<File | null>(null)
   const avatarPreviewUrl = ref<string | null>(null)
   const toast = useToast()
-
-  // Fetch the initial data from the API
   const { data, pending, error, refresh } = useFetch<InternDetails>(`/api/interns/${internId}`)
-
-  // This is the reactive "working copy" of the form that the UI will bind to.
   const form = reactive<Partial<InternDetails>>({})
   
-  // --- THE FIX: Storing the original state ---
-  // We store the pristine, original data in a simple, non-reactive object.
   let originalFormState: Partial<InternDetails> = {}
 
-  // This watcher syncs our form when the data is first loaded or refreshed.
   watch(data, (newInternData) => {
     if (newInternData) {
-      // Update the reactive `form` object with the new data.
       Object.assign(form, newInternData)
-      // Create a deep, non-reactive copy of the pristine data for our backup.
       originalFormState = JSON.parse(JSON.stringify(newInternData))
     }
   }, { immediate: true })
-
-  // --- CORRECTED FUNCTIONS ---
 
   function startEditing() {
     isEditing.value = true
   }
 
   function cancelEditing() {
-    // This now works correctly. It copies the values from our backup
-    // back into the reactive `form` object, which updates the UI.
     Object.assign(form, originalFormState)
     
-    // Also reset any pending file uploads
     avatarFile.value = null
     avatarPreviewUrl.value = null
     
