@@ -6,13 +6,13 @@
 		@approved="bus.emit()"
 	>
 		<template #header>
-			<div class="flex items-center space-x-3">
+			<div class="flex items-center space-x-4">
 				<UAvatar
 					:src="avatarUrl || ''"
 					alt="Intern"
-					size="3xl"
+					size="lg"
 				/>
-				<p class="text-base font-semibold">{{ log.intern_name }}</p>
+				<p class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ log.intern_name }}</p>
 			</div>
 		</template>
 
@@ -26,7 +26,7 @@
 					:label="remarksButtonLabel"
 					icon="i-lucide-plus"
 					color="neutral"
-					variant="outline"
+					variant="ghost"
 					block
 					@click="logCardRef.startEditingRemarks()"
 				/>
@@ -92,6 +92,6 @@
 	})
 
 	const remarksButtonLabel = computed(() => {
-		return admin_remarks.value ? 'Edit Remarks' : 'Add Remarks'
+		return admin_remarks.value ? 'Edit Remarks' : 'Add Remarks (Optional)'
 	})
 </script>

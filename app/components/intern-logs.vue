@@ -6,7 +6,7 @@
 	>
 		<template #header>
 			<div class="flex items-center justify-between">
-				<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ dateDisplay }}</p>
+				<p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ dateDisplay }}</p>
 				<UModal
 					v-model:open="isApproveModalOpen"
 					title="Confirmation"
@@ -56,8 +56,8 @@
 		<template #body-extra>
 			<div v-if="!isPending && log.admin_remarks">
 				<UDivider class="my-3" />
-				<p class="text-sm font-medium text-gray-500">Admin Remarks:</p>
-				<p class="text-sm">{{ log.admin_remarks }}</p>
+				<p class="text-xs font-medium text-gray-500">Admin Remarks:</p>
+				<p class="text-sm font-semibold">{{ log.admin_remarks }}</p>
 			</div>
 		</template>
 

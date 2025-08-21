@@ -1,28 +1,30 @@
 <template>
-	<UCard class="w-full">
+	<UCard class="w-full shadow-md">
 		<template #header>
-			<slot name="header" />
+			<div class="flex items-start space-x-4">
+				<slot name="header" />
+			</div>
 		</template>
 
-		<div class="space-y-4">
+		<div class="space-y-3">
 			<div class="grid grid-cols-3 text-center">
 				<div>
-					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Time In:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_in) }}</p>
+					<p class="text-xs font-medium text-gray-500 dark:text-gray-400">Time In</p>
+					<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_in) }}</p>
 				</div>
 				<div>
-					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Time Out:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_out) }}</p>
+					<p class="text-xs text-gray-500 dark:text-gray-400">Time Out</p>
+					<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatTimeOnly(log.time_out) }}</p>
 				</div>
 				<div>
-					<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Hours:</span>
-					<p class="text-xs font-medium text-gray-900 dark:text-white">{{ totalHoursForDisplay }}</p>
+					<p class="text-xs text-gray-500 dark:text-gray-400">Total Hours:</p>
+					<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ totalHoursForDisplay }}</p>
 				</div>
 			</div>
 
 			<div v-if="log.intern_notes">
-				<UDivider label="Intern Notes" />
-				<p class="mt-2 text-sm font-normal text-gray-700 italic dark:text-gray-300">"{{ log.intern_notes }}"</p>
+				<p class="text-xs break-words text-gray-500 dark:text-gray-400">Intern Notes:</p>
+				<p class="text-sm font-semibold text-gray-900 dark:text-white">{{ log.intern_notes }}</p>
 			</div>
 
 			<slot name="body-extra" />
@@ -50,7 +52,10 @@
 			</div>
 		</div>
 
-		<template #footer>
+		<template
+			v-if="!log.status"
+			#footer
+		>
 			<slot name="footer" />
 		</template>
 	</UCard>
@@ -64,20 +69,11 @@
 
 	type Log = DashboardLog | InternLog
 
-	const props = defineProps<{
-		log: Log
-	}>()
-
-	const emit = defineEmits<{
-		(e: 'approved'): void
-	}>()
-
+	const props = defineProps<{ log: Log }>()
+	const emit = defineEmits<{ (e: 'approved'): void }>()
 	const { isApproving, approve } = useLogApproval()
-
 	const isEditingRemarks = ref(false)
-
 	const admin_remarks = defineModel<string | null>('admin_remarks')
-
 	const remarksContainer = ref<HTMLDivElement | null>(null)
 
 	watch(admin_remarks, (newValue) => {

@@ -18,7 +18,7 @@
 					:name="link.icon"
 					class="h-6 w-6"
 					:class="[
-						route.path.startsWith(link.to) ? 'text-neutral' : 'group-hover:text-neutral text-gray-600 transition-colors dark:text-gray-400',
+						route.path.startsWith(link.to) ? 'text-neutral' : 'group-hover:text-neutral text-gray-400 transition-colors dark:text-gray-500',
 					]"
 				/>
 				<span
@@ -26,7 +26,7 @@
 					:class="[
 						route.path.startsWith(link.to)
 							? 'text-neutral font-bold'
-							: 'group-hover:text-neutral text-gray-600 transition-colors dark:text-gray-400',
+							: 'group-hover:text-neutral text-gray-400 transition-colors dark:text-gray-500',
 					]"
 				>
 					{{ link.label }}

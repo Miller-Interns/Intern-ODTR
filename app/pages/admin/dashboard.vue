@@ -24,12 +24,15 @@
 					v-model:open="isApproveModalOpen"
 					title="Confirmation"
 				>
-					<UButton
-						label="Approve All"
-						icon="i-lucide-check-check"
-						color="primary"
-						variant="solid"
-					/>
+					<div v-if="dashboardLogs && dashboardLogs.length > 0">
+						<UButton
+							label="Approve All"
+							icon="i-lucide-check-check"
+							color="primary"
+							variant="solid"
+						/>
+					</div>
+
 					<template #header>
 						<h2 class="text-2xl font-bold dark:text-gray-400">Approve Time Log</h2>
 					</template>
@@ -99,14 +102,9 @@
 
 			<div
 				v-else
-				class="mt-8 rounded-lg border-2 border-dashed border-gray-300 py-12 text-center dark:border-gray-700"
+				class="mt-8 rounded-lg bg-white p-6 text-center shadow-md sm:p-8 dark:bg-gray-800"
 			>
-				<UIcon
-					name="i-lucide-circle-check"
-					class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-				/>
-				<p class="mt-2 text-base font-normal text-gray-600 dark:text-gray-300">No Pending Approvals</p>
-				<p class="text-sm text-gray-500 dark:text-gray-400">Everything is up to date!</p>
+				<p class="text-gray-500 dark:text-gray-400">No pending approvals for today</p>
 			</div>
 		</main>
 	</UContainer>

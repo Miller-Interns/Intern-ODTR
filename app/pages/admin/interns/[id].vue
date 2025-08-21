@@ -90,7 +90,6 @@
 						block
 						class="mt-6"
 						:loading="isExporting"
-						:disabled="isExporting"
 						@click="handleExport"
 					/>
 				</template>
@@ -111,7 +110,7 @@
 	const timeLogs = computed<InternLog[]>(() => data.value?.timeLogs ?? [])
 	const isEditing = ref(false)
 	const avatarPreviewUrl = ref<string | null>(null)
-	const { isExporting, exportError, downloadFile } = useFileDownloader()
+	const { isExporting, downloadFile } = useFileDownloader()
 
 	const tabItems = [
 		{ slot: 'personalinfo', label: 'Personal Info' },
@@ -134,16 +133,16 @@
 		avatarPreviewUrl.value = URL.createObjectURL(file)
 	}
 
+	const handleExport = () => {
+		const exportUrl = `/api/interns/${internId.value}/export`
+		downloadFile(exportUrl, 'timelogs.csv')
+	}
+
 	onUnmounted(() => {
 		if (avatarPreviewUrl.value) {
 			URL.revokeObjectURL(avatarPreviewUrl.value)
 		}
 	})
-
-	const handleExport = () => {
-		const exportUrl = `/api/interns/${internId.value}/export`
-		downloadFile(exportUrl, 'timelogs.csv')
-	}
 
 	definePageMeta({
 		layout: 'admin',
