@@ -34,7 +34,7 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		const timeInDate = new Date(String(activeTimeLog.value.time_in))
 		const now = new Date()
 		const diffMilliseconds = now.getTime() - timeInDate.getTime()
-		elapsedTime.value = diffMilliseconds / (1000 * 60 * 60)
+		elapsedTime.value = diffMilliseconds / (1000 * 60 * 60) //converting milliseconds into hours as a decimal number
 	}
 
 	async function handleTimeOut() {
