@@ -89,7 +89,6 @@
 
 <script setup lang="ts">
 	import type { ActiveInternsResponse } from '~/types/Api'
-
 	const { data, pending, error } = await useFetch<ActiveInternsResponse>(`/api/interns/active-interns`)
 
 	const batchStatus = computed(() => {

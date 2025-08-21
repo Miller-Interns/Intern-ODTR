@@ -13,9 +13,6 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    console.log(`[API] Received request for intern ID:`, params.id);
-
-
     const useCaseContext: RequestContext = {
         auth: event.context.auth ?? {},
         trx: event.context.trx,
@@ -25,15 +22,8 @@ export default defineEventHandler(async (event) => {
         internId: internId,
     }
 
-    const internDetails = await getInternDetails(dto, useCaseContext)
-
-    console.log('Data from getInternDetails:', JSON.stringify(internDetails, null, 2));
-
     try {
         const internDetails = await getInternDetails(dto, useCaseContext)
-
-        console.log('Data from getInternDetails:', JSON.stringify(internDetails, null, 2));
-
         try {
             return internFactory.toDetailsResponse(internDetails)
         } catch (error) {

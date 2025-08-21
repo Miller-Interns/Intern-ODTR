@@ -64,18 +64,42 @@ async function getTimeLogsByInternId(internId: string, ctx: RequestContext): Pro
 	return logs
 }
 
-async function getFormattedLogsByInternId(internId: string, ctx: RequestContext) {
-	const qb = ctx.trx ?? db
+// async function getFormattedLogsByInternId(internId: string, ctx: RequestContext): Promise<FormattedTimeLog[]> {
+// 	const qb = ctx.trx ?? db
 
-	const logs = await qb
+// 	const rawLogs = await qb
+// 		.selectFrom('time_logs as tl')
+// 		.leftJoin('users as u', 'u.id', 'tl.admin_id')
+// 		.where('tl.intern_id', '=', internId)
+// 		.select(['tl.time_in', 'tl.time_out', 'tl.total_hours', sql<string>`COALESCE(u.name, 'N/A')`.as('approved_by')])
+// 		.orderBy('tl.time_in', 'asc')
+// 		.execute()
+
+// 	const formattedLogs: FormattedTimeLog[] = rawLogs.map((log: any) => {
+// 		const timeInDate = new Date(log.time_in);
+// 		const timeOutDate = log.time_out ? new Date(log.time_out) : null;
+
+// 		return {
+// 			date: timeInDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }),
+// 			timeIn: timeInDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+// 			timeOut: timeOutDate ? timeOutDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A',
+// 			noOfHours: log.total_hours,
+// 			approvedBy: log.approved_by,
+// 		};
+// 	});
+
+// 	return formattedLogs;
+// }
+
+async function getLogsByInternIdWithAdmin(internId: string, ctx: RequestContext) {
+	const qb = ctx.trx ?? db;
+	return qb
 		.selectFrom('time_logs as tl')
 		.leftJoin('users as u', 'u.id', 'tl.admin_id')
 		.where('tl.intern_id', '=', internId)
 		.select(['tl.time_in', 'tl.time_out', 'tl.total_hours', sql<string>`COALESCE(u.name, 'N/A')`.as('approved_by')])
-		.orderBy('tl.time_in', 'asc')
-		.execute()
-
-	return logs
+		.orderBy('tl.time_in', 'desc')
+		.execute();
 }
 
 export const timeLogService = {
@@ -83,5 +107,5 @@ export const timeLogService = {
 	approveLog,
 	getTimeLogsByInternId,
 	getLogById,
-	getFormattedLogsByInternId,
+	getLogsByInternIdWithAdmin,
 }
