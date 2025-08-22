@@ -1,8 +1,15 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+enum Status {
+  INCOMING
+  ONGOING
+  COMPLETED
+}   
+
 generator client {
   provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 generator kysely {
@@ -29,6 +36,7 @@ model User {
 
   Intern  Intern[]
   TimeLog TimeLog[]
+  supervised_batches Batch[] @relation("SupervisorToBatch")
 
   @@map("users")
 }
@@ -38,12 +46,15 @@ model Batch {
   batch_number String
   start_date   DateTime  @default(now())
   end_date     DateTime?
-  status       Boolean   @default(true)
+  status       Status   @default(INCOMING)
+  supervisorId String
+  intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
 
   Intern Intern[]
 
   @@map("batches")
 }
+
 
 model Intern {
   id                       String  @id @default(uuid())
@@ -51,14 +62,22 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
+  first_name               String
+  middle_name              String?
+  last_name                String
   school                   String
-  course                   String
-  year                     String
-  contact_number           String
-  emergency_contact_person String
-  emergency_contact_number String
+  course                   String?
+  year                     String?
+  contact_number           String?
+  emergency_contact_person String?
+  emergency_contact_number String?
   required_hours           Int
-  status                   Boolean
+  status                   Status @default(INCOMING)
+  hours_completed          Float?
+  intern_picture           String?
+  role                     String?
+  notes                    String?
+
 
   TimeLog TimeLog[]
 
@@ -66,17 +85,17 @@ model Intern {
 }
 
 model TimeLog {
-  id          String   @id @default(uuid())
-  intern      Intern   @relation(fields: [intern_id], references: [id])
-  intern_id   String
-  time_in     DateTime
-  time_out    DateTime
-  overtime    Int?
-  total_hours Int
-  remarks     String?
-  status      Boolean  @default(false)
-  user        User     @relation(fields: [admin_id], references: [id])
-  admin_id    String
+  id            String    @id @default(uuid())
+  intern        Intern    @relation(fields: [intern_id], references: [id])
+  intern_id     String
+  time_in       DateTime
+  time_out      DateTime?
+  total_hours   Float
+  admin_remarks String?
+  intern_notes  String?
+  status        Boolean   @default(false)
+  user          User?     @relation(fields: [admin_id], references: [id])
+  admin_id      String?
 
   @@map("time_logs")
 }

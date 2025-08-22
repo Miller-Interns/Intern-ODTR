@@ -29,7 +29,7 @@ export const TimeLogSchema = z.object({
 	time_out: z.date(),
 	overtime: z.number().nullable(),
 	total_hours: z.number(),
-	remarks: z.string().nullable(),
+	intern_notes: z.string().nullable(),
 	status: z.boolean(),
 	admin_id: z.string(),
 })
