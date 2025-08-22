@@ -22,17 +22,6 @@
 
           </UFormField>
         </div>
-        <!-- 
-        <section class="items-center  space-x-10 w-full max-w-md">
-          <UFormGroup  name="startDate" class="grow" required>
-
-            <div>
-              Start Date : <span class="text-red-500">*</span>
-            </div>
-            <UInput class="w-full"  v-model="form.start_date" type="date" size="xl" />
-          </UFormGroup>
-      
-        </section> -->
 
 
 

@@ -1,14 +1,14 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-sc
 
-enum Status{
+
+enum Status {
   INCOMING
   ONGOING
   COMPLETED
 }
+
 generator client {
   provider = "prisma-client-js"
-  output = "../app/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 generator kysely {
@@ -21,7 +21,7 @@ generator kysely {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_CONNECTION_URL") 
+  url      = env("POSTGRES_CONNECTION_URL")
 }
 
 model User {
@@ -48,8 +48,6 @@ model Batch {
   status       Status   @default(INCOMING)
   supervisorId String
   intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
- 
-
 
   Intern Intern[]
 
@@ -62,15 +60,21 @@ model Intern {
   user_id                  String  @unique
   batch                    Batch   @relation(fields: [batch_id], references: [id])
   batch_id                 String
+  first_name               String
+  middle_name              String?
+  last_name                String
   school                   String
+  required_hours           Int
+  status                   Status  @default(INCOMING)
   course                   String
   year                     String
   contact_number           String
   emergency_contact_person String
   emergency_contact_number String
-  required_hours           Int
-  status                   Boolean
-  
+  role                     String  @default("Web Developer")
+  intern_picture           String?
+  hours_completed          Float?
+  note                     String?
 
   TimeLog TimeLog[]
 
@@ -78,17 +82,18 @@ model Intern {
 }
 
 model TimeLog {
-  id          String   @id @default(uuid())
-  intern      Intern   @relation(fields: [intern_id], references: [id])
-  intern_id   String
-  time_in     DateTime
-  time_out    DateTime
-  overtime    Int?
-  total_hours Int
-  remarks     String?
-  status      Boolean  @default(false)
-  user        User     @relation(fields: [admin_id], references: [id])
-  admin_id    String
+  id            String   @id @default(uuid())
+  intern        Intern   @relation(fields: [intern_id], references: [id])
+  intern_id     String
+  time_in       DateTime
+  time_out      DateTime
+  total_hours   Float
+  admin_remarks String?
+  intern_notes  String?
+  status        Boolean  @default(false)
+  user          User?    @relation(fields: [admin_id], references: [id])
+  admin_id      String?
+
 
   @@map("time_logs")
 }

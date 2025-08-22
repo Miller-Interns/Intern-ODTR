@@ -83,22 +83,6 @@ const calendarDate = computed({
   };
    
 
-// const errors=computed(()=>{
-
-//  if (!form.selectedSupervisorId && submitted.value) {
-//       return "Required";
-//     }
-//     if (!form.batch_number && submitted.value) {
-//       return "Required";
-//     }
-//      if (!form.start_date && submitted.value) {
-//        return "Required";
-
-//     }
-//     return undefined
-
-
-// })
 const supervisorError=computed(()=>{
  if (!form.selectedSupervisorId && submitted.value) {
       return "Please select a supervisor.";
