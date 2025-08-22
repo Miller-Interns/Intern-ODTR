@@ -22,25 +22,32 @@ export type Intern = {
     id: string;
     user_id: string;
     batch_id: string;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
     school: string;
+    required_hours: number;
+    status: Generated<Status>;
     course: string;
     year: string;
     contact_number: string;
     emergency_contact_person: string;
     emergency_contact_number: string;
-    required_hours: number;
-    status: boolean;
+    role: Generated<string>;
+    intern_picture: string | null;
+    hours_completed: number | null;
+    note: string | null;
 };
 export type TimeLog = {
     id: string;
     intern_id: string;
     time_in: Timestamp;
     time_out: Timestamp;
-    overtime: number | null;
     total_hours: number;
-    remarks: string | null;
+    admin_remarks: string | null;
+    intern_notes: string | null;
     status: Generated<boolean>;
-    admin_id: string;
+    admin_id: string | null;
 };
 export type User = {
     id: string;

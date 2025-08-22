@@ -77,7 +77,6 @@ const {
   supervisorList,  
   calendarDate,
   isLoading,     
-  error,     
   submit,      
 } = useBatchForm(batchId);
 

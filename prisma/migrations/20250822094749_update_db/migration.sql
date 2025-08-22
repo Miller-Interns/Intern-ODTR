@@ -64,14 +64,21 @@ CREATE TABLE "interns" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "batch_id" TEXT NOT NULL,
+    "first_name" TEXT NOT NULL,
+    "middle_name" TEXT,
+    "last_name" TEXT NOT NULL,
     "school" TEXT NOT NULL,
+    "required_hours" INTEGER NOT NULL,
+    "status" "Status" NOT NULL DEFAULT 'INCOMING',
     "course" TEXT NOT NULL,
     "year" TEXT NOT NULL,
     "contact_number" TEXT NOT NULL,
     "emergency_contact_person" TEXT NOT NULL,
     "emergency_contact_number" TEXT NOT NULL,
-    "required_hours" INTEGER NOT NULL,
-    "status" BOOLEAN NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'Web Developer',
+    "intern_picture" TEXT,
+    "hours_completed" DOUBLE PRECISION,
+    "note" TEXT,
 
     CONSTRAINT "interns_pkey" PRIMARY KEY ("id")
 );
@@ -82,11 +89,11 @@ CREATE TABLE "time_logs" (
     "intern_id" TEXT NOT NULL,
     "time_in" TIMESTAMP(3) NOT NULL,
     "time_out" TIMESTAMP(3) NOT NULL,
-    "overtime" INTEGER,
-    "total_hours" INTEGER NOT NULL,
-    "remarks" TEXT,
+    "total_hours" DOUBLE PRECISION NOT NULL,
+    "admin_remarks" TEXT,
+    "intern_notes" TEXT,
     "status" BOOLEAN NOT NULL DEFAULT false,
-    "admin_id" TEXT NOT NULL,
+    "admin_id" TEXT,
 
     CONSTRAINT "time_logs_pkey" PRIMARY KEY ("id")
 );
@@ -110,4 +117,4 @@ ALTER TABLE "interns" ADD CONSTRAINT "interns_batch_id_fkey" FOREIGN KEY ("batch
 ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_intern_id_fkey" FOREIGN KEY ("intern_id") REFERENCES "interns"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
