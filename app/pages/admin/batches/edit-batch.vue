@@ -56,11 +56,6 @@
 
         <UButton type="submit" text=regular label="Save Batch" :loading="isLoading" color=primary block size="lg"
           class="mt-8" />
-<!-- 
-        <UAlert v-if="successMessage" icon="i-heroicons-check-circle" color=success variant="subtle"
-        :title="successMessage" @close="successMessage = ''" />
-      <UAlert v-if="errorMessage" icon="i-heroicons-x-circle" color=error variant="subtle" :title="errorMessage"
-        @close="errorMessage = ''" /> -->
       </UForm>
     </div>
   </UApp>
