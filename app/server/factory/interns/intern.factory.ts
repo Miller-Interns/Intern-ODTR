@@ -1,13 +1,13 @@
 import type { Intern } from '~/server/db/types.d' 
 import { AddInternResponseSchema, type AddInternResponse } from '~/server/response/add_intern/add-intern.response'
 import { InternDetailsResponseSchema, type InternDetailsResponse } from '~/server/response/interns/intern-details.response'
-import type { InternWithUser } from '~/server/service/interns/intern.service'
+import type { InternWithUserAndBatchStatus } from '~/server/service/interns/intern.service'
 
 function toAddInternResponse(intern: Intern): AddInternResponse {
   return AddInternResponseSchema.parse(intern);
 }
 
-function toInternDetailsResponse(internWithUser: InternWithUser): InternDetailsResponse {
+function toInternDetailsResponse(internWithUser: InternWithUserAndBatchStatus): InternDetailsResponse {
   
   const viewModel = {
     userId: internWithUser.user_id,

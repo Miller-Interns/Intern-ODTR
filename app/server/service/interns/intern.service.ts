@@ -1,9 +1,9 @@
 import { db } from '~/server/db'
-import type { User, Intern } from '~/server/db/types'
+import type { User, Intern, Batch } from '~/server/db/types'
 import type { Updateable, Insertable, Transaction } from 'kysely'
 import type { DB } from '~/server/db/types'
 
-export type InternWithUser = Intern & User & { user_id_from_users?: string };
+export type InternWithUserAndBatchStatus = Intern & User & { batch_status: Batch['status'] } & { user_id_from_users?: string };
 
 type CreateInternAndUserPayload = {
   userData: Insertable<User>,
@@ -34,9 +34,12 @@ async function createInternAndUser(payload: CreateInternAndUserPayload): Promise
   return result as unknown as Intern;
 }
 
-async function findInternWithUserById(internId: string, trx?: Transaction<DB>): Promise<InternWithUser> {
+async function findInternWithUserById(internId: string, trx?: Transaction<DB>): Promise<InternWithUserAndBatchStatus> {
   const dbOrTrx = trx || db;
-  const intern = await dbOrTrx.selectFrom('interns').innerJoin('users', 'users.id', 'interns.user_id')
+  const intern = await dbOrTrx
+    .selectFrom('interns')
+    .innerJoin('users', 'users.id', 'interns.user_id')
+    .innerJoin('batches', 'batches.id', 'interns.batch_id') 
     .selectAll('interns')
     .select([
       'users.id as user_id_from_users',
@@ -44,7 +47,8 @@ async function findInternWithUserById(internId: string, trx?: Transaction<DB>): 
       'users.email',
       'users.isAdmin',
       'users.createdAt',
-      'users.updatedAt'
+      'users.updatedAt',
+      'batches.status as batch_status'
     ])
     .where('interns.id', '=', internId)
     .executeTakeFirst()
@@ -52,8 +56,9 @@ async function findInternWithUserById(internId: string, trx?: Transaction<DB>): 
   if (!intern) {
     throw createError({ statusCode: 404, statusMessage: 'Intern not found.' })
   }
-  return intern as unknown as InternWithUser;
+  return intern as unknown as InternWithUserAndBatchStatus;
 }
+
 
 async function updateInternStatus(internId: string, status: 'INCOMING' | 'ONGOING' | 'COMPLETED') {
   return db.updateTable('interns').set({ status }).where('id', '=', internId).returningAll().executeTakeFirstOrThrow()
@@ -63,7 +68,7 @@ async function updateInternPicture(internId: string, picturePath: string) {
   return db.updateTable('interns').set({ intern_picture: picturePath }).where('id', '=', internId).returningAll().executeTakeFirstOrThrow()
 }
 
-async function updateInternAndUser(payload: { userId: string; internId: string; userData: Updateable<User>; internData: Updateable<Intern> }): Promise<InternWithUser> {
+async function updateInternAndUser(payload: { userId: string; internId: string; userData: Updateable<User>; internData: Updateable<Intern> }): Promise<InternWithUserAndBatchStatus> {
   return db.transaction().execute(async (trx) => {
     await trx.updateTable('users').set(payload.userData).where('id', '=', payload.userId).execute()
     await trx.updateTable('interns').set(payload.internData).where('id', '=', payload.internId).execute()

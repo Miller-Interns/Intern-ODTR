@@ -11,7 +11,7 @@
               size="xl"
               class="-ml-4"
               aria-label="Back"
-              to="admin/batches"
+              to="/admin/batches"
             />
             <h1 class="text-lg font-bold ml-4 text-gray-900 dark:text-white">Batch Details</h1>
           </div>
