@@ -21,7 +21,7 @@ export function useTimeLogs() {
 	const { session } = useUserSession()
 	const toast = useToast()
 	const typedUser = computed(() => session.value?.user as SessionUser | undefined)
-	const { data, pending, error } = useFetch<TimeLogsResponse>('/api/timelog/list')
+	const { data, pending, error } = useFetch<TimeLogsResponse>('/api/timelog/intern/list')
 	const formattedDate = (dateString: string | Date) => {
 		if (!dateString) return ''
 		return new Date(String(dateString)).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })

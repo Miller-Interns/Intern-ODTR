@@ -27,7 +27,7 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		pending,
 		error,
 		refresh,
-	} = useFetch<DashboardDataResponse>('/api/timelog/current', { watch: [typedUser], immediate: !!typedUser.value })
+	} = useFetch<DashboardDataResponse>('/api/timelog/intern/current', { watch: [typedUser], immediate: !!typedUser.value })
 
 	function updateElapsedTime() {
 		if (!activeTimeLog.value?.time_in) return
@@ -41,7 +41,7 @@ export function useDashboard(renderedHours: Ref<number>, totalHours: Ref<number>
 		if (!activeTimeLog.value || isTimeOutDisabled.value) return
 		isSubmitting.value = true
 		try {
-			await $fetch('/api/timelog/timeout', {
+			await $fetch('/api/timelog/intern/timeout', {
 				method: 'POST',
 				body: {
 					timeLogId: activeTimeLog.value.id,

@@ -67,6 +67,7 @@ async function findActiveLogByIdAndInternId(logId: string, internId: string, ctx
 		.where('id', '=', logId)
 		.where('intern_id', '=', internId)
 		.where('time_out', 'is', null)
+		.orderBy('time_in', 'asc')
 		.executeTakeFirst()
 }
 

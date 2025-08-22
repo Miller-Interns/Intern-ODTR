@@ -52,15 +52,9 @@ export async function loginUseCase(dto: LoginDTO, context: RequestContext): Prom
 					let shouldTimeIn = false
 
 					if (internProfile.status === Status.INCOMING) {
-						await trx
-							.updateTable('interns')
-							.set({ status: Status.ONGOING })
-							.where('id', '=', internProfile.id)
-							.execute()
+						await trx.updateTable('interns').set({ status: Status.ONGOING }).where('id', '=', internProfile.id).execute()
 						shouldTimeIn = true
-					}
-
-					else if (internProfile.status === Status.ONGOING) {
+					} else if (internProfile.status === Status.ONGOING) {
 						shouldTimeIn = true
 					}
 
