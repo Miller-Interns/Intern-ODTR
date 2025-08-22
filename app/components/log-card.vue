@@ -112,10 +112,8 @@
 			return null
 		}
 
-		const BREAK_HOURS = 1
 		const grossDurationHours = (timeOut.getTime() - timeIn.getTime()) / (1000 * 60 * 60)
-
-		return Math.max(0, grossDurationHours - BREAK_HOURS)
+		return Math.max(0, grossDurationHours)
 	})
 
 	const totalHoursForDisplay = computed(() => {

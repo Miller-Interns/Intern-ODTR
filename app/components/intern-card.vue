@@ -19,18 +19,15 @@
 <script setup lang="ts">
 	import type { InternSummary } from '~/types/Intern'
 
-	const { intern } = defineProps<{
+	const props = defineProps<{
 		intern: InternSummary
 	}>()
 
 	const avatarUrl = computed(() => {
-		if (intern.intern_picture) {
-			return `/uploads/avatars/${intern.intern_picture}`
-		}
-		return null
+		return `/uploads/avatars/${props.intern.intern_picture}`
 	})
 
 	const displayCompletedHours = computed(() => {
-		return Math.floor((intern.completed_hours || 0) * 100) / 100
+		return Math.floor((props.intern.completed_hours || 0) * 100) / 100
 	})
 </script>

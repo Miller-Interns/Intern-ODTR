@@ -1,8 +1,8 @@
 import type { Kysely } from 'kysely'
-import type { DB } from '../../db/types'
-import type { ActiveInternsApiResponse } from '../../../types/Api'
-import type { InternSummary } from '../../../types/Intern'
-import { getActiveBatch, getInternsByBatchId } from '../../service/active-intern.service'
+import type { DB } from '../../../db/types'
+import type { ActiveInternsApiResponse } from '../../../../types/Api'
+import type { InternSummary } from '../../../../types/Intern'
+import { getActiveBatch, getInternsByBatchId } from '../../../service/admin/active-intern.service'
 
 export async function getActiveInterns(db: Kysely<DB>): Promise<ActiveInternsApiResponse> {
 	const activeBatch = await getActiveBatch(db)

@@ -1,9 +1,9 @@
 import z from 'zod'
-import { createSchemaValidator } from '../../utils/create-schema-validator'
-import { timeLogService } from '~/server/service/time-logs.service'
-import type { RequestContext } from '../../types/RequestContext'
+import { createSchemaValidator } from '../../../utils/create-schema-validator'
+import { timeLogService } from '~/server/service/admin/time-logs.service'
+import type { RequestContext } from '../../../types/RequestContext'
 import type { DashboardLog } from '~/types/TimeLog'
-import { checkAuthentication } from '../../utils/check-authentication'
+import { checkAuthentication } from '../../../utils/check-authentication'
 import type { RawPendingLogQueryResult } from '~/server/types/RawPendingLogQueryResult'
 
 const dtoSchema = z.object({})
@@ -27,14 +27,14 @@ function formatToDashboardLogs(rawLogs: RawPendingLogQueryResult[]): DashboardLo
 		admin_id: log.admin_id ?? '',
 		intern_name: log.intern_name ?? 'Unnamed Intern',
 		intern_picture: log.intern_picture ?? null,
-	}));
+	}))
 }
 
 export const getPendingToday = async (dto: GetPendingTodayDTO, context: Partial<RequestContext>): Promise<GetPendingTodayResult> => {
 	const safeContext: RequestContext = {
 		auth: context.auth ?? {},
 		trx: context.trx,
-	};
+	}
 
 	await checkAuthentication(safeContext)
 	await validateDTO(dto)
@@ -44,7 +44,7 @@ export const getPendingToday = async (dto: GetPendingTodayDTO, context: Partial<
 	const tomorrow = new Date(today)
 	tomorrow.setDate(tomorrow.getDate() + 1)
 
-	const rawLogs = await timeLogService.fetchPendingWithInternDetails(today, tomorrow, safeContext);
-	const formattedLogs = formatToDashboardLogs(rawLogs);
+	const rawLogs = await timeLogService.fetchPendingWithInternDetails(today, tomorrow, safeContext)
+	const formattedLogs = formatToDashboardLogs(rawLogs)
 	return { logs: formattedLogs }
 }

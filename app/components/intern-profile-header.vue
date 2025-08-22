@@ -36,14 +36,11 @@
 <script setup lang="ts">
 	import type { InternWithDetails } from '~/types/Intern'
 
-	const { intern } = defineProps<{
+	const props = defineProps<{
 		intern: InternWithDetails
 	}>()
 
 	const avatarUrl = computed(() => {
-		if (intern.intern_picture) {
-			return `/uploads/avatars/${intern.intern_picture}`
-		}
-		return null
+		return props.intern.intern_picture
 	})
 </script>

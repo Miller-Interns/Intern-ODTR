@@ -1,5 +1,5 @@
-import { db } from '../db'
-import type { RequestContext } from '../types/RequestContext'
+import { db } from '../../db'
+import type { RequestContext } from '../../types/RequestContext'
 import type { InternQueryRow } from '~/server/types/InternQueryRow'
 
 async function getInternDetailsById(id: string, ctx: RequestContext): Promise<InternQueryRow | null> {

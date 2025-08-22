@@ -1,6 +1,6 @@
 import { checkAuthentication } from '../utils/check-authentication'
 import { userService } from '../service/user.service'
-import { createInternProfileResponse } from '../response/intern-profile.response' // Import the new response formatter
+import { createInternProfileResponse } from '../response/intern-profile.response'
 import type { RequestContext } from '../types/RequestContext'
 
 export const getInternProfileUseCase = async (context: RequestContext) => {

@@ -45,9 +45,9 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	const validate = (state: any): FormError[] => {
 		const errors = []
 		if (state.password && state.password.length > 0 && state.password.length < 6) {
-			const message = 'Password must be at least 6 characters';
-			errors.push({ path: 'password', message: message });
-			passwordError.value = message;
+			const message = 'Password must be at least 6 characters'
+			errors.push({ path: 'password', message: message })
+			passwordError.value = message
 		}
 		return errors
 	}
@@ -90,12 +90,12 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 				last_name: profile.last_name,
 				email: profile.email,
 				password: '',
-				contact_number: profile.contact_number,
-				emergency_contact_person: profile.emergency_contact_person,
-				emergency_contact_number: profile.emergency_contact_number,
+				contact_number: profile.contact_number || '',
+				emergency_contact_person: profile.emergency_contact_person || '',
+				emergency_contact_number: profile.emergency_contact_number || '',
 				school: profile.school,
-				course: profile.course,
-				year: profile.year,
+				course: profile.course || '',
+				year: profile.year || '',
 				required_hours: profile.required_hours,
 				role: profile.role || '',
 				notes: profile.notes || '',
@@ -105,12 +105,12 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	}
 
 	function cancelEdit() {
-		isEditing.value = false;
-		passwordError.value = undefined;
+		isEditing.value = false
+		passwordError.value = undefined
 	}
 
 	async function handleSaveChanges() {
-		passwordError.value = undefined;
+		passwordError.value = undefined
 		isSaving.value = true
 		try {
 			const payload = { ...formState.value }

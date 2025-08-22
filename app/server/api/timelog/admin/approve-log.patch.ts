@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { approveSingleLog } from '~/server/use-case/time-logs/approve-single-log.use-case'
+import { approveSingleLog } from '~/server/use-case/admin/time-logs/approve-single-log.use-case'
 import type { RequestContext } from '~/server/types/RequestContext'
-import type { ApproveSingleLogDTO } from '~/server/use-case/time-logs/approve-single-log.use-case'
+import type { ApproveSingleLogDTO } from '~/server/use-case/admin/time-logs/approve-single-log.use-case'
 
 const approveLogBodySchema = z.object({
 	logId: z.string(),

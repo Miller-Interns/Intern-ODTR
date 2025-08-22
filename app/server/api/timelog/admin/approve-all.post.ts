@@ -1,4 +1,4 @@
-import { approveBulkLogsUseCase } from '~/server/use-case/time-logs/approve-all.use-case'
+import { approveBulkLogsUseCase } from '~/server/use-case/admin/time-logs/approve-all.use-case'
 import { defineEventHandler, readBody } from 'h3'
 import { ZodError } from 'zod'
 import type { RequestContext } from '~/server/types/RequestContext'

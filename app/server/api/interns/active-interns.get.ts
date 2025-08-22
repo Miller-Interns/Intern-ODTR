@@ -1,4 +1,4 @@
-import { getActiveInterns } from '~/server/use-case/interns/get-active-interns.use-case'
+import { getActiveInterns } from '~/server/use-case/admin/interns/get-active-interns.use-case'
 import type { ActiveInternsApiResponse } from '~/types/Api'
 
 export default defineEventHandler(async (event): Promise<ActiveInternsApiResponse> => {

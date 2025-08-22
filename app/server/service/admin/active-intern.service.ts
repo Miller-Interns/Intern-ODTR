@@ -1,6 +1,6 @@
 import { sql, type Kysely } from 'kysely'
-import type { DB, Batch } from '../db/types'
-import type { ActiveInternRow } from '../../types/Intern'
+import type { DB, Batch } from '../../db/types'
+import type { ActiveInternRow } from '../../../types/Intern'
 import type { Selectable } from 'kysely'
 
 export async function getActiveBatch(db: Kysely<DB>): Promise<Selectable<Batch> | undefined> {

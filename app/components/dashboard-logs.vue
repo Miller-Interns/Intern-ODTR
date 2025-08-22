@@ -85,10 +85,7 @@
 	const isApproveModalOpen = ref(false)
 
 	const avatarUrl = computed(() => {
-		if (props.log.intern_picture) {
-			return `/uploads/avatars/${props.log.intern_picture}`
-		}
-		return null
+		return props.log.intern_picture
 	})
 
 	const remarksButtonLabel = computed(() => {

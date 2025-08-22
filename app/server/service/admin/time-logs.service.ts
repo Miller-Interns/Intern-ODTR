@@ -1,6 +1,6 @@
-import { db } from '../db'
+import { db } from '../../db'
 import { sql, type Selectable } from 'kysely'
-import type { TimeLog } from '../db/types'
+import type { TimeLog } from '../../db/types'
 import type { RequestContext } from '~/server/types/RequestContext'
 import type { RawPendingLogQueryResult } from '~/server/types/RawPendingLogQueryResult'
 
@@ -35,7 +35,7 @@ async function fetchPendingWithInternDetails(startDate: Date, endDate: Date, ctx
 async function approveLog(
 	logId: string,
 	adminId: string,
-	updateData: { admin_remarks: string | null; totalHours: number },
+	updateData: { admin_remarks: string | null; status: boolean },
 	ctx: RequestContext,
 ) {
 	const qb = (ctx.trx ??= db)
@@ -43,9 +43,8 @@ async function approveLog(
 	return qb
 		.updateTable('time_logs')
 		.set({
-			status: true,
+			status: updateData.status,
 			admin_remarks: updateData.admin_remarks,
-			total_hours: updateData.totalHours,
 			admin_id: adminId,
 		})
 		.where('id', '=', logId)

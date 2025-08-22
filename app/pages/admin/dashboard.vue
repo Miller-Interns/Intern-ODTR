@@ -34,12 +34,10 @@
 					</div>
 
 					<template #header>
-						<h2 class="text-2xl font-bold dark:text-gray-400">Approve Time Log</h2>
+						<h2 class="text-2xl font-bold dark:text-gray-400">Approve All Time Log</h2>
 					</template>
 					<template #body>
-						<p class="py-4 text-black dark:text-gray-400">
-							Are you sure you want to approve {{ props.log.intern_name }}'s pending time log?
-						</p>
+						<p class="py-4 text-black dark:text-gray-400">Are you sure you want to approve all pending time log?</p>
 					</template>
 					<template #footer>
 						<div class="flex w-full items-center justify-center gap-8">
@@ -116,11 +114,10 @@
 
 	const toast = useToast()
 	const { approveAll, isApproving } = useBulkApproval()
-	const { data: apiResponse, pending, error, refresh } = useFetch<{ logs: DashboardLog[] }>('/api/timelogs/today')
+	const { data: apiResponse, pending, error, refresh } = useFetch<{ logs: DashboardLog[] }>('/api/timelog/admin/today')
 	const isApproveModalOpen = ref(false)
 	const remarksState = reactive<Record<string, string>>({})
 	const dashboardLogs = computed((): DashboardLog[] => apiResponse.value?.logs ?? [])
-	const props = defineProps<{ log: DashboardLog }>()
 
 	async function handleApproveAllClick() {
 		const logsPayload: ApproveLogPayload[] = dashboardLogs.value
@@ -133,7 +130,7 @@
 		if (logsPayload.length === 0) {
 			toast.add({
 				title: 'No Completed Logs',
-				description: 'There are no logs with a "Time Out" to approve.',
+				description: 'There are no logs to approve.',
 				color: 'info',
 			})
 			return
@@ -143,6 +140,7 @@
 		try {
 			const success = await approveAll(logsPayload)
 			if (success) {
+				isApproveModalOpen.value = false
 				await refresh()
 			}
 		} catch (e) {

@@ -3,8 +3,8 @@ import { db } from '~/server/db'
 import type { DB } from '~/server/db/types'
 import type { Transaction } from 'kysely'
 import { createError } from 'h3'
-import { timeLogService } from '~/server/service/time-logs.service'
-import { internService } from '~/server/service/intern.service'
+import { timeLogService } from '~/server/service/admin/time-logs.service'
+import { internService } from '~/server/service/admin/intern.service'
 import { createSchemaValidator } from '~/server/utils/create-schema-validator'
 import { checkAuthentication } from '~/server/utils/check-authentication'
 import type { RequestContext } from '~/server/types/RequestContext'
@@ -21,12 +21,6 @@ type ApproveSingleLogResult = {
 	success: true
 	logId: string
 	updatedCompletedHours: number
-}
-
-function calculateWorkHours(timeIn: Date, timeOut: Date): number {
-	const BREAK_HOURS = 1
-	const grossDurationHours = (timeOut.getTime() - timeIn.getTime()) / (1000 * 60 * 60)
-	return Math.max(0, grossDurationHours - BREAK_HOURS)
 }
 
 export async function approveLogLogic(
@@ -61,28 +55,33 @@ export async function approveLogLogic(
 		return { updatedCompletedHours: intern.hours_completed ?? 0 }
 	}
 
-	const totalHoursForLog = calculateWorkHours(log.time_in, log.time_out)
+	const totalHoursForLog = log.total_hours ?? 0
 	const currentCompletedHours = intern.hours_completed ?? 0
 	const newCompletedHours = currentCompletedHours + totalHoursForLog
 
-	await timeLogService.approveLog(logId, adminId, { admin_remarks, totalHours: totalHoursForLog }, trxContext)
+	await timeLogService.approveLog(logId, adminId, { admin_remarks, status: true }, trxContext)
 	await internService.updateCompletedHours(intern.id, newCompletedHours, trxContext)
 	return { updatedCompletedHours: newCompletedHours }
 }
 
 export const approveSingleLog = async (dto: ApproveSingleLogDTO, context: RequestContext): Promise<ApproveSingleLogResult> => {
-	const authPayload = await checkAuthentication(context)
-	let adminId: string
-	if (typeof authPayload === 'object' && authPayload !== null) {
-		adminId = (authPayload as any).userId
-	} else {
-		adminId = authPayload as string
+	try {
+		const authPayload = await checkAuthentication(context)
+		let adminId: string
+		if (typeof authPayload === 'object' && authPayload !== null) {
+			adminId = (authPayload as any).userId
+		} else {
+			adminId = authPayload as string
+		}
+
+		const { logId, admin_remarks } = await validateDTO(dto)
+		const { updatedCompletedHours } = await db.transaction().execute(async (trx) => {
+			return approveLogLogic(trx, context, logId, adminId, admin_remarks || null)
+		})
+
+		return { success: true, logId, updatedCompletedHours }
+	} catch (error) {
+		console.error('--- ERROR IN APPROVE SINGLE LOG ---', error)
+		throw error
 	}
-
-	const { logId, admin_remarks } = await validateDTO(dto)
-	const { updatedCompletedHours } = await db.transaction().execute(async (trx) => {
-		return approveLogLogic(trx, context, logId, adminId, admin_remarks || null)
-	})
-
-	return { success: true, logId, updatedCompletedHours }
 }

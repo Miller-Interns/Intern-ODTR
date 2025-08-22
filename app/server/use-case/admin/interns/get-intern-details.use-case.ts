@@ -1,8 +1,8 @@
 import z from 'zod'
 import { createSchemaValidator } from '~/server/utils/create-schema-validator'
 import type { RequestContext } from '~/server/types/RequestContext'
-import { internService } from '~/server/service/intern.service'
-import { timeLogService } from '~/server/service/time-logs.service'
+import { internService } from '~/server/service/admin/intern.service'
+import { timeLogService } from '~/server/service/admin/time-logs.service'
 import type { InternDetailsResponse } from '~/server/response/intern-details.response'
 import { createError } from 'h3'
 
@@ -40,18 +40,21 @@ export async function getInternDetails(dto: GetInternDetailsDTO, context: Reques
 		remaining_hours: Math.round(remainingHours * 100) / 100,
 	}
 
-	const timeLogs: InternDetailsResponse['timeLogs'] = timeLogsResult.map((log) => ({
-		...log,
-		time_in: log.time_in.toISOString(),
-		time_out: log.time_out.toISOString(),
-		total_hours: Math.round((log.total_hours || 0) * 100) / 100,
-		intern: {
-			id: internResult.id,
-			name: internResult.name ?? 'Unnamed Intern',
-			role: internResult.role ?? 'intern',
-			intern_picture: internResult.intern_picture ?? null,
-		},
-	}))
+	const timeLogs: InternDetailsResponse['timeLogs'] = timeLogsResult
+
+		.filter((log): log is typeof log & { time_out: Date } => log.time_out !== null)
+		.map((log) => ({
+			...log,
+			time_in: log.time_in.toISOString(),
+			time_out: log.time_out?.toISOString(),
+			total_hours: Math.round((log.total_hours || 0) * 100) / 100,
+			intern: {
+				id: internResult.id,
+				name: internResult.name ?? 'Unnamed Intern',
+				role: internResult.role ?? 'intern',
+				intern_picture: internResult.intern_picture ?? null,
+			},
+		}))
 
 	return {
 		intern,

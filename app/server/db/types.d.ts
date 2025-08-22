@@ -24,9 +24,6 @@ export type Intern = {
 	first_name: string
 	middle_name: string | null
 	last_name: string
-	first_name: string
-	middle_name: string | null
-	last_name: string
 	school: string
 	course: string | null
 	year: string | null
