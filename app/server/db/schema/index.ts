@@ -1,14 +1,10 @@
 import { z } from 'zod'
 import type { Status } from '~/server/db/types.d.ts'
 
-export const StatusSchema = z.enum([
-	"INCOMING",
-	"ONGOING",
-	"COMPLETED"
-]);
+export const StatusSchema = z.enum(['INCOMING', 'ONGOING', 'COMPLETED'])
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _statusCheck: Status = "" as z.infer<typeof StatusSchema>;
+const _statusCheck: Status = '' as z.infer<typeof StatusSchema>
 
 export const BatchSchema = z.object({
 	id: z.string(),

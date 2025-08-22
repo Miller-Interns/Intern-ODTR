@@ -4,7 +4,6 @@
 	>
 		<slot />
 	</main>
-
 	<footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
 		<nav class="px-safe mx-auto flex max-w-4xl justify-around">
 			<NuxtLink
@@ -18,7 +17,7 @@
 					:name="link.icon"
 					class="h-6 w-6"
 					:class="[
-						route.path.startsWith(link.to) ? 'text-neutral' : 'group-hover:text-neutral text-gray-400 transition-colors dark:text-gray-500',
+						route.path.startsWith(link.to) ? 'text-neutral' : 'group-hover:text-neutral text-gray-600 transition-colors dark:text-gray-400',
 					]"
 				/>
 				<span
@@ -26,7 +25,7 @@
 					:class="[
 						route.path.startsWith(link.to)
 							? 'text-neutral font-bold'
-							: 'group-hover:text-neutral text-gray-400 transition-colors dark:text-gray-500',
+							: 'group-hover:text-neutral text-gray-600 transition-colors dark:text-gray-400',
 					]"
 				>
 					{{ link.label }}
@@ -55,9 +54,9 @@
 			to: '/admin/interns',
 		},
 		{
-			label: 'Profile',
+			label: 'Logout',
 			icon: 'i-lucide-circle-user',
-			to: '/admin/profile',
+			to: '/admin/logout',
 		},
 	]
 </script>
