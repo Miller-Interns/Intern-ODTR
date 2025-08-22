@@ -1,5 +1,5 @@
 
-import type { BatchWithInternCount, Batch } from '~/types/Types';
+import type { Batch } from '~/types/Types';
 import { format, parse, isValid } from 'date-fns'
 import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
 
