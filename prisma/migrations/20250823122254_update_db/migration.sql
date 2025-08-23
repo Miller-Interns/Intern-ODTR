@@ -7,6 +7,9 @@
   - You are about to drop the `users` table. If the table is not empty, all the data it contains will be lost.
 
 */
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('INCOMING', 'ONGOING', 'COMPLETED');
+
 -- DropForeignKey
 ALTER TABLE "public"."interns" DROP CONSTRAINT "interns_batch_id_fkey";
 
@@ -50,7 +53,8 @@ CREATE TABLE "batches" (
     "batch_number" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "end_date" TIMESTAMP(3),
-    "status" BOOLEAN NOT NULL DEFAULT true,
+    "status" "Status" NOT NULL DEFAULT 'INCOMING',
+    "supervisorId" TEXT NOT NULL,
 
     CONSTRAINT "batches_pkey" PRIMARY KEY ("id")
 );
@@ -60,14 +64,21 @@ CREATE TABLE "interns" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "batch_id" TEXT NOT NULL,
+    "first_name" TEXT NOT NULL,
+    "middle_name" TEXT,
+    "last_name" TEXT NOT NULL,
     "school" TEXT NOT NULL,
-    "course" TEXT NOT NULL,
-    "year" TEXT NOT NULL,
-    "contact_number" TEXT NOT NULL,
-    "emergency_contact_person" TEXT NOT NULL,
-    "emergency_contact_number" TEXT NOT NULL,
+    "course" TEXT,
+    "year" TEXT,
+    "contact_number" TEXT,
+    "emergency_contact_person" TEXT,
+    "emergency_contact_number" TEXT,
     "required_hours" INTEGER NOT NULL,
-    "status" BOOLEAN NOT NULL,
+    "status" "Status" NOT NULL DEFAULT 'INCOMING',
+    "hours_completed" DOUBLE PRECISION,
+    "intern_picture" TEXT,
+    "role" TEXT,
+    "notes" TEXT,
 
     CONSTRAINT "interns_pkey" PRIMARY KEY ("id")
 );
@@ -77,12 +88,12 @@ CREATE TABLE "time_logs" (
     "id" TEXT NOT NULL,
     "intern_id" TEXT NOT NULL,
     "time_in" TIMESTAMP(3) NOT NULL,
-    "time_out" TIMESTAMP(3) NOT NULL,
-    "overtime" INTEGER,
-    "total_hours" INTEGER NOT NULL,
-    "remarks" TEXT,
+    "time_out" TIMESTAMP(3),
+    "total_hours" DOUBLE PRECISION NOT NULL,
+    "admin_remarks" TEXT,
+    "intern_notes" TEXT,
     "status" BOOLEAN NOT NULL DEFAULT false,
-    "admin_id" TEXT NOT NULL,
+    "admin_id" TEXT,
 
     CONSTRAINT "time_logs_pkey" PRIMARY KEY ("id")
 );
@@ -94,6 +105,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "interns_user_id_key" ON "interns"("user_id");
 
 -- AddForeignKey
+ALTER TABLE "batches" ADD CONSTRAINT "batches_supervisorId_fkey" FOREIGN KEY ("supervisorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "interns" ADD CONSTRAINT "interns_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -103,4 +117,4 @@ ALTER TABLE "interns" ADD CONSTRAINT "interns_batch_id_fkey" FOREIGN KEY ("batch
 ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_intern_id_fkey" FOREIGN KEY ("intern_id") REFERENCES "interns"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "time_logs" ADD CONSTRAINT "time_logs_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
