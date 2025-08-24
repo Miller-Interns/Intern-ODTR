@@ -12,7 +12,7 @@
 
       <UForm :state="{}" @submit="submit" class="space-y-6 ">
         <div class="flex space-x-4 ">
-          <UFormField name="batchNumber" class="grow " :error="batchNumberError">
+          <UFormField name="batchNumber" class="grow " :error="batchNumberError()">
             <div>
               Batch Number : <span class="text-red-500">*</span>
             </div>
@@ -23,7 +23,7 @@
 
 
      <section class=" space-x-10 w-full max-w-md">
-          <UFormField name="startDate" class="grow" :error="startDateError">
+          <UFormField name="startDate" class="grow" :error="startDateError()">
             <div>
               Start Date : <span class="text-red-500">*</span>
             </div>
@@ -45,7 +45,7 @@
         </section>
 
         <section class="items-center space-x-10 w-full max-w-md">
-          <UFormGroup name="slectedSupervisorId" class="grow"  :error="supervisorError">
+          <UFormGroup name="slectedSupervisorId" class="grow"  :error="supervisorError()">
             <div>
               Intern Supervisor : <span class="text-red-500">*</span>
             </div>

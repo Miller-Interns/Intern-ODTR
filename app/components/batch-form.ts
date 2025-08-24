@@ -83,39 +83,55 @@ const calendarDate = computed({
   };
    
 
-const supervisorError=computed(()=>{
+const  supervisorError=()=>{
  if (!form.selectedSupervisorId && submitted.value) {
       return "Please select a supervisor.";
     }
     return undefined
 
-})
+}
 
-const batchNumberError= computed(()=>{
+const batchNumberError=()=>{
 if (!form.batch_number && submitted.value) {
-      return"Please input batch number.";
+      return "Please input batch number.";
     }
-
-
-})
+    return undefined
+}
      
-const startDateError =computed(()=>{
+const startDateError =()=>{
  if (!form.start_date && submitted.value) {
       return "Please input start date.";
 
     }
-  })
+    return undefined
+  }
+  
 
        
   const submit = async () => {
 
-
     isLoading.value = true;
-       error.value.message = null; 
+    error.value.message = null; 
     submitted.value = true
+if (!form.start_date) {
+  supervisorError()
+  isLoading.value = false;
+  return;
+}
+if (!form.batch_number ){
+batchNumberError()
+isLoading.value = false;
+return
+}
+
+if (!form.start_date ){
+startDateError()
+isLoading.value = false;
+return
+}
 
     const endpoint = isEditMode ? '/api/batches/edit' : '/api/batches/Post-batch';
-    const method = isEditMode ? 'PATCH' : 'POST';
+    const method = isEditMode ? 'PATCH'  : 'POST';
 
 
     const body: any = {

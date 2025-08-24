@@ -3,12 +3,13 @@ export default defineAppConfig({
         colors: {
             primary: 'primary',
             secondary: 'black',
-            tertiary: 'neutral', 
+            tertiary: 'indigo', 
             success: 'green',
             warning: 'yellow',
             error: 'red',
             info: 'indigo',
-            required: 'red'
+            required: 'red',
+            neutral: 'neutral',
         },
         button: {
             defaultVariants: {
