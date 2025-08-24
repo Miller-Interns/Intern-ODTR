@@ -1,7 +1,7 @@
 
 import { userFactory } from '~/server/factory/batches/get-single.factory'
 import { getBatchUseCase} from '~/server/use-case/batches/get-single.use-case';
-import { RequestContext } from '~/server/types/RequestContext'
+import {type RequestContext } from '~/server/types/RequestContext'
 
 export default defineEventHandler(async (event) => {
  

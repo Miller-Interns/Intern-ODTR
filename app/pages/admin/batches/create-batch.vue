@@ -55,7 +55,7 @@
             </div>
             <USelect
               class=" w-48 items-center w-full max-w-md box-shadow-[0px 4px 6px -2px #0000000D] box-shadow-[0px 10px 15px -3px #0000001A]"
-              v-model="form.selectedSupervisorId" :items="supervisorList" placeholder="Intern Supervisor" icon="icon"
+              v-model="form.selectedSupervisorId" placeholder="Intern Supervisor" :items="supervisorList"  icon="icon"
               value-key="value" />
           </UFormField>
         <p v-if="error.message" class="text-red-500 mt-2 text-sm">
@@ -76,7 +76,9 @@
 import { useBatchForm } from '~/components/batch-form';
 
 
-
+definePageMeta({
+		layout: 'admin',
+	})
 
 const {
   startDateError,

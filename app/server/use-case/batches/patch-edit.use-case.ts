@@ -1,9 +1,9 @@
-import { Status } from '~/enums/status';
+import { Status } from '~/enum/enums';
 import { z } from 'zod';
 import { BatchService } from '~/server/service/batches/patch-edit-batch.service';
 import { type Batch } from '~/types/Types';
-import { RequestContext } from '~/server/types/RequestContext';
-import { Selectable } from 'kysely';
+import type { RequestContext } from '~/server/types/RequestContext'
+import { type Selectable } from 'kysely';
 
 export const dtoSchema = z.object({
   id: z.string(),

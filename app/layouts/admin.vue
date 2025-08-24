@@ -46,7 +46,7 @@
 		{
 			label: 'Manage',
 			icon: 'i-lucide-users-round',
-			to: '/admin/manage',
+			to: '/admin/batches',
 		},
 		{
 			label: 'Active Interns',

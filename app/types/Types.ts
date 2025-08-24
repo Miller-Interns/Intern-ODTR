@@ -1,5 +1,5 @@
-// import type { Status } from '@prisma/client';
-import type { Status } from '~/enums/status';
+
+import type { Status } from '~/enum/enums';
 import type {Selectable} from 'kysely'
 
 export type BatchWithInternCount = Selectable<Batch> & {

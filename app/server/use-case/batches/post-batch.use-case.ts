@@ -1,10 +1,10 @@
 
 import {z} from 'zod'
-import {Status} from '~/enums/status'
-import { RequestContext } from '~/server/types/RequestContext'
-import { Batch } from '~/types/Types'
+import {Status} from '~/enum/enums'
+import type { RequestContext } from '~/server/types/RequestContext'
+import { type Batch } from '~/types/Types'
 import { BatchService } from '~/server/service/batches/post-batch.service'
-import { Selectable } from 'kysely'
+import { type Selectable } from 'kysely'
 
 const dtoSchema=z.object({
   batch_number: z.string(),

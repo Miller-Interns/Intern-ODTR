@@ -1,6 +1,6 @@
 import { db } from '~/server/db';
-import { RequestContext } from '~/server/types/RequestContext';
-import { Selectable } from 'kysely';
+import type { RequestContext } from '~/server/types/RequestContext'
+import { type Selectable } from 'kysely';
 import {type Batch} from '~/types/Types'
 
 async function findById(id: string, ctx: RequestContext):

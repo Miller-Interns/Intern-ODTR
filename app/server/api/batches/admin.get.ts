@@ -1,6 +1,6 @@
 
 import { getAdminUsersUseCase } from '~/server/use-case/batches/get-admin.use-case';
-import { RequestContext } from '~/server/types/RequestContext'
+import type { RequestContext } from '~/server/types/RequestContext'
 import { adminFactory } from '~/server/factory/batches/get-admin.factory';
 
 export default defineEventHandler(async (event) => {

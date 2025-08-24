@@ -1,7 +1,7 @@
 
 
 import { patchStatusUseCase} from '~/server/use-case/batches/patch-auto-status.use-case';
-import { RequestContext } from '~/server/types/RequestContext'
+import type { RequestContext } from '~/server/types/RequestContext'
 
 export default defineEventHandler(async (event) => {
  

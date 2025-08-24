@@ -1,7 +1,7 @@
 
 import { AdminUserService } from '~/server/service/batches/get-admin.services';
 import { z } from 'zod';
-import { RequestContext } from '~/server/types/RequestContext';
+import { type RequestContext } from '~/server/types/RequestContext';
 import { type AdminUserFull } from '~/server/response/batches/get-admin.response';
 
 const dtoSchema = z.object({

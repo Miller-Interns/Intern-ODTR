@@ -67,7 +67,9 @@ import { useBatchForm } from '~/components/batch-form';
 
 const route = useRoute();
 const batchId = route.query.id as string;
-
+definePageMeta({
+		layout: 'admin',
+	})
 
 const {
    batchNumberError,

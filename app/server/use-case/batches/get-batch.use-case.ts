@@ -2,7 +2,7 @@
 
 import { BatchService } from "~/server/service/batches/get-all-batch.service";
 import { type BatchWithInternCount } from '~/types/Types'
-import { RequestContext } from "~/server/types/RequestContext";
+import type { RequestContext } from '~/server/types/RequestContext'
 
 type GetAllBatchResult = {
   batches: BatchWithInternCount[]

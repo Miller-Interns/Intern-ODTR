@@ -2,7 +2,7 @@
 import { db } from '~/server/db'; 
 import {sql } from 'kysely';
 import type { BatchWithInternCount } from '~/types/Types'
-import {Status} from '~/enums/status'
+import {Status} from '~/enum/enums'
 
 async function getAllBatchesWithDetails(): Promise<BatchWithInternCount[] | null> {
 

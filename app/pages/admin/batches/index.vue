@@ -21,7 +21,7 @@
 
       <div v-else class="flex flex-col ">
         <section>
-          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 ">Manage</h2>
+          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 ">Manage Batch</h2>
           <div v-if="currentBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="batch in currentBatches" :key="batch.id">
 
@@ -96,7 +96,7 @@
         box-shadow-[ 0px 4px 4px 0px #00000040] ">No active batches.</p>
         </section>
 
-        <section class="w-full mt-3 flex flex-col  mb-4 bottom-0 left-1/2 -translate-x-1/2 p-4 z-50 fixed">
+        <section class="w-full mt-3 flex flex-col  mb-4 bottom-10 left-1/2 -translate-x-1/2 p-4 z-50 fixed">
           <NuxtLink to="/admin/batches/create-batch">
             <UButton  icon="i-lucide-plus" label="Create Batch" variant=solid color=primary block
               size=xl />
@@ -161,7 +161,7 @@ import type { number } from 'zod';
 
 
 definePageMeta({
-  layout: 'batch'
+  layout: 'admin'
 })
 const allBatches = ref<BatchWithInternCount[]>([]);
 const pending = ref(false);

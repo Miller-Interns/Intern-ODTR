@@ -1,10 +1,10 @@
 
-import {Status} from '~/enums/status'
+import {Status} from '~/enum/enums'
 import {db} from '~/server/db'
 import { randomUUID } from 'node:crypto'
 import { type Batch } from '~/types/Types'
 import type { RequestContext } from '~/server/types/RequestContext'
-import { Selectable } from 'kysely'
+import { type Selectable } from 'kysely'
 
 async function createBatch(batch_number: string, start_date: Date, 
   status: Status, supervisorId: string,  ctx: RequestContext): Promise<Selectable<Batch> | undefined>{
