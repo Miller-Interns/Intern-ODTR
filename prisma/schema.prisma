@@ -1,4 +1,5 @@
-
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 enum Status {
   INCOMING
@@ -33,21 +34,21 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  Intern  Intern[]
-  TimeLog TimeLog[]
-  supervised_batches Batch[] @relation("SupervisorToBatch")
+  Intern             Intern[]
+  TimeLog            TimeLog[]
+  supervised_batches Batch[]   @relation("SupervisorToBatch")
 
   @@map("users")
 }
 
 model Batch {
-  id           String    @id @default(uuid())
-  batch_number String
-  start_date   DateTime  @default(now())
-  end_date     DateTime?
-  status       Status   @default(INCOMING)
-  supervisorId String
-  intern_supervisor User @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
+  id                String    @id @default(uuid())
+  batch_number      String
+  start_date        DateTime  @default(now())
+  end_date          DateTime?
+  status            Status    @default(INCOMING)
+  supervisorId      String
+  intern_supervisor User      @relation("SupervisorToBatch", fields: [supervisorId], references: [id])
 
   Intern Intern[]
 
@@ -64,17 +65,17 @@ model Intern {
   middle_name              String?
   last_name                String
   school                   String
+  course                   String?
+  year                     String?
+  contact_number           String?
+  emergency_contact_person String?
+  emergency_contact_number String?
   required_hours           Int
   status                   Status  @default(INCOMING)
-  course                   String
-  year                     String
-  contact_number           String
-  emergency_contact_person String
-  emergency_contact_number String
-  role                     String  @default("Web Developer")
-  intern_picture           String?
   hours_completed          Float?
-  note                     String?
+  intern_picture           String?
+  role                     String?
+  notes                    String?
 
   TimeLog TimeLog[]
 
@@ -82,18 +83,17 @@ model Intern {
 }
 
 model TimeLog {
-  id            String   @id @default(uuid())
-  intern        Intern   @relation(fields: [intern_id], references: [id])
+  id            String    @id @default(uuid())
+  intern        Intern    @relation(fields: [intern_id], references: [id])
   intern_id     String
   time_in       DateTime
-  time_out      DateTime
+  time_out      DateTime?
   total_hours   Float
   admin_remarks String?
   intern_notes  String?
-  status        Boolean  @default(false)
-  user          User?    @relation(fields: [admin_id], references: [id])
+  status        Boolean   @default(false)
+  user          User?     @relation(fields: [admin_id], references: [id])
   admin_id      String?
-
 
   @@map("time_logs")
 }

@@ -22,7 +22,7 @@
       <div v-else class="flex flex-col ">
         <section>
           <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 ">Manage</h2>
-          <div v-if="currentBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[32px] ">
+          <div v-if="currentBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="batch in currentBatches" :key="batch.id">
 
               <UCard :ui="{ footer: 'py-3 px-4 sm:px-6' }" class="flex flex-col space-y-1 shadow-[0_5px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)]
@@ -105,7 +105,7 @@
 
         <section class="py-10 pb-40">
 
-          <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 ">
+          <div v-if="previousBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
          
 
             <UCard v-for="batch in previousBatches" :key="batch.id" class="shadow-[0_0px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)]
