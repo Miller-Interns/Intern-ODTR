@@ -1,9 +1,9 @@
 import { PrismaClient } from '../app/generated/prisma/index.js'
 import bcrypt from 'bcrypt'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10
 
 async function main() {
 	const usersToCreate = [
@@ -39,27 +39,27 @@ async function main() {
 			password: 'mllrdev321',
 			isAdmin: true,
 		},
-	];
+	]
 
 	const usersWithHashedPasswords = await Promise.all(
 		usersToCreate.map(async (user) => {
-			const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+			const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS)
 
 			return {
 				...user,
 				password: hashedPassword,
-			};
-		})
-	);
+			}
+		}),
+	)
 
 	await prisma.user.createMany({
 		data: usersWithHashedPasswords,
-	});
+	})
 }
 
 main()
 	.then(async () => {
-		console.log('Disconnecting Prisma Client...');
+		console.log('Disconnecting Prisma Client...')
 		await prisma.$disconnect()
 	})
 	.catch(async (e) => {
