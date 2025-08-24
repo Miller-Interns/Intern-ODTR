@@ -3,11 +3,11 @@
     <UContainer>
     <div class=" items-start gap-4 max-w-md mx-auto w-full">
 
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-4 mb-4">
         <NuxtLink to="/admin/batches">
           <UButton icon="i-lucide-arrow-left" color=secondary variant="ghost" aria-label="Go back" />
           </NuxtLink>
-          <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
+          <h1 class="text-2xl font-semibold md:text-2xl  text-gray-900 dark:text-white ">
             Edit Batch
           </h1>
       </div>

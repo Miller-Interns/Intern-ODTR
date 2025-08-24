@@ -3,9 +3,7 @@
  
     <div class=" flex flex-wrap items-start justify-center gap-4">
       <div v-if="pending" class="flex items-center gap-3">
-
-        <h1 class="text-2xl font-bold text-gray-800 md:text-3xl dark:text-white">Manage Batch</h1>
-
+        <h1 class="text-2xl font-bold text-gray-800 md:text-2xl dark:text-white">Manage Batch</h1>
       </div>
 
       <div v-else-if="error">
@@ -21,7 +19,7 @@
 
       <div v-else class="flex flex-col ">
         <section>
-          <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 ">Manage Batch</h2>
+          <h1 class="text-2xl font-semibold text-gray-800 md:text-2xl dark:text-white mb-4 ">Manage Batch</h1>
           <div v-if="currentBatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="batch in currentBatches" :key="batch.id">
 
