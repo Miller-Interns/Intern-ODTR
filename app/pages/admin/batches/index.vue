@@ -1,11 +1,11 @@
 <template>
-
-    <div class="p-4 sm:p-6 lg:p-8 min-w-[327px] min-h-[336px] mx-auto font-sans ">
-      <div v-if="pending">
-        <h2 class="text-2xl font-semi-bold text-gray-800 dark:text-gray-100 mb-4 ">Manage Batch</h2>
-        <USkeleton class="h-56 w-full mb-4" />
-        <USkeleton class="h-12 w-full mb-8" />
+<UContainer>
  
+    <div class=" flex flex-wrap items-start justify-center gap-4">
+      <div v-if="pending" class="flex items-center gap-3">
+
+        <h1 class="text-2xl font-bold text-gray-800 md:text-3xl dark:text-white">Manage Batch</h1>
+
       </div>
 
       <div v-else-if="error">
@@ -150,14 +150,14 @@
         </section>
       </div>
     </div>
-
+</UContainer>
 </template>
 
 <script setup lang="ts">
 import { capitalize } from '~/server/db/utils/format'
 import { type BatchWithInternCount } from '~/types/Types';
 import { formatDate } from '~/server/db/utils/format'
-import type { number } from 'zod';
+
 
 
 definePageMeta({

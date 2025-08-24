@@ -1,6 +1,7 @@
 <template>
   <UApp>
-    <div class="max-w-md mx-auto p-6 w-full">
+    <UContainer>
+    <div class=" items-start gap-4 max-w-md mx-auto w-full">
 
       <div class="flex items-center space-x-4">
         <NuxtLink to="/admin/batches">
@@ -68,6 +69,7 @@
     
       </UForm>
     </div>
+    </UContainer>
   </UApp>
 </template>
 
