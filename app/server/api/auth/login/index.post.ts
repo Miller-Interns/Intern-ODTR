@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 	const dto: any = {
 		...body,
 	}
-	const response = await loginUseCase(dto, event.context as RequestContext, event)
+	const response = await loginUseCase(dto, event.context as RequestContext)
 
 	if (!response.user) {
 		return null

@@ -34,5 +34,13 @@ export default defineNuxtConfig({
     }
   },
 
+  imports: {
+    dirs: [
+      'enums/**',
+    ],
+  },
+
 
 })
+
+

@@ -1,6 +1,6 @@
 import { userFactory } from '~/server/factory/user.factory'
 import { getCurrentUser } from '~/server/use-case/get-current-user.use-case'
-
+import { RequestContext } from '~/server/types/RequestContext'
 export default defineEventHandler(async (event) => {
 	const params = getRouterParams(event)
 
@@ -8,6 +8,6 @@ export default defineEventHandler(async (event) => {
 		...params,
 	}
 
-	const { user } = await getCurrentUser(dto, event.context)
+	const { user } = await getCurrentUser(dto, event.context as RequestContext)
 	return userFactory.toFullResponse(user)
 })
