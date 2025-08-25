@@ -5,7 +5,7 @@ export const logoutUseCase = (event: H3Event) => {
 		httpOnly: true,
 		path: '/',
 		sameSite: 'lax',
-		maxAge: 0,
+		maxAge: 0, // expire immediately
 	})
 
 	return { status: true }
