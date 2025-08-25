@@ -103,7 +103,7 @@
 
 <script setup lang="ts">
 import { UFormField, UInput, UTextarea } from '#components';
-import type { InternDetails } from '~/types/Intern';
+import type { InternDetails } from '~/types/crud-for-interns/Intern';
 
 defineProps<{
   details: Partial<InternDetails>;

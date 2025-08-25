@@ -23,7 +23,7 @@ export const InternSchema = z.object({
   emergency_contact_number: z.string(),
   required_hours: z.number(),
   status: z.enum(['INCOMING', 'ONGOING', 'COMPLETED']),
-  role: z.string(),
+  role: z.string().nullable(),
   intern_picture: z.string(),
   hours_completed: z.number(),
   notes: z.string().nullable(),

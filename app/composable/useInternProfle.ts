@@ -1,5 +1,5 @@
 import { ref, reactive, watch } from 'vue'
-import type { InternDetails } from '~/types/Intern' 
+import type { InternDetails } from '~/types/crud-for-interns/Intern' 
 import { useToast } from '#imports'
 
 export function useInternProfile(internId: string) {
@@ -8,7 +8,7 @@ export function useInternProfile(internId: string) {
   const avatarFile = ref<File | null>(null)
   const avatarPreviewUrl = ref<string | null>(null)
   const toast = useToast()
-  const { data, pending, error, refresh } = useFetch<InternDetails>(`/api/interns/${internId}`)
+  const { data, pending, error, refresh } = useFetch<InternDetails>(`/api/crud-for-interns/interns/${internId}`)
   const form = reactive<Partial<InternDetails>>({})
   
   let originalFormState: Partial<InternDetails> = {}
@@ -39,10 +39,10 @@ export function useInternProfile(internId: string) {
       if (avatarFile.value) {
         const formData = new FormData()
         formData.append('picture', avatarFile.value)
-        await $fetch(`/api/interns/${form.internId}/picture`, { method: 'POST', body: formData })
+        await $fetch(`/api/crud-for-interns/interns/${form.internId}/picture`, { method: 'POST', body: formData })
       }
 
-      await $fetch(`/api/interns/${form.internId}`, { method: 'PUT', body: form })
+      await $fetch(`/api/crud-for-interns/interns/${form.internId}`, { method: 'PUT', body: form })
 
       toast.add({ title: 'Success', description: 'Changes saved successfully!', color: 'success' }) 
       
@@ -70,7 +70,7 @@ export function useInternProfile(internId: string) {
   async function handleStatusUpdate(newStatus: 'COMPLETED' | 'ONGOING') {
     if (!form.internId) return
     try {
-      await $fetch(`/api/interns/${form.internId}/status`, { method: 'PATCH', body: { status: newStatus } })
+      await $fetch(`/api/crud-for-interns/interns/${form.internId}/status`, { method: 'PATCH', body: { status: newStatus } })
       await refresh()
     } catch (err) {
       console.error(err)

@@ -50,7 +50,7 @@
 import { UAvatar, UBadge, UButton } from '#components'
 import type { PropType } from 'vue'
 import { ref, computed } from 'vue'
-import type { InternDetails } from '~/types/Intern'
+import type { InternDetails } from '~/types/crud-for-interns/Intern'
 
 const props = defineProps({
   intern: {

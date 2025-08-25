@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { BatchDetailsData } from '~/types/Batch';
+import type { BatchDetailsData } from '~/types/crud-for-interns/Batch';
 
 const props = defineProps<{
     batchData: BatchDetailsData | null
