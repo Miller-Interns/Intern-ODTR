@@ -1,11 +1,6 @@
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8">
-    <div v-if="pending" class="text-center py-12 text-black dark:text-white">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8" />
-      <p>Loading your profile...</p>
-    </div>
-    <UAlert v-else-if="error || !data?.profile" icon="i-heroicons-exclamation-triangle" color="error" variant="soft" title="Error Loading Data" description="Could not find your profile data." />
-    <div v-else>
+    <div v-if="isReady && data?.profile">
       <UForm :state="formState" :validate="validate" @submit="handleSaveChanges">
         <UCard class="mb-6">
           <InternProfileHeader 
@@ -23,7 +18,6 @@
           />
         </UCard>
         <UCard class="mt-4">
-          <!-- Pass the new props and listen for the new event -->
           <AccountDetails 
             :details="isEditing ? formState : headerData" 
             :is-editing="isEditing"
@@ -52,6 +46,14 @@
         </UCard>
       </UForm>
     </div>
+    <div v-else class="text-center py-12">
+      <UAlert v-if="error" icon="i-heroicons-exclamation-triangle" color="error" variant="soft" title="Error Loading Data" description="Could not find your profile data." />
+      <div v-else class="flex flex-col items-center justify-center">
+        <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8" />
+        <p>Loading your profile...</p>
+      </div>
+    </div>
+
 		<UModal v-model:open="isLogoutModalOpen" title="Confirmation">
 			<template #header>
 				<h2 class="text-2xl font-bold">Logout?</h2>
@@ -101,8 +103,10 @@ const {
   performLogout,
 } = useProfile(fileInput)
 
+const isReady = computed(() => !pending.value && data.value?.profile);
+
 const headerData = computed((): Partial<InternDetails> => {
-  if (!data.value?.profile) {
+  if (!isReady.value || !data.value?.profile) {
     return {};
   }
   const profile = data.value.profile;

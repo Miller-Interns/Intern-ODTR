@@ -11,7 +11,7 @@
               size="xl"
               class="-ml-4"
               aria-label="Back"
-              to="/admin/crud-for-interns/batches"
+              to="/admin/batches"
             />
             <h1 class="text-lg font-bold ml-4 text-gray-900 dark:text-white">Batch Details</h1>
           </div>
@@ -21,11 +21,7 @@
 
     <main class="py-8">
       <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div v-if="pending" class="text-center py-12 text-gray-500">Loading Batch Details...</div>
-        <div v-else-if="error || !batchData" class="text-center py-12 text-red-500">
-          Could not load batch details. Please try again.
-        </div>
-        <UCard v-else :ui="{ body: 'p-4 sm:p-6' }">
+        <UCard v-if="batchData && batchData.details" :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>  
             <div class="flex justify-between">
               <h2 class="text-base font-bold text-gray-900 dark:text-white">
@@ -42,7 +38,7 @@
             <h2 class="text-lg   font-semibold">Interns</h2>
           </div>
           <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <NuxtLink v-for="intern in batchData.interns" :key="intern.id" :to="`/admin/crud-for-interns/interns/${intern.id}`" class="block">
+            <NuxtLink v-for="intern in batchData.interns" :key="intern.id" :to="`/admin/interns/${intern.id}`" class="block">
               <div class="overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800/50 h-full">
                 <div class="flex items-center gap-3 p-3">
                   <UAvatar :src="intern.internPicture || undefined" :alt="intern.fullName || 'Intern Avatar'" />
@@ -61,11 +57,17 @@
             </NuxtLink>
           </div>
           <template #footer>
-            <UButton v-if="batchData.details.internCount < 5" :to="`/admin/crud-for-interns/interns/add-new-intern?batchId=${batchData.details.id}`" block icon="i-lucide-plus" size="xl" color="primary">
+            <UButton v-if="batchData.details.internCount < 5" :to="`/admin/interns/add-new-intern?batchId=${batchData.details.id}`" block icon="i-lucide-plus" size="xl" color="primary">
               Add Intern
             </UButton>
           </template>
         </UCard>
+        <div v-else class="text-center py-12">
+          <div v-if="pending" class="text-gray-500">Loading Batch Details...</div>
+          <div v-else class="text-red-500">
+            Could not load batch details. Please try again.
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -74,15 +76,16 @@
 <script setup lang="ts">
   import type { BatchDetailsData } from '~/types/Batch';
   
-
   definePageMeta({
-  layout: 'admin',
-})
+    layout: 'admin',
+  })
 
   const route = useRoute()
   const batchId = route.params.id as string
 
-  const { data: batchData, pending, error } = await useFetch<BatchDetailsData>(`/api/crud-for-interns/batches/${batchId}`, {
+  // The 'await' here means the page will not render at all until the fetch is complete,
+  // making the rendering logic much safer.
+  const { data: batchData, pending, error } = await useFetch<BatchDetailsData>(`/api/batches/${batchId}`, {
     key: `batch-${batchId}`
   })
 </script>
