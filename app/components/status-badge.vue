@@ -18,7 +18,7 @@ const badgeAppearance = computed(() => {
       return { color: 'success', text: 'Ongoing' } as const;
     
     case Status.COMPLETED:
-      return { color: 'secondary', text: 'Completed' } as const;
+      return { color: 'neutral', text: 'Completed' } as const;
       
     case Status.INCOMING:
       return { color: 'primary', text: 'Incoming' } as const;

@@ -1,4 +1,4 @@
 export enum RouterNames {
-    LOGIN = 'login',
-    DASHBOARD = 'dashboard',
+	LOGIN = 'login',
+	DASHBOARD = 'dashboard',
 }

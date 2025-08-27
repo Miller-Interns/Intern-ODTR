@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <UButton
-      to="/batches/edit-batch" 
+      to="/admin/batches/edit-batch" 
       icon="i-lucide-pen"
       variant="ghost"
       color="primary"

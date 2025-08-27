@@ -1,7 +1,8 @@
 import { db } from '~/server/db'
-import type { User, Intern, Batch } from '~/server/db/types'
+import type { User, Intern, Batch} from '~/server/db/types.d'
 import type { Updateable, Insertable, Transaction } from 'kysely'
 import type { DB } from '~/server/db/types'
+
 
 export type InternWithUserAndBatchStatus = Intern & User & { batch_status: Batch['status'] } & { user_id_from_users?: string };
 
@@ -76,6 +77,7 @@ async function updateInternAndUser(payload: { userId: string; internId: string; 
     return updatedData;
   })
 }
+
 
 export const internService = {
   createInternAndUser,

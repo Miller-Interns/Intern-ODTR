@@ -1,7 +1,8 @@
+import bcrypt from 'bcrypt' // <-- 1. Import bcrypt
 import { createSchemaValidator } from '~/server/utils/create-schema-validator'
 import { internService } from '~/server/service/interns/intern.service'
 import { internFactory } from '~/server/factory/interns/intern.factory'
-import { UpdateInternSchema, type UpdateInternDTO } from '~/types/intern'
+import { UpdateInternSchema, type UpdateInternDTO } from '~/types/Intern'
 
 const validateDTO = createSchemaValidator(UpdateInternSchema)
 
@@ -15,6 +16,7 @@ export const updateInternDetailsUseCase = async (dto: UpdateInternDTO) => {
     lastName,
     middleName,
     email,
+    password,
     courseYear,
     requiredHours,
     contactNumber,
@@ -27,16 +29,20 @@ export const updateInternDetailsUseCase = async (dto: UpdateInternDTO) => {
   
   const middleInitial = middleName ? `${middleName.charAt(0).toUpperCase()}.` : '';
   const displayName = [firstName, middleInitial, lastName].filter(Boolean).join(' ');
-
   const [course, year] = courseYear.split('-').map((part: string) => part.trim())
+  const userDataToUpdate: { name: string; email: string; password?: string } = { 
+    name: displayName, 
+    email 
+  };
+
+  if (password && password.length > 0) {
+    userDataToUpdate.password = await bcrypt.hash(password, 10);
+  }
 
   const updatedInternWithUser = await internService.updateInternAndUser({
     userId,
     internId,
-    userData: { 
-      name: displayName, 
-      email 
-    },
+    userData: userDataToUpdate,
     internData: { 
       first_name: firstName,
       middle_name: middleName,

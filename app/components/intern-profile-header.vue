@@ -37,7 +37,7 @@
         </p>
         <div class="mt-2">
           <p class="text-sm text-black dark:text-white">
-            Hours Completed: {{ intern.hoursCompleted ?? 0 }} / {{ intern.requiredHours }}
+            Hours Completed: {{ formattedHoursCompleted }} / {{ intern.requiredHours }}
           </p>
           <UMeter :value="intern.hoursCompleted ?? 0" :max="intern.requiredHours" class="mt-1" />
         </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { UAvatar, UBadge, UButton } from '#components'
+import StatusBadge from '~/components/status-badge.vue';
 import type { PropType } from 'vue'
 import { ref, computed } from 'vue'
 import type { InternDetails } from '~/types/Intern'
@@ -69,6 +69,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:status', 'upload-picture'])
 const fileInput = ref<HTMLInputElement | null>(null)
+
+const formattedHoursCompleted = computed(() => {
+  const hours = props.intern?.hoursCompleted ?? 0;
+  return hours.toFixed(2);
+});
 
 const isCompleted = computed(() => props.intern?.status === 'COMPLETED')
 

@@ -36,6 +36,7 @@ function toInternDetailsResponse(internWithUser: InternWithUserAndBatchStatus): 
   return InternDetailsResponseSchema.parse(viewModel);
 }
 
+
 export const internFactory = {
   toAddInternResponse,
   toInternDetailsResponse,

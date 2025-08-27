@@ -8,14 +8,20 @@ export function useInternProfile(internId: string) {
   const avatarFile = ref<File | null>(null)
   const avatarPreviewUrl = ref<string | null>(null)
   const toast = useToast()
+  
+  const isPasswordVisible = ref(false);
+  const passwordError = ref<string | null>(null);
+  const isSaving = ref(false); // The ref is here...
+
   const { data, pending, error, refresh } = useFetch<InternDetails>(`/api/interns/${internId}`)
-  const form = reactive<Partial<InternDetails>>({})
+  const form = reactive<Partial<InternDetails> & { password?: string }>({})
   
   let originalFormState: Partial<InternDetails> = {}
 
   watch(data, (newInternData) => {
     if (newInternData) {
       Object.assign(form, newInternData)
+      form.password = ''; 
       originalFormState = JSON.parse(JSON.stringify(newInternData))
     }
   }, { immediate: true })
@@ -26,15 +32,24 @@ export function useInternProfile(internId: string) {
 
   function cancelEditing() {
     Object.assign(form, originalFormState)
-    
+    form.password = '';
     avatarFile.value = null
     avatarPreviewUrl.value = null
-    
     isEditing.value = false
+    passwordError.value = null;
   }
 
   async function saveChanges() {
     if (!form.internId) return
+    
+    if (form.password && form.password.length > 0 && form.password.length < 6) {
+      passwordError.value = 'Password must be at least 6 characters.';
+      toast.add({ title: 'Validation Error', description: passwordError.value, color: 'error' });
+      return;
+    }
+    passwordError.value = null;
+
+    isSaving.value = true;
     try {
       if (avatarFile.value) {
         const formData = new FormData()
@@ -53,6 +68,8 @@ export function useInternProfile(internId: string) {
       console.error(err)
       const errorMessage = err.data?.statusMessage || 'An unexpected error occurred.'
       toast.add({ title: 'Error', description: `Failed to save changes: ${errorMessage}`, color: 'error' })
+    } finally {
+      isSaving.value = false;
     }
   }
 
@@ -84,8 +101,21 @@ export function useInternProfile(internId: string) {
   }
 
   return {
-    form, pending, error, isEditing, avatarPreviewUrl, isModalOpen,
-    startEditing, cancelEditing, saveChanges, markAsCompleted,
-    handleStatusUpdate, handlePictureUpload,
+    form, 
+    pending, 
+    error, 
+    isEditing, 
+    avatarPreviewUrl, 
+    isModalOpen,
+    refresh,
+    isPasswordVisible,
+    passwordError,
+    isSaving, // ...but it needs to be returned here.
+    startEditing, 
+    cancelEditing, 
+    saveChanges, 
+    markAsCompleted,
+    handleStatusUpdate, 
+    handlePictureUpload,
   }
 }

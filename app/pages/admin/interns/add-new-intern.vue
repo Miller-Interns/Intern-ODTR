@@ -74,7 +74,7 @@
             create-item="always"
             :items="schoolOptions"
             @create="onCreate"
-            placeholder="Select or enter a new school Eq. Negros Oriental State University" 
+            placeholder="Select or enter a new school Eg. Negros Oriental State University" 
             size="xl"
             class="w-full"
           />
@@ -113,6 +113,10 @@
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import type { FormSubmitEvent } from '#ui/types'
 import { AddInternSchema, type AddInternDTO } from '~/types/Intern'
+
+definePageMeta({
+  layout: 'admin',
+})
 
 const route = useRoute()
 const router = useRouter()

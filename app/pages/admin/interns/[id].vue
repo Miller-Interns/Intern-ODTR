@@ -29,10 +29,17 @@
       <UTabs :items="items" variant="link" :ui="{ trigger: 'grow' }"  class="w-full">
         <template #personalinfo>
           <UCard class="mt-4">
-            <AccountDetails :details="form" :is-editing="isEditing" />
+            <!-- FIX: Pass the new props and handle the event -->
+            <AccountDetails 
+              :details="form" 
+              :is-editing="isEditing"
+              :is-password-visible="isPasswordVisible"
+              :password-error="passwordError"
+              @toggle-password-visibility="isPasswordVisible = !isPasswordVisible"
+            />
             <div class="flex flex-col gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
               <template v-if="isEditing">
-                <UButton type="submit" label="Save Changes" size="xl" block  />
+                <UButton type="submit" label="Save Changes" size="xl" block :loading="isSaving" />
                 <UButton color="primary" variant="outline" label="Cancel" size="xl" block @click="cancelEditing" />
               </template>
               <template v-else>
@@ -54,10 +61,21 @@
             </div>
           </UCard>
         </template>
-        <template #timelog>
+        <template #internlog>
           <UCard class="mt-4">
-            <TimeLog :details="form" />
+            <InternLog :details="{ internId: form.internId }" 
+              @approved="handleLogApproval" />
           </UCard>
+          <UButton
+						label="Export DTR"
+						color="primary"
+						variant="solid"
+						icon="i-heroicons-arrow-down-tray"
+						block
+						class="mt-6"
+						:loading="isExporting"
+						@click="handleExport"
+					/>
         </template>
       </UTabs>
     </UForm>
@@ -68,15 +86,24 @@
 import { defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TabsItem } from '#ui/types'
-import { useInternProfile } from '~/composable/useInternProfle'
+import { useInternProfile } from '~/composables/useInternProfle'
 import InternProfileHeader from '~/components/intern-profile-header.vue'
 import { UAlert, UButton, UCard, UForm, UIcon, UTabs, UModal } from '#components'
+import { useFileDownloader } from '~/composables/useFileDownloader'
 
+const { isExporting, downloadFile } = useFileDownloader()
 const AccountDetails = defineAsyncComponent(() => import('~/components/intern-details.vue'))
-const TimeLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
+const InternLog = defineAsyncComponent(() => import('~/components/time-log.vue')) 
 const route = useRoute()
 const router = useRouter()
 const internId = route.params.id as string
+
+function handleLogApproval() {
+  console.log('Approval event received on main page. Refreshing profile data!')
+  if (refreshProfile) {
+    refreshProfile()
+  }
+}
 
 function goBack(){
   router.back()
@@ -84,7 +111,7 @@ function goBack(){
 
 const items: TabsItem[] = [
   { slot: 'personalinfo', label: 'Personal Info' },
-  { slot: 'timelog', label: 'Time Log' },
+  { slot: 'internlog', label: 'Time Log' },
 ]
 
 const {
@@ -94,6 +121,11 @@ const {
   isEditing,
   avatarPreviewUrl,
   isModalOpen,
+  refresh: refreshProfile,
+  // FIX: Destructure the new state variables
+  isPasswordVisible,
+  passwordError,
+  isSaving,
   startEditing,
   cancelEditing,
   saveChanges,
@@ -101,4 +133,14 @@ const {
   handleStatusUpdate,
   handlePictureUpload,
 } = useInternProfile(internId)
+
+const handleExport = () => {
+		const exportUrl = `/api/interns/${internId}/export`
+		downloadFile(exportUrl, 'timelogs.csv')
+	}
+
+
+definePageMeta({
+  layout: 'admin'
+})
 </script>

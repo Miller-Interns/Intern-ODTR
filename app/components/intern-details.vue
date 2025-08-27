@@ -6,7 +6,7 @@
       </h2>
       <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3">
         <div class="form-field-container">
-          <label class="block text-sm font-medium leading-6 text-gray-700 dark:text-gray-200">First Name</label>
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">First Name</label>
           <div class="mt-2">
             <UInput v-if="isEditing" v-model="details.firstName" size="xl" class="w-full"/>
             <p v-else class="text-base text-black dark:text-white">{{ details.firstName || '-' }}</p>
@@ -33,6 +33,32 @@
             <p v-else class="text-base text-black dark:text-white">{{ details.email || '-' }}</p>
           </div>
         </div>
+
+        <!-- FIX: Added New Password Field, only visible in edit mode -->
+        <div v-if="isEditing" class="form-field-container">
+          <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">New Password (leave blank to keep current)</label>
+          <div class="mt-2">
+            <UInput
+              v-model="details.password"
+              :type="isPasswordVisible ? 'text' : 'password'"
+              placeholder="Enter new password"
+              size="xl"
+              class="w-full"
+            >
+              <template #trailing>
+                <UButton
+                  :icon="isPasswordVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                  variant="link"
+                  color="neutral"
+                  :padded="false"
+                  @click="$emit('togglePasswordVisibility')"
+                />
+              </template>
+            </UInput>
+             <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+          </div>
+        </div>
+
         <div class="form-field-container">
           <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">Contact Number</label>
           <div class="mt-2">
@@ -106,7 +132,11 @@ import { UFormField, UInput, UTextarea } from '#components';
 import type { InternDetails } from '~/types/Intern';
 
 defineProps<{
-  details: Partial<InternDetails>;
+  details: Partial<InternDetails> & { password?: string };
   isEditing: boolean;
+  isPasswordVisible?: boolean;
+  passwordError?: string | null;
 }>();
+
+defineEmits<{ (e: 'togglePasswordVisibility'): void }>();
 </script>

@@ -54,7 +54,7 @@
                     Hours Rendered
                   </p>
                   <p class="text-sm text-black dark:text-white">
-                    {{ intern.hoursCompleted ?? 0 }}/{{ intern.requiredHours }} hrs
+                    {{ (intern.hoursCompleted ?? 0).toFixed(2) }}/{{ intern.requiredHours }} hrs
                   </p>
                 </div>
               </div>
@@ -73,6 +73,11 @@
 
 <script setup lang="ts">
   import type { BatchDetailsData } from '~/types/Batch';
+  
+
+  definePageMeta({
+  layout: 'admin',
+})
 
   const route = useRoute()
   const batchId = route.params.id as string

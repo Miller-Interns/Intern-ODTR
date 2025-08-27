@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { createSchemaValidator } from '~/server/utils/create-schema-validator'
 import { internService, type InternWithUserAndBatchStatus } from '~/server/service/interns/intern.service'
 import { internFactory } from '~/server/factory/interns/intern.factory'
-import type { InternDetails } from '~/types/intern'
+import type { InternDetails } from '~/types/Intern'
 
 const dtoSchema = z.object({ id: z.string().min(1) })
 const validateDTO = createSchemaValidator(dtoSchema)
