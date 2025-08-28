@@ -132,11 +132,6 @@
               </template>
             </UCard>
           </div>
-          <UCard v-else class="w-full shadow-[0_5px_15px_rgba(0,0,0,0.1),_0_3px_6px_rgba(0,0,0,0.08)] box-shadow-[ 0px 4px 4px 0px #00000040]">
-            <div class="flex items-center justify-center text-center py-24">
-                <p class="text-regular text-gray-500 dark:text-gray-400">No previous batches found.</p>
-            </div>
-          </UCard>
         </section>
       </div>
     </div>
