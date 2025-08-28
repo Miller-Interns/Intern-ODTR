@@ -1,6 +1,6 @@
 import type { Selectable } from 'kysely'
 import type { Batch } from '../../app/server/db/types.d.ts'
-import type { InternWithDetails, InternSummary } from './Intern.js'
+import type { InternWithDetails, InternSummary } from '~/types/Intern.js'
 import type { InternLog } from './TimeLog.js'
 
 export type ActiveInternsApiResponse = {

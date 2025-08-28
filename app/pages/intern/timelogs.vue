@@ -24,7 +24,7 @@
 
 		<div
 			v-else-if="data?.timeLogs"
-			class="space-y-4 px-4"
+			class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
 		>
 			<div
 				v-if="data.timeLogs.length === 0"
@@ -101,10 +101,12 @@
 				Export DTR
 			</UButton>
 		</div>
-		<LayoutBottomNav />
 	</div>
 </template>
 
 <script setup lang="ts">
 	const { pending, error, data, formattedDate, formatTime, exportDTR } = useTimeLogs()
+	definePageMeta({
+		layout: 'intern',
+	})
 </script>

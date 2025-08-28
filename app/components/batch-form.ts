@@ -1,9 +1,7 @@
-
 import type { Batch } from '~/types/Types';
 import { Status } from '~/enum/enums';
 import { format, parse, isValid } from 'date-fns'
 import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
-
 
 export const useBatchForm = (batchId?: string) => {
   const submitted = ref(false)
@@ -13,7 +11,6 @@ export const useBatchForm = (batchId?: string) => {
     batch_number: '',
     start_date: format(new Date(), 'MM/dd/yyyy'),
     selectedSupervisorId: '',
-
   });
 
   const supervisorList = ref<{ label: string; value: string; icon: string}[]>([]);
@@ -24,28 +21,26 @@ export const useBatchForm = (batchId?: string) => {
 
   const isEditMode = !!batchId;
 
+  const calendarDate = computed({
+    get: () => {
+      if (!form.start_date) {
+        return undefined;
+      }
+      const jsDate = parse(form.start_date, 'MM/dd/yyyy', new Date());
+      if (!isValid(jsDate)) {
+        return undefined;
+      }
+      
+      return new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
+    },
 
-
-const calendarDate = computed({
-  get: () => {
-    if (!form.start_date) {
-      return undefined;
+    set: (value) => {
+      if (value) {
+        const jsDate = value.toDate(getLocalTimeZone());
+        form.start_date = format(jsDate, 'MM/dd/yyyy');
+      }
     }
-    const jsDate = parse(form.start_date, 'MM/dd/yyyy', new Date());
-    if (!isValid(jsDate)) {
-      return undefined;
-    }
-    
-    return new CalendarDate(jsDate.getFullYear(), jsDate.getMonth() + 1, jsDate.getDate());
-  },
-
-  set: (value) => {
-    if (value) {
-      const jsDate = value.toDate(getLocalTimeZone());
-      form.start_date = format(jsDate, 'MM/dd/yyyy');
-    }
-  }
-});
+  });
 
   const fetchSupervisors = async () => {
     try {
@@ -67,7 +62,6 @@ const calendarDate = computed({
     }
   };
 
-
   const loadBatchForEdit = async () => {
     if (!isEditMode) return;
     try {
@@ -84,56 +78,39 @@ const calendarDate = computed({
   };
    
 
-const  supervisorError=()=>{
- if (!form.selectedSupervisorId && submitted.value) {
-      return "Please select a supervisor.";
-    }
-    return undefined
-
-}
-
-const batchNumberError=()=>{
-if (!form.batch_number && submitted.value) {
-      return "Please input batch number.";
-    }
-    return undefined
-}
-     
-const startDateError =()=>{
- if (!form.start_date && submitted.value) {
-      return "Please input start date.";
-
-    }
-    return undefined
+  const  supervisorError=()=>{
+  if (!form.selectedSupervisorId && submitted.value) {
+        return "Please select a supervisor.";
+      }
+      return undefined
   }
+
+  const batchNumberError=()=>{
+  if (!form.batch_number && submitted.value) {
+        return "Please input batch number.";
+      }
+      return undefined
+  }
+      
+  const startDateError =()=>{
+  if (!form.start_date && submitted.value) {
+        return "Please input start date.";
+      }
+      return undefined
+    }
   
-
-       
   const submit = async () => {
-
     isLoading.value = true;
     error.value.message = null; 
     submitted.value = true
-if (!form.start_date) {
-  supervisorError()
-  isLoading.value = false;
-  return;
-}
-if (!form.batch_number ){
-batchNumberError()
-isLoading.value = false;
-return
-}
 
-if (!form.start_date ){
-startDateError()
-isLoading.value = false;
-return
-}
+    if (!form.start_date || !form.batch_number || !form.selectedSupervisorId) {
+        isLoading.value = false;
+        return;
+    }
 
     const endpoint = isEditMode ? '/api/batches/edit' : '/api/batches/Post-batch';
     const method = isEditMode ? 'PATCH'  : 'POST';
-
 
     const body: any = {
       batch_number: form.batch_number,
@@ -152,24 +129,18 @@ return
         description: `Batch ${form.batch_number} ${isEditMode ? 'updated' : 'added'} successfully`,
       });
       
-      await router.push('/admin/batches');
+      window.location.href = '/admin/batches';
 
     } catch (e: any) {
-  const errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
-   error.value.message = errorMessage;
-  if (e.statusCode === 409) {
-    error.value.message = errorMessage;
-  } else {
-    error.value.message = errorMessage;
-  }
-} finally {
+      const errorMessage = e.data?.statusMessage || 'An unexpected error occurred.';
+      error.value.message = errorMessage;
+    } finally {
       isLoading.value = false;
     }
   };
 
 
   Promise.all([
-    
     fetchSupervisors(),
     loadBatchForEdit(),
   ]).finally(() => {
@@ -177,7 +148,6 @@ return
   });
 
   return {
-
     supervisorError,
     batchNumberError,
     startDateError,

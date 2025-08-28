@@ -203,7 +203,6 @@
 				</UCard>
 			</div>
 		</div>
-		<LayoutBottomNav />
 	</div>
 </template>
 
@@ -230,4 +229,8 @@
 		progressPercentage,
 		handleTimeOut,
 	} = useDashboard(renderedHours, totalHours)
+
+	definePageMeta({
+		layout: 'intern',
+	})
 </script>

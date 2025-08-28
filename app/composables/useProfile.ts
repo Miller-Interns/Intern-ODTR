@@ -22,25 +22,28 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	const isEditing = ref(false)
 	const isSaving = ref(false)
 	const isUploading = ref(false)
+	const previewSrc = ref<string | null>(null)
+	const avatarFile = ref<File | null>(null)
 
 	const formState = ref({
-		first_name: '',
-		middle_name: '',
-		last_name: '',
+		firstName: '',
+		middleName: '',
+		lastName: '',
 		email: '',
 		password: '',
-		contact_number: '',
-		emergency_contact_person: '',
-		emergency_contact_number: '',
+		contactNumber: '',
+		emergencyContactPerson: '',
+		emergencyContactNumber: '',
 		school: '',
-		course: '',
-		year: '',
-		required_hours: 0,
+		courseYear: '',
+		requiredHours: 0,
 		role: '',
 		notes: '',
 	})
 
-	const { data, pending, error, refresh } = useFetch<ProfileDataResponse>('/api/profile/fetch')
+	const { data, pending, error, refresh } = useFetch<ProfileDataResponse>('/api/profile/fetch', {
+		server: false,
+	})
 
 	const validate = (state: any): FormError[] => {
 		const errors = []
@@ -56,27 +59,22 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		fileInput.value?.click()
 	}
 
-	async function handleFileChange(event: Event) {
+	function stageFile(file: File) {
+		avatarFile.value = file;
+		previewSrc.value = URL.createObjectURL(file);
+	}
+
+	function handleFileChange(event: Event) {
 		const input = event.target as HTMLInputElement
 		const file = input.files?.[0]
-		if (!file) return
-
-		isUploading.value = true
-		const formData = new FormData()
-		formData.append('picture', file)
-
-		try {
-			await $fetch('/api/profile/picture', {
-				method: 'POST',
-				body: formData,
-			})
-			toast.add({ title: 'Profile picture updated!', color: 'success' })
-			await refresh()
-		} catch (err: any) {
-			toast.add({ title: 'Error', description: err.data?.message || 'Could not upload picture.', color: 'error' })
-		} finally {
-			isUploading.value = false
-			if (fileInput.value) fileInput.value.value = ''
+		if (file) {
+			stageFile(file);
+		}
+	}
+	
+	function handleFileUpload(file: File) {
+		if (file) {
+			stageFile(file);
 		}
 	}
 
@@ -84,19 +82,17 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		if (data.value?.profile) {
 			const profile = data.value.profile
 			formState.value = {
-				...formState.value,
-				first_name: profile.first_name,
-				middle_name: profile.middle_name || '',
-				last_name: profile.last_name,
+				firstName: profile.first_name,
+				middleName: profile.middle_name || '',
+				lastName: profile.last_name,
 				email: profile.email,
 				password: '',
-				contact_number: profile.contact_number || '',
-				emergency_contact_person: profile.emergency_contact_person || '',
-				emergency_contact_number: profile.emergency_contact_number || '',
+				contactNumber: profile.contact_number || '',
+				emergencyContactPerson: profile.emergency_contact_person || '',
+				emergencyContactNumber: profile.emergency_contact_number || '',
 				school: profile.school,
-				course: profile.course || '',
-				year: profile.year || '',
-				required_hours: profile.required_hours,
+				courseYear: `${profile.course || ''} - ${profile.year || ''}`,
+				requiredHours: profile.required_hours,
 				role: profile.role || '',
 				notes: profile.notes || '',
 			}
@@ -107,14 +103,44 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 	function cancelEdit() {
 		isEditing.value = false
 		passwordError.value = undefined
+		previewSrc.value = null; 
+		avatarFile.value = null;
 	}
 
 	async function handleSaveChanges() {
 		passwordError.value = undefined
 		isSaving.value = true
 		try {
-			const payload = { ...formState.value }
+			if (avatarFile.value) {
+				isUploading.value = true;
+				const formData = new FormData()
+				formData.append('picture', avatarFile.value)
+				await $fetch('/api/profile/picture', {
+					method: 'POST',
+					body: formData,
+				})
+				isUploading.value = false;
+			}
+
+			const [course, year] = formState.value.courseYear.split('-').map(s => s.trim());
+			const payload = {
+				first_name: formState.value.firstName,
+				middle_name: formState.value.middleName,
+				last_name: formState.value.lastName,
+				email: formState.value.email,
+				password: formState.value.password,
+				contact_number: formState.value.contactNumber,
+				emergency_contact_person: formState.value.emergencyContactPerson,
+				emergency_contact_number: formState.value.emergencyContactNumber,
+				school: formState.value.school,
+				course: course,
+				year: year,
+				required_hours: formState.value.requiredHours,
+				role: formState.value.role,
+				notes: formState.value.notes,
+			}
 			await $fetch('/api/profile/update', { method: 'PUT', body: payload })
+			
 			toast.add({ title: 'Profile updated successfully!', color: 'success' })
 			isEditing.value = false
 			await refresh()
@@ -122,6 +148,9 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 			toast.add({ title: 'Error', description: err.data?.message || 'Could not update profile.', color: 'error' })
 		} finally {
 			isSaving.value = false
+			isUploading.value = false;
+			avatarFile.value = null;
+			previewSrc.value = null;
 		}
 	}
 
@@ -140,6 +169,7 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		isSaving,
 		isUploading,
 		formState,
+		previewSrc,
 		isPasswordVisible,
 		passwordError,
 		isLogoutModalOpen,
@@ -147,6 +177,7 @@ export function useProfile(fileInput: Ref<HTMLInputElement | null>) {
 		validate,
 		openFileInput,
 		handleFileChange,
+		handleFileUpload,
 		enterEditMode,
 		handleSaveChanges,
 		performLogout,

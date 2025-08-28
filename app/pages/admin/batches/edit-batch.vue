@@ -4,9 +4,7 @@
     <div class=" items-start gap-4 max-w-md mx-auto w-full">
 
       <div class="flex items-center space-x-4 mb-4">
-        <NuxtLink to="/admin/batches">
-          <UButton icon="i-lucide-arrow-left" color=secondary variant="ghost" aria-label="Go back" />
-          </NuxtLink>
+        <UButton icon="i-lucide-arrow-left" color=secondary variant="ghost" aria-label="Go back" @click="goBack"/>
           <h1 class="text-2xl font-semibold md:text-2xl  text-gray-900 dark:text-white ">
             Edit Batch
           </h1>
@@ -66,9 +64,14 @@
 
 <script setup lang="ts">
 import { useBatchForm } from '~/components/batch-form';
-
+import { useRoute } from 'vue-router'
 
 const route = useRoute();
+const router = useRouter()
+
+function goBack(){
+  router.back()
+}
 const batchId = route.query.id as string;
 definePageMeta({
 		layout: 'admin',

@@ -55,6 +55,7 @@ model Batch {
   @@map("batches")
 }
 
+
 model Intern {
   id                       String  @id @default(uuid())
   user                     User    @relation(fields: [user_id], references: [id])
