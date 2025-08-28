@@ -29,7 +29,6 @@
       <UTabs :items="items" variant="link" :ui="{ trigger: 'grow' }"  class="w-full">
         <template #personalinfo>
           <UCard class="mt-4">
-            <!-- FIX: Pass the new props and handle the event -->
             <AccountDetails 
               :details="form" 
               :is-editing="isEditing"
@@ -122,7 +121,6 @@ const {
   avatarPreviewUrl,
   isModalOpen,
   refresh: refreshProfile,
-  // FIX: Destructure the new state variables
   isPasswordVisible,
   passwordError,
   isSaving,
